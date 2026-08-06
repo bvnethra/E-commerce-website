@@ -3,20 +3,24 @@
 **/dist/
 **/node_modules/
 
-# OS Files
+# System Files
 .DS_Store
 Thumbs.db
 
-# IDE and Editor configs
-.idea/
+# Editor Files
 .vscode/
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
 
-# Logging and temp files
+# Temporary Files
+tmp/
+temp/
 *.log
 npm-debug.log*
 yarn-debug.log*
