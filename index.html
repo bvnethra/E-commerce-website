@@ -135,21 +135,24 @@
         </div>
 
         <!-- Cart Icon -->
-        <button class="cart-btn" aria-label="Shopping Cart" title="Shopping Cart">
+        <button class="cart-btn" id="header-cart-btn" aria-label="Shopping Cart" title="Shopping Cart">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           <span id="cart-badge" class="cart-badge">2</span>
         </button>
 
         <!-- User Profile Avatar Quick Access -->
-        <div class="header-avatar">
+        <div class="header-avatar" id="header-profile-btn" style="cursor: pointer;" title="View Profile">
           <img src="assets/images/cat_men.png" alt="User profile" class="avatar-img">
         </div>
       </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="hero-content">
+    <!-- Main View Container -->
+    <div id="view-container">
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-content">
         <span class="hero-tagline">NEW COLLECTION</span>
         <h2 class="hero-headline">STYLE THAT<br>MOVES <span class="highlight-text">YOU</span></h2>
         <p class="hero-description">Discover everything you need to elevate your everyday.</p>
@@ -462,6 +465,7 @@
         </div>
       </div>
     </footer>
+    </div> <!-- End #view-container -->
   </main>
 
   <!-- JavaScript -->
