@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: aura-mysql-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: aura_ecommerce
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ../database/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: aura-backend-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/aura_ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - db
+
+  customer-portal:
+    build:
+      context: ../customer-portal
+      dockerfile: Dockerfile
+    container_name: aura-customer-portal
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  admin-portal:
+    build:
+      context: ../admin-portal
+      dockerfile: Dockerfile
+    container_name: aura-admin-portal
+    restart: always
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
