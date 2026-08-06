@@ -11,21 +11,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart_items", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_cart_variant", columnNames = {"cart_id", "product_id", "product_variant_id"})
-})
+@Table(name = "inventory")
 @Getter
 @Setter
 @NoArgsConstructor
-public class CartItem {
+public class Inventory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
@@ -37,7 +31,11 @@ public class CartItem {
 
     @NotNull
     @Column(nullable = false)
-    private Integer quantity = 1;
+    private Integer quantity = 0;
+
+    @NotNull
+    @Column(name = "low_stock_threshold", nullable = false)
+    private Integer lowStockThreshold = 10;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -47,10 +45,10 @@ public class CartItem {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public CartItem(Cart cart, Product product, ProductVariant productVariant, Integer quantity) {
-        this.cart = cart;
+    public Inventory(Product product, ProductVariant productVariant, Integer quantity, Integer lowStockThreshold) {
         this.product = product;
         this.productVariant = productVariant;
         this.quantity = quantity;
+        this.lowStockThreshold = lowStockThreshold;
     }
 }

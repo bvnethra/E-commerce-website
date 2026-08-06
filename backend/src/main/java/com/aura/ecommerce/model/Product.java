@@ -43,16 +43,25 @@ public class Product {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @NotNull
-    @Column(name = "stock_quantity", nullable = false)
-    private Integer stockQuantity = 0;
-
     @Column(name = "image_url")
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ProductVariant> variants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Inventory> inventoryList = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
@@ -65,13 +74,13 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Product(String name, String slug, String description, BigDecimal price, Integer stockQuantity, String imageUrl, Category category) {
+    public Product(String name, String slug, String description, BigDecimal price, String imageUrl, Category category, Brand brand) {
         this.name = name;
         this.slug = slug;
         this.description = description;
         this.price = price;
-        this.stockQuantity = stockQuantity;
         this.imageUrl = imageUrl;
         this.category = category;
+        this.brand = brand;
     }
 }

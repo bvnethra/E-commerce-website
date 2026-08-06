@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_order_product", columnNames = {"order_id", "product_id"})
+    @UniqueConstraint(name = "uq_order_item_variant", columnNames = {"order_id", "product_id", "product_variant_id"})
 })
 @Getter
 @Setter
@@ -29,6 +29,10 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_variant_id")
+    private ProductVariant productVariant;
+
     @NotNull
     @Column(nullable = false)
     private Integer quantity;
@@ -37,9 +41,10 @@ public class OrderItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    public OrderItem(Order order, Product product, Integer quantity, BigDecimal price) {
+    public OrderItem(Order order, Product product, ProductVariant productVariant, Integer quantity, BigDecimal price) {
         this.order = order;
         this.product = product;
+        this.productVariant = productVariant;
         this.quantity = quantity;
         this.price = price;
     }

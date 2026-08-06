@@ -1,43 +1,44 @@
 package com.aura.ecommerce.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart_items", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_cart_variant", columnNames = {"cart_id", "product_id", "product_variant_id"})
-})
+@Table(name = "product_variants")
 @Getter
 @Setter
 @NoArgsConstructor
-public class CartItem {
+public class ProductVariant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id")
-    private ProductVariant productVariant;
+    @NotBlank
+    @Size(max = 100)
+    @Column(nullable = false, unique = true)
+    private String sku;
 
     @NotNull
-    @Column(nullable = false)
-    private Integer quantity = 1;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @Column(name = "sku_details")
+    private String skuDetails;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -47,10 +48,10 @@ public class CartItem {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public CartItem(Cart cart, Product product, ProductVariant productVariant, Integer quantity) {
-        this.cart = cart;
+    public ProductVariant(Product product, String sku, BigDecimal price, String skuDetails) {
         this.product = product;
-        this.productVariant = productVariant;
-        this.quantity = quantity;
+        this.sku = sku;
+        this.price = price;
+        this.skuDetails = skuDetails;
     }
 }

@@ -42,6 +42,10 @@ public class Order {
     private BigDecimal totalAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shipping_address_id")
     private Address shippingAddress;
 
@@ -55,6 +59,9 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Payment payment;
 
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Shipment shipment;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -63,10 +70,11 @@ public class Order {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Order(User user, BigDecimal totalAmount, Address shippingAddress, Address billingAddress) {
+    public Order(User user, BigDecimal totalAmount, Address shippingAddress, Address billingAddress, Coupon coupon) {
         this.user = user;
         this.totalAmount = totalAmount;
         this.shippingAddress = shippingAddress;
         this.billingAddress = billingAddress;
+        this.coupon = coupon;
     }
 }
