@@ -2808,10 +2808,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nameMatch && !catMatch && !brandMatch && !descMatch) return false;
       }
 
-      // 2. Multi-Select Categories
+      // 2. Multi-Select Categories (with sub-category mapping support)
       if (f.categories && f.categories.length > 0) {
         const catName = p.cat.toLowerCase();
-        const matchesCategory = f.categories.some(c => c.toLowerCase() === catName);
+        const categoryMapping = {
+          'men': ['smart watch', 'shoes', 'accessories'],
+          'women': ['smart watch', 'earbuds', 'backpack'],
+          'electronics': ['smart watch', 'earbuds', 'camera'],
+          'shoes': ['shoes'],
+          'accessories': ['accessories', 'backpack']
+        };
+
+        const matchesCategory = f.categories.some(c => {
+          const lowerC = c.toLowerCase();
+          const mappedCats = categoryMapping[lowerC] || [lowerC];
+          return mappedCats.includes(catName);
+        });
+
         if (!matchesCategory) return false;
       }
 
@@ -2894,10 +2907,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderProductListingView(overrideCategory = null) {
     if (!viewContainer) return;
 
-    if (overrideCategory) {
-      if (!AppState.listingFilters.categories.includes(overrideCategory)) {
-        AppState.listingFilters.categories = [overrideCategory];
-      }
+    const cat = overrideCategory || AppState.selectedCategory;
+    if (cat) {
+      AppState.listingFilters.categories = [cat];
+      AppState.selectedCategory = null;
     }
 
     syncFiltersToURL();
@@ -5038,19 +5051,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* Category Card Filter Router */
-  document.querySelectorAll('.category-card[data-category]').forEach(card => {
-    card.addEventListener('click', (e) => {
-      e.preventDefault();
-      const catName = card.getAttribute('data-category');
-      if (catName) {
-        AppState.selectedCategory = catName;
-        AppState.searchQuery = '';
-        renderView('shop');
-        showToast(`Filtered by ${catName}`, 'info');
+  /* Category Card Filter Router (Delegated for dynamic views) */
+  if (viewContainer) {
+    viewContainer.addEventListener('click', (e) => {
+      const card = e.target.closest('.category-card[data-category]');
+      if (card) {
+        e.preventDefault();
+        const catName = card.getAttribute('data-category');
+        if (catName) {
+          AppState.selectedCategory = catName;
+          AppState.searchQuery = '';
+          renderView('shop');
+          showToast(`Filtered by ${catName}`, 'info');
+        }
       }
     });
-  });
+  }
 
   // Initial bindings for static elements on initial DOM load
   loadFiltersFromURL();
