@@ -726,6 +726,70 @@
     </div>
   </div>
 
+  <!-- Manage Addresses Modal Overlay -->
+  <div id="address-modal-overlay" class="address-modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="address-modal-card">
+      <div class="address-modal-header">
+        <h3>Manage Delivery Addresses</h3>
+        <button id="address-modal-close" class="address-modal-close-btn" aria-label="Close modal">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <div class="address-modal-body">
+        <!-- Button to Add New Address -->
+        <button id="add-new-address-trigger" class="btn-primary-action" style="width: 100%; justify-content: center; margin-bottom: 20px; padding: 12px; border-radius: var(--radius-md); font-weight: 700;">
+          <span>+ Add New Address</span>
+        </button>
+
+        <!-- Address Form (Hidden by default) -->
+        <form id="address-form" style="display: none; flex-direction: column; gap: 14px; margin-bottom: 20px; padding: 18px; background: var(--bg-hover); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+          <h4 id="address-form-title" style="margin-top: 0; font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">Add New Address</h4>
+          <input type="hidden" id="address-edit-id">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input type="text" id="address-name" class="address-input" placeholder="Full Name" required>
+            <input type="tel" id="address-phone" class="address-input" placeholder="Mobile Number (10 digits)" pattern="[0-9]{10}" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+            <input type="text" id="address-pincode" class="address-input" placeholder="Pincode" required>
+            <input type="text" id="address-line" class="address-input" placeholder="Flat, House no., Building, MG Road" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input type="text" id="address-city" class="address-input" placeholder="Town/City" required>
+            <input type="text" id="address-state" class="address-input" placeholder="State" required>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
+            <div style="display: flex; gap: 10px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                <input type="radio" name="address-type" value="Home" checked> Home
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                <input type="radio" name="address-type" value="Work"> Work
+              </label>
+            </div>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+              <input type="checkbox" id="address-default"> Set as Default Address
+            </label>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 4px;">
+            <button type="button" id="address-form-cancel" class="btn-secondary-action" style="flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-md);">Cancel</button>
+            <button type="submit" class="btn-primary-action" style="flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; justify-content: center; border-radius: var(--radius-md);">Save Address</button>
+          </div>
+        </form>
+
+        <!-- Saved Addresses List Container -->
+        <div id="address-list-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 4px;">
+          <!-- Dynamically rendered address cards -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Flipkart-inspired Authentication Modal Overlay -->
   <div id="auth-modal-overlay" class="fk-modal-overlay">
     <div class="fk-auth-modal" role="dialog" aria-modal="true" aria-labelledby="fk-banner-title">

@@ -170,6 +170,275 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Auth User
   AppState.user = AuthService.getUser();
 
+  /* ==========================================================================
+     Saved Address Management Service
+     ========================================================================== */
+  const AddressService = {
+    init() {
+      if (!localStorage.getItem('aura_addresses')) {
+        const defaultAddr = [
+          {
+            id: 'addr_1',
+            name: AppState.user?.name || 'Vishal',
+            phone: AppState.user?.phone || '8120089832',
+            pincode: '560001',
+            addressLine: 'Flat 402, Skyline Residency, MG Road',
+            city: 'Bengaluru',
+            state: 'Karnataka',
+            type: 'Home',
+            isDefault: true
+          }
+        ];
+        localStorage.setItem('aura_addresses', JSON.stringify(defaultAddr));
+      }
+      this.updateHeaderLocation();
+    },
+
+    getAll() {
+      try {
+        return JSON.parse(localStorage.getItem('aura_addresses')) || [];
+      } catch (e) {
+        return [];
+      }
+    },
+
+    getDefault() {
+      const addrs = this.getAll();
+      return addrs.find(a => a.isDefault) || addrs[0] || null;
+    },
+
+    save(addresses) {
+      localStorage.setItem('aura_addresses', JSON.stringify(addresses));
+      this.updateHeaderLocation();
+      
+      // Update UI if profile page is currently open
+      const profileText = document.getElementById('profile-saved-address-text');
+      if (profileText) {
+        const def = this.getDefault();
+        profileText.textContent = def 
+          ? `${def.addressLine}, ${def.city}, ${def.state} - ${def.pincode}`
+          : 'No address saved yet.';
+      }
+    },
+
+    add(addr) {
+      const addrs = this.getAll();
+      const newAddr = {
+        id: 'addr_' + Date.now(),
+        ...addr,
+        isDefault: addr.isDefault || addrs.length === 0
+      };
+
+      if (newAddr.isDefault) {
+        addrs.forEach(a => a.isDefault = false);
+      }
+
+      addrs.push(newAddr);
+      this.save(addrs);
+      return newAddr;
+    },
+
+    update(id, updatedFields) {
+      const addrs = this.getAll();
+      const idx = addrs.findIndex(a => a.id === id);
+      if (idx !== -1) {
+        if (updatedFields.isDefault) {
+          addrs.forEach(a => a.isDefault = false);
+        }
+        addrs[idx] = { ...addrs[idx], ...updatedFields };
+        this.save(addrs);
+      }
+    },
+
+    delete(id) {
+      let addrs = this.getAll();
+      const toDelete = addrs.find(a => a.id === id);
+      addrs = addrs.filter(a => a.id !== id);
+
+      if (toDelete && toDelete.isDefault && addrs.length > 0) {
+        addrs[0].isDefault = true;
+      }
+
+      this.save(addrs);
+    },
+
+    setDefault(id) {
+      const addrs = this.getAll();
+      addrs.forEach(a => {
+        a.isDefault = (a.id === id);
+      });
+      this.save(addrs);
+    },
+
+    updateHeaderLocation() {
+      const currentLocationLabel = document.getElementById('current-location');
+      if (currentLocationLabel) {
+        const def = this.getDefault();
+        if (def && AuthService.isAuthenticated()) {
+          currentLocationLabel.textContent = `${def.city} - ${def.pincode}`;
+        } else {
+          currentLocationLabel.textContent = 'India';
+        }
+      }
+    }
+  };
+
+  // Initialize Address Service
+  AddressService.init();
+
+  function initAddressModal() {
+    const overlay = document.getElementById('address-modal-overlay');
+    const closeBtn = document.getElementById('address-modal-close');
+    const addTrigger = document.getElementById('add-new-address-trigger');
+    const form = document.getElementById('address-form');
+    const formCancel = document.getElementById('address-form-cancel');
+    const listContainer = document.getElementById('address-list-container');
+    
+    if (!overlay) return;
+
+    // Open Modal function
+    window.openAddressModal = function() {
+      overlay.classList.remove('hidden');
+      renderAddressList();
+      form.reset();
+      form.style.display = 'none';
+      addTrigger.style.display = 'block';
+      document.getElementById('address-edit-id').value = '';
+      document.getElementById('address-form-title').textContent = 'Add New Address';
+    };
+
+    // Close Modal function
+    window.closeAddressModal = function() {
+      overlay.classList.add('hidden');
+    };
+
+    closeBtn.addEventListener('click', window.closeAddressModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) window.closeAddressModal();
+    });
+
+    addTrigger.addEventListener('click', () => {
+      addTrigger.style.display = 'none';
+      form.style.display = 'flex';
+      form.reset();
+      document.getElementById('address-edit-id').value = '';
+      document.getElementById('address-form-title').textContent = 'Add New Address';
+    });
+
+    formCancel.addEventListener('click', () => {
+      form.reset();
+      form.style.display = 'none';
+      addTrigger.style.display = 'block';
+    });
+
+    // Handle Form Submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('address-edit-id').value;
+      const name = document.getElementById('address-name').value.trim();
+      const phone = document.getElementById('address-phone').value.trim();
+      const pincode = document.getElementById('address-pincode').value.trim();
+      const addressLine = document.getElementById('address-line').value.trim();
+      const city = document.getElementById('address-city').value.trim();
+      const state = document.getElementById('address-state').value.trim();
+      const type = form.elements['address-type'].value;
+      const isDefault = document.getElementById('address-default').checked;
+
+      const addrData = { name, phone, pincode, addressLine, city, state, type, isDefault };
+
+      if (id) {
+        AddressService.update(id, addrData);
+        showToast('Address updated successfully', 'success');
+      } else {
+        AddressService.add(addrData);
+        showToast('Address added successfully', 'success');
+      }
+
+      form.reset();
+      form.style.display = 'none';
+      addTrigger.style.display = 'block';
+      renderAddressList();
+    });
+
+    // Render list
+    function renderAddressList() {
+      const addrs = AddressService.getAll();
+      listContainer.innerHTML = '';
+
+      if (addrs.length === 0) {
+        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.88rem; margin: 20px 0;">No saved addresses found. Add one above!</p>';
+        return;
+      }
+
+      addrs.forEach(addr => {
+        const card = document.createElement('div');
+        card.className = `address-card ${addr.isDefault ? 'default-address' : ''}`;
+        
+        card.innerHTML = `
+          <div class="address-card-header">
+            <span class="address-badge ${addr.isDefault ? 'default' : ''}">
+              ${addr.type} ${addr.isDefault ? '(Default)' : ''}
+            </span>
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-accent); cursor: pointer;" class="address-set-default-btn" data-id="${addr.id}">
+              ${addr.isDefault ? '' : 'Set as Default'}
+            </div>
+          </div>
+          <div style="margin-top: 4px;">
+            <span class="address-card-name" style="font-weight: 700;">${addr.name}</span>
+            <span class="address-card-phone" style="margin-left: 8px;">${addr.phone}</span>
+          </div>
+          <div class="address-card-details" style="margin-top: 4px;">
+            ${addr.addressLine}, ${addr.city}, ${addr.state} - ${addr.pincode}
+          </div>
+          <div class="address-card-actions">
+            <button class="address-action-btn edit" data-id="${addr.id}">Edit</button>
+            <button class="address-action-btn delete" data-id="${addr.id}" style="color: #ef4444;">Delete</button>
+          </div>
+        `;
+
+        // Bind events
+        card.querySelector('.edit').addEventListener('click', () => {
+          document.getElementById('address-edit-id').value = addr.id;
+          document.getElementById('address-name').value = addr.name;
+          document.getElementById('address-phone').value = addr.phone;
+          document.getElementById('address-pincode').value = addr.pincode;
+          document.getElementById('address-line').value = addr.addressLine;
+          document.getElementById('address-city').value = addr.city;
+          document.getElementById('address-state').value = addr.state;
+          form.elements['address-type'].value = addr.type;
+          document.getElementById('address-default').checked = addr.isDefault;
+
+          document.getElementById('address-form-title').textContent = 'Edit Address';
+          addTrigger.style.display = 'none';
+          form.style.display = 'flex';
+          form.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        card.querySelector('.delete').addEventListener('click', () => {
+          if (confirm('Are you sure you want to delete this address?')) {
+            AddressService.delete(addr.id);
+            showToast('Address deleted successfully', 'info');
+            renderAddressList();
+          }
+        });
+
+        const setDefaultBtn = card.querySelector('.address-set-default-btn');
+        if (setDefaultBtn && !addr.isDefault) {
+          setDefaultBtn.addEventListener('click', () => {
+            AddressService.setDefault(addr.id);
+            showToast('Default address changed', 'success');
+            renderAddressList();
+          });
+        }
+
+        listContainer.appendChild(card);
+      });
+    }
+  }
+
+  // Initialize Address Modal triggers
+  initAddressModal();
+
   function requireAuth(actionType, payload, callback) {
     if (AuthService.isAuthenticated()) {
       callback();
@@ -246,6 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       if (loginTrigger) loginTrigger.style.display = 'flex';
       if (userTrigger) userTrigger.style.display = 'none';
+    }
+    if (typeof AddressService !== 'undefined') {
+      AddressService.updateHeaderLocation();
     }
   }
 
@@ -420,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (menuProfile) menuProfile.addEventListener('click', () => { userMenu.classList.remove('show'); renderView('profile'); });
     if (menuOrders) menuOrders.addEventListener('click', () => { userMenu.classList.remove('show'); renderView('orders'); });
     if (menuWishlist) menuWishlist.addEventListener('click', () => { userMenu.classList.remove('show'); renderView('wishlist'); });
-    if (menuAddresses) menuAddresses.addEventListener('click', () => { userMenu.classList.remove('show'); requireAuth('ADDRESSES', {}, () => showToast('Managing delivery addresses', 'info')); });
+    if (menuAddresses) menuAddresses.addEventListener('click', () => { userMenu.classList.remove('show'); requireAuth('ADDRESSES', {}, () => { if (window.openAddressModal) window.openAddressModal(); }); });
     if (menuLogout) menuLogout.addEventListener('click', () => { userMenu.classList.remove('show'); AuthService.logout(); });
 
     // Mode View Switchers & Social Login
@@ -3193,6 +3465,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (viewName === 'profile') {
       const u = AuthService.getUser() || { name: 'User', email: 'user@example.com', phone: '+91 98765 43210' };
       const initials = (u.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      const defaultAddr = typeof AddressService !== 'undefined' ? AddressService.getDefault() : null;
+      const defaultAddressString = defaultAddr 
+        ? `${defaultAddr.addressLine}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
+        : 'No address saved yet.';
 
       contentHtml = `
         <div class="view-section-header">
@@ -3219,7 +3495,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
             <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
               <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Saved Address</h4>
-              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">Flat 402, Skyline Residency, MG Road, Bengaluru, Karnataka - 560001</p>
+              <p id="profile-saved-address-text" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">${defaultAddressString}</p>
               <button id="profile-manage-address-btn" class="btn-secondary-action" style="padding: 8px 16px; font-size: 0.85rem;">Manage Addresses</button>
             </div>
             <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
@@ -3250,7 +3526,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (addressBtn) {
         addressBtn.addEventListener('click', () => {
-          requireAuth('ADDRESSES', {}, () => showToast('Address management opened', 'info'));
+          requireAuth('ADDRESSES', {}, () => { if (window.openAddressModal) window.openAddressModal(); });
         });
       }
       if (logoutBtn) {
