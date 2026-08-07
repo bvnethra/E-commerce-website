@@ -159,6 +159,48 @@ function initializeAdminDatabases() {
       }
     }
   } catch (e) {}
+
+  // 6. Categories Database initialization fallback
+  if (!localStorage.getItem('shopsphere_categories')) {
+    const defaultCategories = [
+      { name: 'Men', subtitle: 'Clothing & Accessories', bg: '#e0f2fe', img: 'assets/images/cat_accessories.png' },
+      { name: 'Women', subtitle: 'Clothing & Fashion', bg: '#fce7f3', img: 'assets/images/cat_accessories.png' },
+      { name: 'Electronics', subtitle: 'Gadgets & Devices', bg: '#dcfce7', img: 'assets/images/cat_accessories.png' },
+      { name: 'Accessories', subtitle: 'Daily Essentials', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' }
+    ];
+    localStorage.setItem('shopsphere_categories', JSON.stringify(defaultCategories));
+  }
+
+  // 7. Products Database initialization fallback
+  if (!localStorage.getItem('shopsphere_products')) {
+    const defaultProducts = [
+      {
+        id: 1,
+        name: 'Noise Ultra 2 Max',
+        cat: 'Smart Watch',
+        brand: 'Noise',
+        price: '₹4,999',
+        originalPrice: '₹6,999',
+        numericPrice: 4999,
+        discount: 28,
+        badge: '-28%',
+        rating: 4.8,
+        reviewCount: 342,
+        inStock: true,
+        stockCount: 14,
+        sku: 'SKU-NWT-9021',
+        deliveryBadge: 'Express Shipping in 2 Days',
+        warranty: '1 Year Brand Warranty',
+        returnPolicy: '30 Days Money Back Guarantee',
+        sellerInfo: 'Hype Direct Official Store • Verified Retailer',
+        shortDesc: 'Amoled display smartwatch with Bluetooth calling, 100+ sports modes, and 7-day battery backup.',
+        description: 'Experience next-gen smart wearable tech with Noise Ultra 2 Max. Features an ultra-bright AMOLED display, stainless steel dial frame, real-time SpO2 & heart rate monitoring, and seamless Bluetooth HD calling.',
+        img: 'assets/images/prod_watch.png',
+        images: ['assets/images/prod_watch.png']
+      }
+    ];
+    localStorage.setItem('shopsphere_products', JSON.stringify(defaultProducts));
+  }
 }
 
 /* ==========================================================================
