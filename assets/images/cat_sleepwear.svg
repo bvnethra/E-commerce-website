@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradSleep" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff" />
+      <stop offset="100%" stop-color="#fae8ff" />
+    </linearGradient>
+    <linearGradient id="maskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#7e22ce" />
+    </linearGradient>
+    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#eab308" />
+    </linearGradient>
+    <filter id="shadowSleep" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#6b21a8" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" rx="32" fill="url(#bgGradSleep)" />
+
+  <g filter="url(#shadowSleep)" transform="translate(200, 200)">
+    <!-- Crescent Moon -->
+    <path d="M-40,-70 A 55 55 0 1 0 40,30 A 42 42 0 1 1 -40,-70 Z" fill="url(#moonGrad)" transform="translate(20, -20) rotate(-15)" />
+
+    <!-- Sleep Mask -->
+    <path d="M-75,10 C-75,-15 -45,-15 -20,5 C-5,15 5,15 20,5 C45,-15 75,-15 75,10 C75,35 45,45 20,30 C5,20 -5,20 -20,30 C-45,45 -75,35 -75,10 Z" fill="url(#maskGrad)" />
+    
+    <!-- Eyelash detail on mask -->
+    <path d="M-45,12 Q-35,22 -25,12 M-40,18 L-42,26 M-35,19 L-35,28 M-30,18 L-28,26" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" />
+    <path d="M25,12 Q35,22 45,12 M30,18 L28,26 M35,19 L35,28 M40,18 L42,26" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" />
+
+    <!-- Strap -->
+    <path d="M-75,10 C-90,10 -90,0 -75,-5" stroke="#a855f7" stroke-width="6" fill="none" stroke-linecap="round" />
+    <path d="M75,10 C90,10 90,0 75,-5" stroke="#a855f7" stroke-width="6" fill="none" stroke-linecap="round" />
+  </g>
+</svg>

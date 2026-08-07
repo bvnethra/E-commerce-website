@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradOffice" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed" />
+      <stop offset="100%" stop-color="#ffedd5" />
+    </linearGradient>
+    <linearGradient id="bookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#c2410c" />
+    </linearGradient>
+    <linearGradient id="penGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="shadowOffice" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#7c2d12" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" rx="32" fill="url(#bgGradOffice)" />
+
+  <g filter="url(#shadowOffice)" transform="translate(200, 200)">
+    <!-- Notebook -->
+    <rect x="-60" y="-70" width="100" height="130" rx="10" fill="url(#bookGrad)" />
+    <!-- Notebook Spiral -->
+    <line x1="-50" y1="-60" x2="-50" y2="50" stroke="#ffffff" stroke-width="4" stroke-dasharray="6 6" />
+    <rect x="-40" y="-50" width="60" height="8" rx="4" fill="#ffedd5" opacity="0.8" />
+
+    <!-- Pen -->
+    <rect x="25" y="-60" width="16" height="110" rx="8" fill="url(#penGrad)" transform="rotate(25)" />
+    <path d="M25,50 L33,65 L41,50 Z" fill="#78350f" transform="rotate(25)" />
+  </g>
+</svg>
