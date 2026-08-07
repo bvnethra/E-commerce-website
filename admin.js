@@ -452,9 +452,31 @@ function renderOrdersTable() {
   }
 
   orders.forEach(order => {
-    const addr = order.address || {};
-    const addrStr = `${addr.line1 || ''}, ${addr.line2 ? addr.line2 + ', ' : ''}${addr.city || ''}, ${addr.state || ''} - ${addr.zip || ''}`;
-    const itemsSummary = (order.items || []).map(it => `${it.name} (x${it.quantity})`).join(', ');
+    const addrStr = typeof order.address === 'object' 
+      ? `${order.address.line1 || ''}, ${order.address.city || ''}` 
+      : (order.address || 'N/A');
+    const itemsSummary = (order.itemsDetail || []).map(it => `${it.name} (x${it.quantity})`).join(', ') || `${order.items || 1} items`;
+
+    let statusActionHtml = '';
+    const statusUpper = (order.status || 'PLACED').toUpperCase();
+    if (statusUpper === 'PROCESSING' || statusUpper === 'PLACED') {
+      statusActionHtml = `
+        <div style="display:flex; gap: 8px;">
+          <button class="btn" style="padding: 5px 10px; font-size: 11.5px; background-color: var(--color-success); color: white;" onclick="approveOrder('${order.id}', true)">Accept</button>
+          <button class="btn" style="padding: 5px 10px; font-size: 11.5px; background-color: var(--color-danger); color: white;" onclick="approveOrder('${order.id}', false)">Reject</button>
+        </div>
+      `;
+    } else {
+      statusActionHtml = `
+        <select class="form-control" style="padding: 4px 8px; font-size: 12px; height: auto;" onchange="updateOrderStatus('${order.id}', this.value)">
+          <option value="PLACED" ${order.status === 'PLACED' ? 'selected' : ''}>Placed</option>
+          <option value="PACKED" ${order.status === 'PACKED' ? 'selected' : ''}>Packed</option>
+          <option value="SHIPPED" ${order.status === 'SHIPPED' ? 'selected' : ''}>Shipped</option>
+          <option value="DELIVERED" ${order.status === 'DELIVERED' ? 'selected' : ''}>Delivered</option>
+          <option value="CANCELLED" ${order.status === 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
+        </select>
+      `;
+    }
 
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -465,18 +487,30 @@ function renderOrdersTable() {
       <td>${order.paymentMethod || 'COD'}</td>
       <td style="font-size: 12.5px; color: var(--text-secondary); max-width: 180px;">${addrStr}</td>
       <td><span class="badge-status status-${(order.status || 'PLACED').toLowerCase()}">${order.status || 'PLACED'}</span></td>
-      <td>
-        <select class="form-control" style="padding: 4px 8px; font-size: 12px; height: auto;" onchange="updateOrderStatus('${order.id}', this.value)">
-          <option value="PLACED" ${order.status === 'PLACED' ? 'selected' : ''}>Placed</option>
-          <option value="PACKED" ${order.status === 'PACKED' ? 'selected' : ''}>Packed</option>
-          <option value="SHIPPED" ${order.status === 'SHIPPED' ? 'selected' : ''}>Shipped</option>
-          <option value="DELIVERED" ${order.status === 'DELIVERED' ? 'selected' : ''}>Delivered</option>
-          <option value="CANCELLED" ${order.status === 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
-        </select>
-      </td>
+      <td>${statusActionHtml}</td>
     `;
     tableBody.appendChild(row);
   });
+}
+
+function approveOrder(orderId, isAccepted) {
+  const orders = JSON.parse(localStorage.getItem('shopsphere_orders') || '[]');
+  const index = orders.findIndex(o => String(o.id) === String(orderId));
+  if (index !== -1) {
+    const newStatus = isAccepted ? 'PACKED' : 'CANCELLED';
+    orders[index].status = newStatus;
+    orders[index].statusClass = isAccepted ? 'packed' : 'cancelled';
+    localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
+    
+    // Log dynamic status update to delivery logs automatically
+    updateDeliveryLogStatus(orderId, newStatus);
+    
+    // Log standard notification triggers
+    logSystemNotification('Customer', 'SMS & Email', `Order #${orderId} has been ${isAccepted ? 'Accepted & Packed' : 'Rejected & Cancelled'} by administrator.`);
+    
+    renderOrdersTable();
+    renderKPIs();
+  }
 }
 
 function updateOrderStatus(orderId, newStatus) {
@@ -484,6 +518,7 @@ function updateOrderStatus(orderId, newStatus) {
   const index = orders.findIndex(o => String(o.id) === String(orderId));
   if (index !== -1) {
     orders[index].status = newStatus;
+    orders[index].statusClass = newStatus.toLowerCase();
     localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
     
     // Log dynamic status update to delivery logs automatically
