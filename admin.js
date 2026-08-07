@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ==========================================================================
    Authentication & Session Handling
    ========================================================================== */
-const ADMIN_USERNAME = 'shopsphere_admin';
-const ADMIN_PASSWORD = 'admin_password_2026';
+const ADMIN_USERNAME = 'admin_ss';
+const ADMIN_PASSWORD = 'ss123';
 
 function showLoginScreen() {
   document.getElementById('auth-overlay').style.display = 'flex';
