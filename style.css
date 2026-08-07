@@ -1388,6 +1388,8 @@ input {
   gap: 20px;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
+  margin-top: 40px;
+  margin-bottom: 20px;
 }
 
 .service-item {
