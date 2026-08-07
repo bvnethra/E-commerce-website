@@ -2,6 +2,9 @@
 -- Normalized 23-table MySQL database structure for high-performance scale
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS saved_reports;
+DROP TABLE IF EXISTS support_tickets;
+DROP TABLE IF EXISTS saved_cards;
 DROP TABLE IF EXISTS audit_logs;
 DROP TABLE IF EXISTS banners;
 DROP TABLE IF EXISTS notifications;
@@ -315,6 +318,41 @@ CREATE TABLE audit_logs (
     CONSTRAINT fk_audit_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 24. Saved Cards Table (Tokenized)
+CREATE TABLE saved_cards (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    card_token VARCHAR(255) NOT NULL,
+    card_brand VARCHAR(50) NOT NULL,
+    last_four VARCHAR(4) NOT NULL,
+    expiry_month INT NOT NULL,
+    expiry_year INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_saved_cards_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 25. Support Tickets Table
+CREATE TABLE support_tickets (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    subject VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'OPEN', -- OPEN, IN_PROGRESS, RESOLVED
+    priority VARCHAR(20) NOT NULL DEFAULT 'MEDIUM', -- LOW, MEDIUM, HIGH
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_support_tickets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 26. Saved Reports Table
+CREATE TABLE saved_reports (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    report_type VARCHAR(50) NOT NULL, -- SALES, INVENTORY, CUSTOMER
+    parameters JSON NOT NULL,
+    data JSON NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- --- DATABASE INDEXES FOR PERFORMANCE TUNING ---
 CREATE INDEX idx_products_slug ON products(slug);
@@ -335,3 +373,5 @@ CREATE INDEX idx_payments_order ON payments(order_id);
 CREATE INDEX idx_coupon_usage_user ON coupon_usage(user_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_audit_logs_user ON audit_logs(user_id);
+CREATE INDEX idx_saved_cards_user ON saved_cards(user_id);
+CREATE INDEX idx_support_tickets_user ON support_tickets(user_id);
