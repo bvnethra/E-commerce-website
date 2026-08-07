@@ -1,7 +1,13 @@
-FROM node:24-alpine
+# Build Stage
+FROM maven:3.9.9-eclipse-temurin-21-jammy AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Run Stage
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-CMD ["node", "server.js"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

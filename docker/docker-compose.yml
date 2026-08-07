@@ -15,15 +15,6 @@ services:
       - ../database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
       - ../database/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
 
-  redis:
-    image: redis:7-alpine
-    container_name: aura-redis-cache
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-
   backend:
     build:
       context: ../backend
@@ -33,25 +24,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - PORT=8080
-      - NODE_ENV=production
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASS=password
-      - DB_NAME=aura_ecommerce
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - JWT_SECRET=supersecretjwtkeyforauraenterpriseplatform2026
-      - JWT_REFRESH_SECRET=supersecretjwtrefreshkeyforauraenterpriseplatform2026
-      - JWT_ACCESS_EXPIRY=15m
-      - JWT_REFRESH_EXPIRY=7d
-      - RAZORPAY_KEY_ID=rzp_test_placeholderkey
-      - RAZORPAY_KEY_SECRET=placeholderkeysecret
-      - RAZORPAY_WEBHOOK_SECRET=webhooksecret
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/aura_ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
     depends_on:
       - db
-      - redis
 
   customer-portal:
     build:
@@ -77,4 +54,3 @@ services:
 
 volumes:
   mysql-data:
-  redis-data:
