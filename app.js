@@ -2058,7 +2058,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
       };
       // Initialize/sync products database in localStorage if not set or outdated
-      const CURRENT_DB_VERSION = 'v6';
+      const CURRENT_DB_VERSION = 'v7';
       let storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
       const currentDbVersion = localStorage.getItem('shopsphere_db_version');
       if (storedProducts.length < 108 || currentDbVersion !== CURRENT_DB_VERSION || !storedProducts[0]?.name.includes('Shirt')) {

@@ -199,7 +199,7 @@ function initializeAdminDatabases() {
   }
 
   // 7. Products Database initialization fallback
-  const CURRENT_DB_VERSION_PROD = 'v6';
+  const CURRENT_DB_VERSION_PROD = 'v7';
   let storedProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
   if (storedProds.length < 108 || currentDbVersion !== CURRENT_DB_VERSION_PROD || !storedProds[0]?.name.includes('Shirt')) {
     const defaultProducts = [];
