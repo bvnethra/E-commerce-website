@@ -463,64 +463,366 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   const TRANSLATIONS = {
     en: {
+      // Sidebar & Navigation
       home: "Home",
       shop: "Shop",
       categories: "Categories",
       wishlist: "Wishlist",
       orders: "Orders",
       profile: "Profile",
+      // Header
       search_placeholder: "Search for products, brands and more...",
       deliver_to: "Deliver to",
       login: "Login",
       logout: "Logout",
-      welcome: "Welcome",
       my_profile: "My Profile",
       addresses: "Addresses",
+      // Shop Page Filters
+      filters: "Filters",
+      brand: "Brand",
+      category: "Category",
+      price_range: "Price Range",
+      customer_rating: "Customer Rating",
+      reset_filters: "Reset Filters",
+      sort_by: "Sort by",
+      sort_relevance: "Relevance",
+      sort_low_high: "Price: Low to High",
+      sort_high_low: "Price: High to Low",
+      sort_rating: "Rating",
+      add_to_cart: "Add to Cart",
+      added_to_cart: "Added to Cart",
+      out_of_stock: "Out of Stock",
+      ratings_count: "ratings",
+      // Empty States
       cart_empty: "Your Cart is Empty",
+      cart_empty_desc: "Add items to it now to shop.",
       wishlist_empty: "Your Wishlist is Empty",
-      orders_empty: "No Orders Yet"
+      wishlist_empty_desc: "Explore products and add your favorites.",
+      orders_empty: "No Orders Yet",
+      orders_empty_desc: "You have not placed any orders yet.",
+      shop_now: "Shop Now",
+      explore_products: "Explore Products",
+      // Cart View
+      shopping_cart: "Shopping Cart",
+      order_summary: "Order Summary",
+      price_items: "Price",
+      delivery_charges: "Delivery Charges",
+      free: "Free",
+      total_amount: "Total Amount",
+      place_order: "Place Order",
+      // Wishlist View
+      my_wishlist: "My Wishlist",
+      remove: "Remove",
+      move_to_cart: "Move to Cart",
+      // Orders View
+      my_orders: "My Orders",
+      order_id: "Order ID",
+      order_date: "Date",
+      order_status: "Status",
+      order_total_paid: "Total Paid",
+      track_order: "Track Order",
+      // Profile View
+      user_profile: "User Profile",
+      profile_sub: "Manage personal information & delivery addresses",
+      verified_account: "Verified Account",
+      jwt_auth: "JWT Authenticated",
+      saved_address: "Saved Address",
+      manage_addresses: "Manage Addresses",
+      log_out: "Log Out",
+      // Address Modal
+      manage_delivery_addresses: "Manage Delivery Addresses",
+      add_new_address: "Add New Address",
+      edit_address: "Edit Address",
+      placeholder_fullname: "Full Name",
+      placeholder_mobile: "Mobile Number (10 digits)",
+      placeholder_pincode: "Pincode",
+      placeholder_address: "Flat, House no., Building, MG Road",
+      placeholder_city: "Town/City",
+      placeholder_state: "State",
+      address_type_home: "Home",
+      address_type_work: "Work",
+      set_default_address: "Set as Default Address",
+      cancel: "Cancel",
+      save_address: "Save Address",
+      set_as_default: "Set as Default",
+      delete: "Delete",
+      // Confirm Delete Modal
+      delete_address_title: "Delete Address?",
+      delete_address_desc: "Are you sure you want to delete this address? This action cannot be undone.",
+      // Settings Drawer
+      display_language: "Display & Language",
+      theme_mode: "Theme Mode",
+      light_mode: "Light Mode",
+      dark_mode: "Dark Mode",
+      color_palette: "Color Palette",
+      language_select: "Language / மொழி / भाषा",
+      // Auth Modal
+      style_moves_you: "Style That Moves You",
+      welcome_perk: "WELCOME PERK",
+      get_10_off: "GET 10% OFF",
+      login_or_signup: "Login or Signup",
+      enter_mobile_email: "Enter Mobile Number or Email",
+      continue_btn: "Continue",
+      verify_otp: "Verify Security OTP",
+      enter_code: "Enter Code",
+      verify_proceed: "Verify & Proceed",
+      create_password: "Create Password",
+      continue_signup: "Continue Signup",
+      new_to_shopsphere: "New to ShopSphere?",
+      create_account: "Create an account",
+      agree_terms: "By continuing, you agree to ShopSphere's",
+      terms_of_use: "Terms of Use",
+      privacy_policy: "Privacy Policy",
+      placeholder_email: "Email Address",
+      enter_password: "Enter Password",
+      existing_user: "Existing User?",
+      and: "and"
     },
     ta: {
+      // Sidebar & Navigation
       home: "முகப்பு",
       shop: "கடை",
       categories: "பிரிவுகள்",
       wishlist: "விருப்பப் பட்டியல்",
       orders: "ஆர்டர்கள்",
       profile: "சுயவிவரம்",
+      // Header
       search_placeholder: "தயாரிப்புகள், பிராண்டுகள் மற்றும் பலவற்றைத் தேடுங்கள்...",
       deliver_to: "விநியோகிக்கவும்",
       login: "உள்நுழைக",
       logout: "வெளியேறு",
-      welcome: "வரவேற்கிறோம்",
       my_profile: "எனது சுயவிவரம்",
       addresses: "முகவரிகள்",
-      cart_empty: "உங்கள் வண்டி காலியாக உள்ளது",
+      // Shop Page Filters
+      filters: "வடிகட்டிகள்",
+      brand: "பிராண்ட்",
+      category: "பிரிவு",
+      price_range: "விலை வரம்பு",
+      customer_rating: "வாடிக்கையாளர் மதிப்பீடு",
+      reset_filters: "வடிகட்டிகளை மீட்டமை",
+      sort_by: "வரிசைப்படுத்து",
+      sort_relevance: "பொருத்தம்",
+      sort_low_high: "விலை: குறைந்ததிலிருந்து அதிகத்திற்கு",
+      sort_high_low: "விலை: அதிகத்திலிருந்து குறைந்தத்திற்கு",
+      sort_rating: "மதிப்பீடு",
+      add_to_cart: "வண்டியில் சேர்",
+      added_to_cart: "வண்டியில் சேர்க்கப்பட்டது",
+      out_of_stock: "இருப்பு இல்லை",
+      ratings_count: "மதிப்பீடுகள்",
+      // Empty States
+      cart_empty: "உங்களது கார்ட் காலியாக உள்ளது",
+      cart_empty_desc: "ஷாப்பிங் செய்ய இப்போது பொருட்களைச் சேர்க்கவும்.",
       wishlist_empty: "உங்கள் விருப்பப் பட்டியல் காலியாக உள்ளது",
-      orders_empty: "இன்னும் ஆர்டர்கள் இல்லை"
+      wishlist_empty_desc: "தயாரிப்புகளை ஆராய்ந்து உங்களுக்கு பிடித்தவற்றை சேர்க்கவும்.",
+      orders_empty: "இன்னும் ஆர்டர்கள் இல்லை",
+      orders_empty_desc: "நீங்கள் இன்னும் எந்த ஆர்டரையும் செய்யவில்லை.",
+      shop_now: "இப்போது வாங்குங்கள்",
+      explore_products: "தயாரிப்புகளை ஆராயுங்கள்",
+      // Cart View
+      shopping_cart: "ஷாப்பிங் கார்ட்",
+      order_summary: "ஆர்டர் சுருக்கம்",
+      price_items: "விலை",
+      delivery_charges: "டெலிவரி கட்டணம்",
+      free: "இலவசம்",
+      total_amount: "மொத்த தொகை",
+      place_order: "ஆர்டர் செய்",
+      // Wishlist View
+      my_wishlist: "எனது விருப்பப் பட்டியல்",
+      remove: "நீக்கு",
+      move_to_cart: "கார்டிற்கு நகர்த்து",
+      // Orders View
+      my_orders: "எனது ஆர்டர்கள்",
+      order_id: "ஆர்டர் ஐடி",
+      order_date: "தேதி",
+      order_status: "நிலை",
+      order_total_paid: "செலுத்தப்பட்ட மொத்த தொகை",
+      track_order: "ஆர்டரை டிராக் செய்",
+      // Profile View
+      user_profile: "சுயவிவரம்",
+      profile_sub: "தனிப்பட்ட விவரங்கள் & முகவரிகளை நிர்வகிக்கவும்",
+      verified_account: "சரிபார்க்கப்பட்ட கணக்கு",
+      jwt_auth: "JWT அங்கீகரிக்கப்பட்டது",
+      saved_address: "சேமிக்கப்பட்ட முகவரி",
+      manage_addresses: "முகவரிகளை நிர்வகி",
+      log_out: "வெளியேறு",
+      // Address Modal
+      manage_delivery_addresses: "டெலிவரி முகவரிகளை நிர்வகி",
+      add_new_address: "புதிய முகவரியைச் சேர்",
+      edit_address: "முகவரியைத் திருத்து",
+      placeholder_fullname: "முழு பெயர்",
+      placeholder_mobile: "அலைபேசி எண் (10 இலக்கங்கள்)",
+      placeholder_pincode: "பின்கோடு",
+      placeholder_address: "பிளாட், வீட்டு எண், கட்டிடம், எம்.ஜி சாலை",
+      placeholder_city: "நகரம் / ஊர்",
+      placeholder_state: "மாநிலம்",
+      address_type_home: "வீடு",
+      address_type_work: "அலுவலகம்",
+      set_default_address: "இயல்புநிலை முகவரியாக அமை",
+      cancel: "ரத்து செய்",
+      save_address: "முகவரியைச் சேமி",
+      set_as_default: "இயல்புநிலையாக அமை",
+      delete: "நீக்கு",
+      // Confirm Delete Modal
+      delete_address_title: "முகவரியை நீக்கவா?",
+      delete_address_desc: "நிச்சயமாக இந்த முகவரியை நீக்க வேண்டுமா? இந்த செயலை மாற்ற முடியாது.",
+      // Settings Drawer
+      display_language: "காட்சி மற்றும் மொழி",
+      theme_mode: "தீம் முறை",
+      light_mode: "ஒளி முறை",
+      dark_mode: "இருண்ட முறை",
+      color_palette: "வண்ண தட்டு",
+      language_select: "Language / மொழி / भाषा",
+      // Auth Modal
+      style_moves_you: "உங்களை கவரும் ஸ்டைல்",
+      welcome_perk: "வரவேற்பு சலுகை",
+      get_10_off: "10% தள்ளுபடி பெறுங்கள்",
+      login_or_signup: "உள்நுழைவு அல்லது பதிவு",
+      enter_mobile_email: "அலைபேसी எண் அல்லது மின்னஞ்சலை உள்ளிடவும்",
+      continue_btn: "தொடரவும்",
+      verify_otp: "OTP சரிபார்ப்பு",
+      enter_code: "குறியீட்டை உள்ளிடவும்",
+      verify_proceed: "சரிபார்த்து தொடரவும்",
+      create_password: "கடவுச்சொல்லை உருவாக்கவும்",
+      continue_signup: "பதிவை தொடரவும்",
+      new_to_shopsphere: "ShopSphere-க்கு புதியவரா?",
+      create_account: "ஒரு கணக்கை உருவாக்குங்கள்",
+      agree_terms: "தொடர்வதன் மூலம், நீங்கள் ஏற்றுக்கொள்கிறீர்கள்",
+      terms_of_use: "பயன்பாட்டு விதிமுறைகள்",
+      privacy_policy: "தனியுரிமைக் கொள்கை",
+      placeholder_email: "மின்னஞ்சல் முகவரி",
+      enter_password: "கடவுச்சொல்லை உள்ளிடவும்",
+      existing_user: "ஏற்கனவே உள்ள பயனரா?",
+      and: "மற்றும்"
     },
     hi: {
+      // Sidebar & Navigation
       home: "मुख्य पृष्ठ",
       shop: "दुकान",
       categories: "श्रेणियाँ",
       wishlist: "इच्छा सूची",
       orders: "ऑर्डर",
       profile: "प्रोफ़ाइल",
+      // Header
       search_placeholder: "उत्पाद, ब्रांड और बहुत कुछ खोजें...",
       deliver_to: "यहाँ भेजें",
       login: "लॉगिन",
       logout: "लॉगआउट",
-      welcome: "स्वागत है",
       my_profile: "मेरी प्रोफ़ाइल",
       addresses: "पते",
+      // Shop Page Filters
+      filters: "फ़िल्टर",
+      brand: "ब्रांड",
+      category: "श्रेणी",
+      price_range: "मूल्य सीमा",
+      customer_rating: "ग्राहक रेटिंग",
+      reset_filters: "फ़िल्टर रीसेट करें",
+      sort_by: "क्रमित करें",
+      sort_relevance: "प्रासंगिकता",
+      sort_low_high: "कीमत: कम से अधिक",
+      sort_high_low: "कीमत: अधिक से कम",
+      sort_rating: "रेटिंग",
+      add_to_cart: "कार्ट में जोड़ें",
+      added_to_cart: "कार्ट में जोड़ा गया",
+      out_of_stock: "आउट ऑफ स्टॉक",
+      ratings_count: "रेटिंग",
+      // Empty States
       cart_empty: "आपकी कार्ट खाली है",
+      cart_empty_desc: "खरीदारी करने के लिए अभी आइटम जोड़ें।",
       wishlist_empty: "आपकी इच्छा सूची खाली है",
-      orders_empty: "अभी तक कोई ऑर्डर नहीं"
+      wishlist_empty_desc: "उत्पादों का अन्वेषण करें और अपने पसंदीदा जोड़ें।",
+      orders_empty: "अभी तक कोई ऑर्डर नहीं",
+      orders_empty_desc: "आपने अभी तक कोई ऑर्डर नहीं दिया है।",
+      shop_now: "अभी खरीदें",
+      explore_products: "उत्पादों का अन्वेषण करें",
+      // Cart View
+      shopping_cart: "शॉपिंग कार्ट",
+      order_summary: "ऑर्डर सारांश",
+      price_items: "कीमत",
+      delivery_charges: "डिलिवरी शुल्क",
+      free: "निःशुल्क",
+      total_amount: "कुल राशि",
+      place_order: "ऑर्डर दें",
+      // Wishlist View
+      my_wishlist: "मेरी इच्छा सूची",
+      remove: "हटाएं",
+      move_to_cart: "कार्ट में स्थानांतरित करें",
+      // Orders View
+      my_orders: "मेरे ऑर्डर",
+      order_id: "ऑर्डर आईडी",
+      order_date: "दिनांक",
+      order_status: "स्थिति",
+      order_total_paid: "कुल भुगतान किया गया",
+      track_order: "ऑर्डर ट्रैक करें",
+      // Profile View
+      user_profile: "उपयोगकर्ता प्रोफ़ाइल",
+      profile_sub: "व्यक्तिगत जानकारी और पते प्रबंधित करें",
+      verified_account: "सत्यापित खाता",
+      jwt_auth: "JWT प्रमाणित",
+      saved_address: "सहेजा गया पता",
+      manage_addresses: "पते प्रबंधित करें",
+      log_out: "लॉगआउट",
+      // Address Modal
+      manage_delivery_addresses: "डिलिवरी पते प्रबंधित करें",
+      add_new_address: "नया पता जोड़ें",
+      edit_address: "पता संपादित करें",
+      placeholder_fullname: "पूरा नाम",
+      placeholder_mobile: "मोबाइल नंबर (10 अंक)",
+      placeholder_pincode: "पिनकोड",
+      placeholder_address: "फ्लैट, हाउस नंबर, बिल्डिंग, एमजी रोड",
+      placeholder_city: "शहर",
+      placeholder_state: "राज्य",
+      address_type_home: "घर",
+      address_type_work: "कार्यालय",
+      set_default_address: "डिफ़ॉल्ट पते के रूप में सेट करें",
+      cancel: "रद्द करें",
+      save_address: "पता सहेजें",
+      set_as_default: "डिफ़ॉल्ट सेट करें",
+      delete: "हटाएं",
+      // Confirm Delete Modal
+      delete_address_title: "पता हटाएं?",
+      delete_address_desc: "क्या आप वाकई इस पते को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
+      // Settings Drawer
+      display_language: "प्रदर्शन और भाषा",
+      theme_mode: "थीम मोड",
+      light_mode: "लाइट मोड",
+      dark_mode: "डार्क मोड",
+      color_palette: "रंग पैलेट",
+      language_select: "Language / மொழி / भाषा",
+      // Auth Modal
+      style_moves_you: "शैली जो आपको प्रभावित करे",
+      welcome_perk: "स्वागत लाभ",
+      get_10_off: "10% छूट पाएं",
+      login_or_signup: "लॉगिन या साइनअप",
+      enter_mobile_email: "मोबाइल नंबर या ईमेल दर्ज करें",
+      continue_btn: "जारी रखें",
+      verify_otp: "OTP सत्यापित करें",
+      enter_code: "कोड दर्ज करें",
+      verify_proceed: "सत्यापित करें और आगे बढ़ें",
+      create_password: "पासवर्ड बनाएं",
+      continue_signup: "साइनअप जारी रखें",
+      new_to_shopsphere: "ShopSphere में नए हैं?",
+      create_account: "खाता बनाएं",
+      agree_terms: "जारी रखकर, आप सहमत हैं",
+      terms_of_use: "उपयोग की शर्तें",
+      privacy_policy: "गोपनीयता नीति",
+      placeholder_email: "ईमेल पता",
+      enter_password: "पासवर्ड दर्ज करें",
+      existing_user: "मौजूदा उपयोगकर्ता?",
+      and: "और"
     }
   };
 
   AppState.language = localStorage.getItem('shopsphere_language') || 'en';
 
+  let isTranslating = false;
+  let viewObserver = null;
+
   function applyTranslations() {
+    if (isTranslating) return;
+    isTranslating = true;
+
+    if (viewObserver) viewObserver.disconnect();
+
     const lang = AppState.language;
     const dict = TRANSLATIONS[lang] || TRANSLATIONS['en'];
     
@@ -533,7 +835,29 @@ document.addEventListener('DOMContentLoaded', () => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (dict[key]) el.setAttribute('placeholder', dict[key]);
     });
+
+    // Re-observe after mutations are done
+    const viewContainer = document.getElementById('view-container');
+    if (viewObserver && viewContainer) {
+      viewObserver.observe(viewContainer, { childList: true, subtree: true });
+    }
+
+    isTranslating = false;
   }
+
+  // Set up MutationObserver to automatically translate dynamic view injection
+  function initTranslationObserver() {
+    const viewContainer = document.getElementById('view-container');
+    if (viewContainer) {
+      viewObserver = new MutationObserver(() => {
+        applyTranslations();
+      });
+      viewObserver.observe(viewContainer, { childList: true, subtree: true });
+    }
+  }
+
+  // Initialize Observer
+  initTranslationObserver();
 
   /* ==========================================================================
      Theme Color Palette Engine
@@ -1522,18 +1846,18 @@ document.addEventListener('DOMContentLoaded', () => {
       viewContainer.innerHTML = `
         <div class="view-section-header">
           <div>
-            <h2 class="view-title">Shopping Cart</h2>
-            <p class="view-subtitle">Your cart is currently empty</p>
+            <h2 class="view-title" data-i18n="shopping_cart">Shopping Cart</h2>
+            <p class="view-subtitle" data-i18n="cart_empty_desc">Your cart is currently empty</p>
           </div>
         </div>
         <div style="background: var(--bg-card); padding: 48px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;">
           <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-body); display: flex; align-items: center; justify-content: center;">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="width: 32px; height: 32px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
-          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Your Cart is Empty</h3>
-          <p style="color: var(--text-secondary); max-width: 400px; font-size: 0.95rem;">You haven't added any products to your cart yet. Discover trending style & electronics in our catalog!</p>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);" data-i18n="cart_empty">Your Cart is Empty</h3>
+          <p style="color: var(--text-secondary); max-width: 400px; font-size: 0.95rem;" data-i18n="cart_empty_desc">You haven't added any products to your cart yet. Discover trending style & electronics in our catalog!</p>
           <button class="btn-primary-action" data-nav-target="shop" style="margin-top: 8px;">
-            <span>Browse Products</span>
+            <span data-i18n="explore_products">Browse Products</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -1597,17 +1921,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <!-- Right: Order Summary -->
         <div class="cart-summary-card" style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px; position: sticky; top: 90px;">
-          <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">Order Summary</h3>
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 14px;" data-i18n="order_summary">Order Summary</h3>
           
           <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
             <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
-              <span>Subtotal (${AppState.cart.reduce((s, i) => s + i.qty, 0)} items)</span>
+              <span><span data-i18n="price_items">Subtotal</span> (${AppState.cart.reduce((s, i) => s + i.qty, 0)} items)</span>
               <strong style="color: var(--text-primary);">₹${subtotal.toLocaleString('en-IN')}</strong>
             </div>
 
             <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
-              <span>Shipping Fee</span>
-              <span style="color: var(--color-success); font-weight: 700;">${shipping === 0 ? 'FREE (Express 2 Days)' : '₹99'}</span>
+              <span data-i18n="delivery_charges">Shipping Fee</span>
+              <span style="color: var(--color-success); font-weight: 700;">${shipping === 0 ? `<span data-i18n="free">FREE</span>` : '₹99'}</span>
             </div>
 
             <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
@@ -1617,12 +1941,12 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <div style="border-top: 1px dashed var(--border-color); padding-top: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Total Amount</span>
+            <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);" data-i18n="total_amount">Total Amount</span>
             <span style="font-size: 1.4rem; font-weight: 800; color: var(--color-accent);">₹${total.toLocaleString('en-IN')}</span>
           </div>
 
           <button class="btn-primary-action" id="checkout-btn" style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem;">
-            <span>Proceed to Checkout</span>
+            <span data-i18n="place_order">Proceed to Checkout</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
 
@@ -3510,8 +3834,8 @@ document.addEventListener('DOMContentLoaded', () => {
         contentHtml = `
           <div class="view-section-header">
             <div>
-              <h2 class="view-title">Saved Wishlist</h2>
-              <p class="view-subtitle">Your wishlist is currently empty</p>
+              <h2 class="view-title" data-i18n="wishlist">Saved Wishlist</h2>
+              <p class="view-subtitle" data-i18n="wishlist_empty_desc">Your wishlist is currently empty</p>
             </div>
           </div>
           <div class="empty-state-card">
@@ -3520,13 +3844,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             </div>
-            <h3 class="empty-state-title">Your Wishlist is Empty</h3>
-            <p class="empty-state-desc">
+            <h3 class="empty-state-title" data-i18n="wishlist_empty">Your Wishlist is Empty</h3>
+            <p class="empty-state-desc" data-i18n="wishlist_empty_desc">
               Save your favorite items here to track their availability, price drops, and get notifications!
             </p>
             <div class="empty-state-actions">
               <button class="btn-primary-action" id="wishlist-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
-                Browse Products &nbsp; ➜
+                <span data-i18n="explore_products">Browse Products</span> &nbsp; ➜
               </button>
             </div>
           </div>
@@ -3535,7 +3859,7 @@ document.addEventListener('DOMContentLoaded', () => {
         contentHtml = `
           <div class="view-section-header">
             <div>
-              <h2 class="view-title">Saved Wishlist</h2>
+              <h2 class="view-title" data-i18n="wishlist">Saved Wishlist</h2>
               <p class="view-subtitle">Showing ${data.length} premium items</p>
             </div>
           </div>
@@ -3594,8 +3918,8 @@ document.addEventListener('DOMContentLoaded', () => {
         contentHtml = `
           <div class="view-section-header">
             <div>
-              <h2 class="view-title">Your Orders</h2>
-              <p class="view-subtitle">No orders found</p>
+              <h2 class="view-title" data-i18n="orders">Your Orders</h2>
+              <p class="view-subtitle" data-i18n="orders_empty_desc">No orders found</p>
             </div>
           </div>
           <div class="empty-state-card">
@@ -3606,13 +3930,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <line x1="10" y1="12" x2="14" y2="12"/>
               </svg>
             </div>
-            <h3 class="empty-state-title">No Orders Yet</h3>
-            <p class="empty-state-desc">
+            <h3 class="empty-state-title" data-i18n="orders_empty">No Orders Yet</h3>
+            <p class="empty-state-desc" data-i18n="orders_empty_desc">
               You have not placed any orders yet. Once you complete a purchase, your order history will appear here!
             </p>
             <div class="empty-state-actions">
               <button class="btn-primary-action" id="orders-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
-                Shop Now &nbsp; ➜
+                <span data-i18n="shop_now">Shop Now</span> &nbsp; ➜
               </button>
             </div>
           </div>
@@ -3704,8 +4028,8 @@ document.addEventListener('DOMContentLoaded', () => {
       contentHtml = `
         <div class="view-section-header">
           <div>
-            <h2 class="view-title">User Profile</h2>
-            <p class="view-subtitle">Manage personal information & delivery addresses</p>
+            <h2 class="view-title" data-i18n="profile">User Profile</h2>
+            <p class="view-subtitle" data-i18n="profile_sub">Manage personal information & delivery addresses</p>
           </div>
         </div>
         <div style="background: var(--bg-card); padding: 30px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 24px;">
@@ -3717,17 +4041,17 @@ document.addEventListener('DOMContentLoaded', () => {
               <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin: 0;">${u.name}</h3>
               <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 4px 0;">${u.email} • ${u.phone}</p>
               <div style="display: flex; gap: 8px; margin-top: 6px;">
-                <span class="status-pill success">Verified Account</span>
-                <span class="status-pill success" style="background: rgba(40,116,240,0.15); color: #2874f0;">JWT Authenticated</span>
+                <span class="status-pill success" data-i18n="verified_account">Verified Account</span>
+                <span class="status-pill success" style="background: rgba(40,116,240,0.15); color: #2874f0;" data-i18n="jwt_auth">JWT Authenticated</span>
               </div>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
             <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Saved Address</h4>
+              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;" data-i18n="saved_address">Saved Address</h4>
               <p id="profile-saved-address-text" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">${defaultAddressString}</p>
-              <button id="profile-manage-address-btn" class="btn-secondary-action" style="padding: 8px 16px; font-size: 0.85rem;">Manage Addresses</button>
+              <button id="profile-manage-address-btn" class="btn-secondary-action" data-i18n="manage_addresses" style="padding: 8px 16px; font-size: 0.85rem;">Manage Addresses</button>
             </div>
             <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
               <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Account Security</h4>
