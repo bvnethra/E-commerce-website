@@ -171,6 +171,26 @@ document.addEventListener('DOMContentLoaded', () => {
   AppState.user = AuthService.getUser();
 
   /* ==========================================================================
+     Saved Order Management Service
+     ========================================================================== */
+  const OrderService = {
+    getAll() {
+      try {
+        const stored = localStorage.getItem('shopsphere_orders');
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    },
+    add(order) {
+      const orders = this.getAll();
+      orders.unshift(order);
+      localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
+      return order;
+    }
+  };
+
+  /* ==========================================================================
      Saved Address Management Service
      ========================================================================== */
   const AddressService = {
@@ -1886,7 +1906,7 @@ document.addEventListener('DOMContentLoaded', () => {
           { name: 'Toys & Games', subtitle: 'Play & Collectibles', bg: '#fef9c3', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="25" y="55" width="22" height="22" rx="3" fill="#ef4444"/><rect x="52" y="55" width="22" height="22" rx="3" fill="#3b82f6"/><rect x="38" y="30" width="22" height="22" rx="3" fill="#eab308"/></svg>' },
           { name: 'Pet Supplies', subtitle: 'Food & Accessories', bg: '#f5ebe0', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><ellipse cx="50" cy="65" rx="30" ry="15" fill="#d97706"/><circle cx="35" cy="40" r="8" fill="#b45309"/><circle cx="65" cy="40" r="8" fill="#b45309"/><circle cx="50" cy="35" r="10" fill="#b45309"/></svg>' }
         ],
-        orders: [],
+        orders: OrderService.getAll(),
         wishlist: [],
         notifications: [],
         reviews: [
@@ -2309,30 +2329,379 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', () => {
         requireAuth('CHECKOUT', {}, () => {
-          showToast('Order placed successfully! Thank you for shopping with ShopSphere.', 'success');
+          renderView('checkout');
+        });
+      });
+    }
+
+  }
+
+  // Render Checkout View with Payment Options & Addresses selection
+  function renderCheckoutView() {
+    if (!viewContainer) return;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (!AppState.cart || AppState.cart.length === 0) {
+      renderView('cart');
+      return;
+    }
+
+    const subtotal = AppState.cart.reduce((sum, item) => sum + (item.product.numericPrice * item.qty), 0);
+    const shipping = subtotal > 999 ? 0 : 99;
+    const total = subtotal + shipping;
+
+    const addresses = AddressService.getAll();
+    const selectedAddress = AddressService.getDefault() || addresses[0] || null;
+
+    let addressSectionHtml = '';
+    if (addresses.length === 0) {
+      addressSectionHtml = `
+        <div style="background: rgba(239, 68, 68, 0.08); border: 1px dashed #ef4444; padding: 16px; border-radius: var(--radius-md); text-align: center; color: #ef4444;">
+          <p style="font-weight: bold; font-size: 0.95rem;" data-i18n="no_addresses_found">No delivery address found!</p>
+          <button class="btn-primary-action" id="checkout-add-address-btn" style="margin-top: 10px; font-size: 0.85rem; padding: 8px 16px; background: #ef4444; border-color: #ef4444;" data-i18n="add_new_address">Add New Address</button>
+        </div>
+      `;
+    } else {
+      addressSectionHtml = `
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="background: var(--bg-body); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-lg); position: relative;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-accent); margin-bottom: 6px;">
+              <span data-i18n="address_type_${selectedAddress.type.toLowerCase()}">${selectedAddress.type}</span> <span data-i18n="default_label">(Default)</span>
+            </div>
+            <div style="font-weight: 700; color: var(--text-primary);">${selectedAddress.name}</div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 4px;">
+              ${selectedAddress.addressLine}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Phone: ${selectedAddress.phone}</div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="checkout-address-select" class="sort-select" style="font-size: 0.88rem; padding: 8px 12px; height: auto; flex-grow: 1;">
+              ${addresses.map(a => `
+                <option value="${a.id}" ${a.id === selectedAddress.id ? 'selected' : ''}>
+                  ${a.name} (${a.type}) - ${a.addressLine.substring(0, 20)}...
+                </option>
+              `).join('')}
+            </select>
+            <button class="btn-secondary-action" id="checkout-manage-address-btn" style="padding: 8px 14px; font-size: 0.85rem;" data-i18n="manage_addresses">Manage</button>
+          </div>
+        </div>
+      `;
+    }
+
+    const contentHtml = `
+      <div class="view-section-header">
+        <div>
+          <h2 class="view-title">Secure Checkout</h2>
+          <p class="view-subtitle">Select shipping address and payment method</p>
+        </div>
+      </div>
+
+      <div class="checkout-layout-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start;">
+        <!-- Left Panel: Delivery & Payment Details -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- 1. Delivery Address Block -->
+          <div class="checkout-card" style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+              <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-accent-bg); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">1</span>
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Delivery Address</h3>
+            </div>
+            ${addressSectionHtml}
+          </div>
+
+          <!-- 2. Payment Options Block -->
+          <div class="checkout-card" style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+              <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-accent-bg); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">2</span>
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Payment Options</h3>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- UPI Option -->
+              <label class="payment-option-label" style="display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <input type="radio" name="payment-method" value="upi" checked style="accent-color: var(--color-accent);">
+                  <div style="font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                    <span>UPI (Google Pay, PhonePe, Paytm)</span>
+                  </div>
+                </div>
+                <div id="upi-details-section" style="margin-left: 28px; margin-top: 4px;">
+                  <input type="text" id="upi-id-input" class="app-input" placeholder="Enter UPI ID (e.g., username@okaxis)" style="font-size: 0.88rem; padding: 10px; width: 100%; max-width: 320px;">
+                </div>
+              </label>
+
+              <!-- Credit/Debit Card Option -->
+              <label class="payment-option-label" style="display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <input type="radio" name="payment-method" value="card" style="accent-color: var(--color-accent);">
+                  <div style="font-weight: 700; color: var(--text-primary);">Credit or Debit Card</div>
+                </div>
+                <div id="card-details-section" style="margin-left: 28px; margin-top: 4px; display: none; flex-direction: column; gap: 10px; width: 100%; max-width: 340px;">
+                  <input type="text" id="card-number-input" class="app-input" placeholder="Card Number (16 digits)" maxlength="19" style="font-size: 0.88rem; padding: 10px;">
+                  <div style="display: flex; gap: 10px;">
+                    <input type="text" id="card-expiry-input" class="app-input" placeholder="MM/YY" maxlength="5" style="font-size: 0.88rem; padding: 10px; flex: 1;">
+                    <input type="password" id="card-cvv-input" class="app-input" placeholder="CVV" maxlength="3" style="font-size: 0.88rem; padding: 10px; flex: 1;">
+                  </div>
+                  <input type="text" id="card-name-input" class="app-input" placeholder="Cardholder Name" style="font-size: 0.88rem; padding: 10px;">
+                </div>
+              </label>
+
+              <!-- Net Banking Option -->
+              <label class="payment-option-label" style="display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <input type="radio" name="payment-method" value="netbanking" style="accent-color: var(--color-accent);">
+                  <div style="font-weight: 700; color: var(--text-primary);">Net Banking</div>
+                </div>
+                <div id="netbanking-details-section" style="margin-left: 28px; margin-top: 4px; display: none;">
+                  <select id="netbanking-bank-select" class="sort-select" style="font-size: 0.88rem; padding: 10px; width: 100%; max-width: 320px;">
+                    <option value="sbi">State Bank of India</option>
+                    <option value="hdfc">HDFC Bank</option>
+                    <option value="icici">ICICI Bank</option>
+                    <option value="axis">Axis Bank</option>
+                  </select>
+                </div>
+              </label>
+
+              <!-- Cash on Delivery Option -->
+              <label class="payment-option-label" style="display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <input type="radio" name="payment-method" value="cod" style="accent-color: var(--color-accent);">
+                  <div style="font-weight: 700; color: var(--text-primary);">Cash on Delivery (COD)</div>
+                </div>
+                <div id="cod-details-section" style="margin-left: 28px; margin-top: 4px; display: none; font-size: 0.85rem; color: var(--text-secondary);">
+                  Pay with cash or scan payment QR code upon delivery of your products.
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Summary & Order Button -->
+        <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px; position: sticky; top: 90px;">
+          <h3 style="font-size: 1.20rem; font-weight: 700; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">Order Details</h3>
+          
+          <!-- Small Items List -->
+          <div style="max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px dashed var(--border-color); padding-bottom: 14px;">
+            ${AppState.cart.map(item => `
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem;">
+                <span style="color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
+                  ${item.product.name} <strong style="color: var(--text-primary);">x${item.qty}</strong>
+                </span>
+                <span style="font-weight: 700; color: var(--text-primary);">₹${(item.product.numericPrice * item.qty).toLocaleString('en-IN')}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+              <span>Subtotal</span>
+              <strong style="color: var(--text-primary);">₹${subtotal.toLocaleString('en-IN')}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+              <span>Shipping Fee</span>
+              <span style="color: var(--color-success); font-weight: 700;">${shipping === 0 ? 'FREE' : '₹99'}</span>
+            </div>
+          </div>
+
+          <div style="border-top: 1px dashed var(--border-color); padding-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary);">Grand Total</span>
+            <span style="font-size: 1.35rem; font-weight: 800; color: var(--color-accent);">₹${total.toLocaleString('en-IN')}</span>
+          </div>
+
+          <button class="btn-primary-action" id="checkout-pay-btn" style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; margin-top: 10px;">
+            <span id="checkout-pay-btn-text">Pay & Place Order</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    viewContainer.innerHTML = contentHtml;
+
+    // Address section actions
+    const selectAddr = document.getElementById('checkout-address-select');
+    const manageAddrBtn = document.getElementById('checkout-manage-address-btn');
+    const addAddrBtn = document.getElementById('checkout-add-address-btn');
+
+    if (manageAddrBtn) {
+      manageAddrBtn.addEventListener('click', () => {
+        // Open the address management modal
+        const addressModal = document.getElementById('address-modal-overlay');
+        if (addressModal) addressModal.classList.remove('hidden');
+      });
+    }
+
+    if (addAddrBtn) {
+      addAddrBtn.addEventListener('click', () => {
+        // Open the address modal
+        const addressModal = document.getElementById('address-modal-overlay');
+        if (addressModal) {
+          addressModal.classList.remove('hidden');
+          // Show form inside modal directly
+          const form = document.getElementById('address-form');
+          const addTrigger = document.getElementById('add-address-trigger');
+          if (form && addTrigger) {
+            form.reset();
+            document.getElementById('address-edit-id').value = '';
+            document.getElementById('address-form-title').textContent = 'Add New Address';
+            addTrigger.style.display = 'none';
+            form.style.display = 'flex';
+          }
+        }
+      });
+    }
+
+    // Toggle Payment Method view forms
+    const paymentRadios = document.querySelectorAll('input[name="payment-method"]');
+    const sections = {
+      upi: document.getElementById('upi-details-section'),
+      card: document.getElementById('card-details-section'),
+      netbanking: document.getElementById('netbanking-details-section'),
+      cod: document.getElementById('cod-details-section')
+    };
+
+    paymentRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const val = e.target.value;
+        // Show/hide relative detail forms
+        Object.keys(sections).forEach(k => {
+          if (sections[k]) {
+            sections[k].style.display = k === val ? (k === 'card' ? 'flex' : 'block') : 'none';
+          }
+        });
+      });
+    });
+
+    // Formatting Inputs CVV, Expiry, Card Number
+    const cardNum = document.getElementById('card-number-input');
+    if (cardNum) {
+      cardNum.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        let matches = v.match(/\d{4,16}/g);
+        let match = matches && matches[0] || '';
+        let parts = [];
+        for (let i=0, len=match.length; i<len; i+=4) {
+          parts.push(match.substring(i, i+4));
+        }
+        if (parts.length > 0) {
+          e.target.value = parts.join(' ');
+        } else {
+          e.target.value = v;
+        }
+      });
+    }
+
+    const cardExpiry = document.getElementById('card-expiry-input');
+    if (cardExpiry) {
+      cardExpiry.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/[^0-9]/gi, '');
+        if (v.length >= 2) {
+          e.target.value = v.substring(0, 2) + '/' + v.substring(2, 4);
+        } else {
+          e.target.value = v;
+        }
+      });
+    }
+
+    // Place Order Pay click
+    const payBtn = document.getElementById('checkout-pay-btn');
+    const payBtnText = document.getElementById('checkout-pay-btn-text');
+
+    if (payBtn) {
+      payBtn.addEventListener('click', () => {
+        if (addresses.length === 0) {
+          showToast('Please add a delivery address first!', 'error');
+          return;
+        }
+
+        const activePayment = document.querySelector('input[name="payment-method"]:checked').value;
+        
+        // Validations
+        if (activePayment === 'upi') {
+          const upiId = document.getElementById('upi-id-input').value.trim();
+          if (!upiId || !upiId.includes('@')) {
+            showToast('Please enter a valid UPI ID (e.g. username@okaxis)', 'error');
+            return;
+          }
+        } else if (activePayment === 'card') {
+          const num = document.getElementById('card-number-input').value.trim();
+          const exp = document.getElementById('card-expiry-input').value.trim();
+          const cvv = document.getElementById('card-cvv-input').value.trim();
+          const name = document.getElementById('card-name-input').value.trim();
+
+          if (num.replace(/\s/g, '').length < 16) {
+            showToast('Please enter a valid 16-digit card number', 'error');
+            return;
+          }
+          if (exp.length < 5 || !exp.includes('/')) {
+            showToast('Please enter a valid card expiry (MM/YY)', 'error');
+            return;
+          }
+          if (cvv.length < 3) {
+            showToast('Please enter a valid 3-digit CVV number', 'error');
+            return;
+          }
+          if (!name) {
+            showToast('Please enter the cardholder name', 'error');
+            return;
+          }
+        }
+
+        // Processing order placement
+        payBtn.disabled = true;
+        payBtn.style.opacity = '0.7';
+        payBtn.style.cursor = 'not-allowed';
+        payBtnText.innerHTML = `<span class="loading-spinner-inline" style="display:inline-block; width:12px; height:12px; border:2px solid #fff; border-radius:50%; border-top-color:transparent; animation:spin 0.8s linear infinite; margin-right:8px;"></span> Processing Secure Payment...`;
+
+        setTimeout(() => {
+          // Address details string
+          const targetAddrId = selectAddr ? selectAddr.value : (selectedAddress?.id || 'addr_1');
+          const targetAddr = addresses.find(a => a.id == targetAddrId) || selectedAddress;
+          const addressTextStr = `${targetAddr.name}, ${targetAddr.addressLine}, ${targetAddr.city}, ${targetAddr.state} - ${targetAddr.pincode}`;
+
+          // Create new order object
+          const newOrder = {
+            id: 'HYP-' + Math.floor(100000 + Math.random() * 900000),
+            date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            items: AppState.cart.reduce((s, i) => s + i.qty, 0),
+            total: `₹${total.toLocaleString('en-IN')}`,
+            status: 'Processing',
+            statusClass: 'pending',
+            address: addressTextStr,
+            paymentMethod: activePayment.toUpperCase()
+          };
+
+          // Save order
+          OrderService.add(newOrder);
+
+          // Trigger order placed notification
           if (typeof addNotification === 'function') {
             addNotification({
               id: 'notif_' + Date.now(),
               category: 'order',
               subType: 'Order Placed',
               title: 'Order Placed Successfully! 🛒',
-              desc: 'Your order #HYP-' + Math.floor(1000 + Math.random() * 9000) + ' has been placed and is being processed.',
+              desc: `Your order #${newOrder.id} has been placed and is currently being processed.`,
               time: 'Just now',
               timestamp: Date.now(),
               unread: true,
               priority: 'high',
               actionUrl: 'orders',
-              actionText: 'View Order'
+              actionText: 'Track Order'
             });
           }
+
+          // Clear cart
           AppState.cart = [];
-          updateCartBadge();
-          renderCartView();
-        });
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+
+          showToast('Payment successful! Your order has been placed.', 'success');
+          
+          // Redirect to orders view
+          renderView('orders');
+        }, 1500);
       });
     }
 
-    bindGlobalNavigationEvents();
+    applyTranslations();
   }
 
   /* ==========================================================================
@@ -3939,6 +4308,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (viewName === 'cart') {
       renderCartView();
+      return;
+    }
+
+    if (viewName === 'checkout') {
+      renderCheckoutView();
       return;
     }
 
