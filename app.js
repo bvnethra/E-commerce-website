@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'usr_' + Math.floor(1000 + Math.random() * 9000),
             name: nameStr,
             email: identifier.includes('@') ? identifier : `${identifier}@example.com`,
-            phone: !identifier.includes('@') ? identifier : '9876543210'
+            phone: !identifier.includes('@') ? identifier : '9876543210',
+            role: (identifier.toLowerCase().includes('admin') || identifier === 'admin') ? 'ADMIN' : 'CUSTOMER'
           };
 
           const token = this.generateMockJwt(user);
@@ -120,7 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'usr_' + Math.floor(1000 + Math.random() * 9000),
             name: name.trim(),
             email: email.trim(),
-            phone: mobile.trim()
+            phone: mobile.trim(),
+            role: (email.toLowerCase().includes('admin') || name.toLowerCase().includes('admin')) ? 'ADMIN' : 'CUSTOMER'
           };
 
           const token = this.generateMockJwt(user);
@@ -141,7 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'usr_goog_' + Math.floor(1000 + Math.random() * 9000),
             name: 'Alex Hype',
             email: 'alex.hype@gmail.com',
-            phone: '+91 98765 43210'
+            phone: '+91 98765 43210',
+            role: 'CUSTOMER'
           };
 
           const token = this.generateMockJwt(user);
@@ -1927,6 +1930,29 @@ document.addEventListener('DOMContentLoaded', () => {
           { user: 'Sarah Jenkins', rating: 4, comment: 'Great products, high durability. Highly recommended for daily use.', date: 'Jul 29, 2026' }
         ]
       };
+      
+      if (!localStorage.getItem('shopsphere_products')) {
+        localStorage.setItem('shopsphere_products', JSON.stringify(mockDb.products));
+      }
+      if (!localStorage.getItem('shopsphere_categories')) {
+        localStorage.setItem('shopsphere_categories', JSON.stringify(mockDb.categories));
+      }
+      if (!localStorage.getItem('shopsphere_reviews')) {
+        localStorage.setItem('shopsphere_reviews', JSON.stringify(mockDb.reviews));
+      }
+
+      if (viewName === 'products') {
+        return JSON.parse(localStorage.getItem('shopsphere_products'));
+      }
+      if (viewName === 'categories') {
+        return JSON.parse(localStorage.getItem('shopsphere_categories'));
+      }
+      if (viewName === 'reviews') {
+        return JSON.parse(localStorage.getItem('shopsphere_reviews'));
+      }
+      if (viewName === 'orders') {
+        return OrderService.getAll();
+      }
       return mockDb[viewName] || mockDb.products;
     }
   };
