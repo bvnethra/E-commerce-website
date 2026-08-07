@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const AppState = {
     currentView: 'home',
     simulatedState: 'normal', // 'normal', 'loading', 'empty', 'error'
-    cartCount: 2,
-    wishlistCount: 3,
+    cartCount: 0,
+    wishlistCount: 0,
     theme: localStorage.getItem('theme') || 'light',
     location: 'India',
     searchQuery: '',
@@ -2653,7 +2653,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Intercept View All Products & Hero CTA links
-    document.querySelectorAll('.view-all-link, .hero-cta-btn').forEach(link => {
+    document.querySelectorAll('.view-all-link, .hero-cta-btn, .shop-now-btn').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -3526,6 +3526,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindProductCardListeners();
   bindGlobalNavigationEvents();
   bindAuthEventListeners();
+  updateCartBadge();
 
   // Automatically prompt login modal on site entry if unauthenticated
   if (!AuthService.isAuthenticated()) {
