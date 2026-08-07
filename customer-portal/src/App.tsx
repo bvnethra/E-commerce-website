@@ -806,29 +806,27 @@ export default function App() {
                 <div>
                   <h2 style={{ marginBottom: '24px' }}>My Wishlist</h2>
                   {wishlist.length === 0 ? (
-                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                      <div className="empty-state-card" style={{ padding: '60px 40px', background: 'var(--bg-card)', maxWidth: '600px', width: '100%' }}>
-                        <div className="empty-state-illustration" style={{ width: '64px', height: '64px', background: 'rgba(194, 219, 58, 0.1)', color: 'var(--text-primary)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                        </div>
-                        <h3 className="empty-state-title" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>Your Wishlist is Empty</h3>
-                        <p className="empty-state-desc" style={{ maxWidth: '400px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>Save your favorite items here so you can find them quickly whenever you return.</p>
-                        <button 
-                          onClick={() => setCurrentView('shop')}
-                          style={{
-                            background: 'var(--color-accent, #c2db3a)',
-                            color: '#000',
-                            border: 'none',
-                            borderRadius: '24px',
-                            padding: '12px 28px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            boxShadow: 'var(--shadow-sm)'
-                          }}
-                        >
-                          Browse Products
-                        </button>
+                    <div className="empty-state-card" style={{ padding: '60px 40px', background: 'var(--bg-card)', width: '100%' }}>
+                      <div className="empty-state-illustration" style={{ width: '64px', height: '64px', background: 'rgba(194, 219, 58, 0.1)', color: 'var(--text-primary)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                       </div>
+                      <h3 className="empty-state-title" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>Your Wishlist is Empty</h3>
+                      <p className="empty-state-desc" style={{ maxWidth: '400px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>Save your favorite items here so you can find them quickly whenever you return.</p>
+                      <button 
+                        onClick={() => setCurrentView('shop')}
+                        style={{
+                          background: 'var(--color-accent, #c2db3a)',
+                          color: '#000',
+                          border: 'none',
+                          borderRadius: '24px',
+                          padding: '12px 28px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          boxShadow: 'var(--shadow-sm)'
+                        }}
+                      >
+                        Browse Products
+                      </button>
                     </div>
                   ) : (
                     <div className="products-grid">
@@ -951,29 +949,27 @@ export default function App() {
                   ) : isOrdersLoading ? (
                     <div style={{ padding: '20px 0', textAlign: 'center' }}>Loading orders...</div>
                   ) : orders.length === 0 ? (
-                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                      <div className="empty-state-card" style={{ padding: '60px 40px', background: 'var(--bg-card)', maxWidth: '600px', width: '100%' }}>
-                        <div className="empty-state-illustration" style={{ width: '64px', height: '64px', background: 'rgba(194, 219, 58, 0.1)', color: 'var(--text-primary)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                        </div>
-                        <h3 className="empty-state-title" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>No Orders Yet</h3>
-                        <p className="empty-state-desc" style={{ maxWidth: '400px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>Looks like you haven't placed any orders yet. Start shopping to fill your history!</p>
-                        <button 
-                          onClick={() => setCurrentView('shop')}
-                          style={{
-                            background: 'var(--color-accent, #c2db3a)',
-                            color: '#000',
-                            border: 'none',
-                            borderRadius: '24px',
-                            padding: '12px 28px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            boxShadow: 'var(--shadow-sm)'
-                          }}
-                        >
-                          Start Shopping
-                        </button>
+                    <div className="empty-state-card" style={{ padding: '60px 40px', background: 'var(--bg-card)', width: '100%' }}>
+                      <div className="empty-state-illustration" style={{ width: '64px', height: '64px', background: 'rgba(194, 219, 58, 0.1)', color: 'var(--text-primary)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                       </div>
+                      <h3 className="empty-state-title" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>No Orders Yet</h3>
+                      <p className="empty-state-desc" style={{ maxWidth: '400px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>Looks like you haven't placed any orders yet. Start shopping to fill your history!</p>
+                      <button 
+                        onClick={() => setCurrentView('shop')}
+                        style={{
+                          background: 'var(--color-accent, #c2db3a)',
+                          color: '#000',
+                          border: 'none',
+                          borderRadius: '24px',
+                          padding: '12px 28px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          boxShadow: 'var(--shadow-sm)'
+                        }}
+                      >
+                        Start Shopping
+                      </button>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
