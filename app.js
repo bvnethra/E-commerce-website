@@ -239,6 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Auth User
   AppState.user = AuthService.getUser();
 
+  // Sync the active user to registered users database on load
+  try {
+    const active = AppState.user;
+    if (active) {
+      const registeredUsers = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+      const exists = registeredUsers.some(u => u.email.toLowerCase() === active.email.toLowerCase());
+      if (!exists) {
+        registeredUsers.push(active);
+        localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
+      }
+    }
+  } catch (e) {}
+
   /* ==========================================================================
      Saved Order Management Service
      ========================================================================== */

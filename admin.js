@@ -139,7 +139,6 @@ function initializeAdminDatabases() {
     localStorage.setItem('shopsphere_notifications_log', JSON.stringify(defaultLogs));
   }
 
-  // 5. Sync default catalog/reviews/orders/users if storefront has not initialized them yet
   if (!localStorage.getItem('aura_registered_users')) {
     const defaultUsers = [
       { id: 'usr_1001', name: 'Admin Manager', email: 'admin@shopsphere.com', phone: '9988776655', role: 'ADMIN' },
@@ -147,6 +146,19 @@ function initializeAdminDatabases() {
     ];
     localStorage.setItem('aura_registered_users', JSON.stringify(defaultUsers));
   }
+
+  // Sync active storefront user to user registry on initialization
+  try {
+    const active = JSON.parse(localStorage.getItem('aura_user') || 'null');
+    if (active) {
+      const registeredUsers = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+      const exists = registeredUsers.some(u => u.email.toLowerCase() === active.email.toLowerCase());
+      if (!exists) {
+        registeredUsers.push(active);
+        localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
+      }
+    }
+  } catch (e) {}
 }
 
 /* ==========================================================================
