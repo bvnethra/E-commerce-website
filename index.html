@@ -246,7 +246,7 @@
             <div id="notif-dropdown-list" class="notif-dropdown-list">
               <!-- Dynamically rendered notification cards -->
             </div>
-
+            
             <div class="notif-dropdown-footer">
               <button id="notif-dropdown-view-all" class="notif-view-all-btn">
                 <span>View Notification Center</span>
@@ -258,9 +258,54 @@
           </div>
         </div>
 
-        <!-- User Profile Avatar Quick Access -->
-        <div class="header-avatar" id="header-profile-btn" style="cursor: pointer;" title="View Profile">
-          <img src="assets/images/cat_men.png" alt="User profile" class="avatar-img">
+        <!-- User Profile / Login Action & Dropdown -->
+        <div class="header-auth-container" id="header-auth-wrapper">
+          <button class="header-login-btn" id="header-login-trigger" style="display: flex;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Login</span>
+          </button>
+
+          <div class="header-user-profile" id="header-user-trigger" style="display: none;">
+            <div class="header-avatar" id="header-profile-btn" title="Account Menu">
+              <span id="header-user-initials" class="avatar-initials">U</span>
+            </div>
+            <span id="header-user-name" class="header-username">User</span>
+            <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+
+            <!-- User Menu Dropdown -->
+            <div class="user-menu-dropdown" id="user-dropdown-menu">
+              <div class="user-menu-header">
+                <div class="user-menu-avatar" id="dropdown-avatar-initials">U</div>
+                <div class="user-menu-details">
+                  <h4 id="dropdown-user-name">Guest User</h4>
+                  <p id="dropdown-user-email">guest@example.com</p>
+                </div>
+              </div>
+              <ul class="user-menu-list">
+                <li id="menu-item-profile">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span>My Profile</span>
+                </li>
+                <li id="menu-item-orders">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                  <span>Orders</span>
+                </li>
+                <li id="menu-item-wishlist">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  <span>Wishlist</span>
+                </li>
+                <li id="menu-item-addresses">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>Addresses</span>
+                </li>
+                <li class="menu-divider"></li>
+                <li id="menu-item-logout" class="menu-logout">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <span>Logout</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -314,9 +359,8 @@
         <!-- Hero Visuals -->
         <div class="hero-visual">
           <div class="hero-bg-circle"></div>
-          <img src="assets/images/hero_composite.png"
-            alt="Featured Hype products: backpack, headphones and white sneakers on rock base" class="hero-main-img">
-
+          <img src="assets/images/hero_composite.png" alt="Featured Hype products: backpack, headphones and white sneakers on rock base" class="hero-main-img">
+          
           <!-- Floating Promo Badge -->
           <div class="hero-promo-card">
             <span class="promo-title">Summer Sale</span>
@@ -324,10 +368,207 @@
             <span class="promo-pct">50%</span>
             <span class="promo-off">OFF</span>
             <button class="promo-arrow-btn" aria-label="View sale items">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <!-- Decorative Pattern Dots -->
+          <div class="deco-dots"></div>
+        </div>
+      </section>
+
+    <!-- Product Categories Section -->
+    <section class="categories-section">
+      <div class="category-grid">
+        <!-- 1. Men -->
+        <a href="#" class="category-card" style="--card-bg: #f1f3e7;" data-category="Men">
+          <div class="category-info">
+            <span class="category-title">Men</span>
+            <span class="category-subtitle">Collection</span>
+          </div>
+          <img src="assets/images/cat_men.png" alt="Men's collection category" class="category-img">
+        </a>
+
+        <!-- 2. Women -->
+        <a href="#" class="category-card" style="--card-bg: #f9ebdf;" data-category="Women">
+          <div class="category-info">
+            <span class="category-title">Women</span>
+            <span class="category-subtitle">Collection</span>
+          </div>
+          <img src="assets/images/cat_women.png" alt="Women's collection category" class="category-img">
+        </a>
+
+        <!-- 3. Electronics -->
+        <a href="#" class="category-card" style="--card-bg: #e4edf7;" data-category="Electronics">
+          <div class="category-info">
+            <span class="category-title">Electronics</span>
+            <span class="category-subtitle">Gadgets</span>
+          </div>
+          <img src="assets/images/cat_electronics.png" alt="Electronics gadgets category" class="category-img">
+        </a>
+
+        <!-- 4. Shoes -->
+        <a href="#" class="category-card" style="--card-bg: #f5ece4;" data-category="Shoes">
+          <div class="category-info">
+            <span class="category-title">Shoes</span>
+            <span class="category-subtitle">Collection</span>
+          </div>
+          <img src="assets/images/cat_shoes.png" alt="Shoes collection category" class="category-img">
+        </a>
+
+        <!-- 5. Accessories -->
+        <a href="#" class="category-card" style="--card-bg: #ecdff9;" data-category="Accessories">
+          <div class="category-info">
+            <span class="category-title">Accessories</span>
+            <span class="category-subtitle">Collection</span>
+          </div>
+          <img src="assets/images/cat_accessories.png" alt="Accessories collection category" class="category-img">
+        </a>
+
+        <!-- All Categories Button Card -->
+        <a href="#" class="category-card all-categories-card" data-nav-target="categories">
+          <div class="all-categories-content">
+            <div class="all-categories-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <span class="all-categories-text">All Categories</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Featured Products & Deals Container -->
+    <section class="featured-section">
+      <div class="section-header">
+        <h2 class="section-title">Featured Products</h2>
+        <a href="#" class="view-all-link">
+          <span>View All Products</span>
+          <span class="arrow-circle-small">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
+      </div>
+
+      <div class="products-and-deals-grid">
+        <!-- Products Sub-Grid (4 columns layout within this flex/grid container) -->
+        <div class="products-grid">
+          
+          <!-- Product Card 1 -->
+          <div class="product-card" data-product-id="1">
+            <div class="product-card-top">
+              <span class="discount-badge">-20%</span>
+              <button class="wishlist-btn" aria-label="Add Smart Watch to wishlist">
+                <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="product-img-wrapper">
+                <img src="assets/images/prod_watch.png" alt="Noise Ultra 2 Max Smart Watch" class="product-img">
+              </div>
+            </div>
+            <div class="product-card-bottom">
+              <div class="product-details">
+                <span class="product-cat">Smart Watch</span>
+                <h3 class="product-name">Noise Ultra 2 Max</h3>
+                <div class="product-price-row">
+                  <span class="price-current">₹4,999</span>
+                  <span class="price-original">₹6,999</span>
+                </div>
+              </div>
+              <button class="add-to-cart-btn" aria-label="Add Noise Ultra 2 Max to cart" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Card 2 -->
+          <div class="product-card" data-product-id="2">
+            <div class="product-card-top">
+              <span class="discount-badge" style="background-color: var(--accent); color: #000;">HOT</span>
+              <button class="wishlist-btn" aria-label="Add Boat Airdopes 181 to wishlist">
+                <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="product-img-wrapper">
+                <img src="assets/images/prod_earbuds.png" alt="Boat Airdopes 181 Earbuds" class="product-img">
+              </div>
+            </div>
+            <div class="product-card-bottom">
+              <div class="product-details">
+                <span class="product-cat">Earbuds</span>
+                <h3 class="product-name">Boat Airdopes 181</h3>
+                <div class="product-price-row">
+                  <span class="price-current">₹1,299</span>
+                  <span class="price-original">₹1,999</span>
+                </div>
+              </div>
+              <button class="add-to-cart-btn" aria-label="Add Boat Airdopes 181 to cart" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Card 3 -->
+          <div class="product-card" data-product-id="3">
+            <div class="product-card-top">
+              <span class="discount-badge">-8%</span>
+              <button class="wishlist-btn" aria-label="Add Canon Camera to wishlist">
+                <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="product-img-wrapper">
+                <img src="assets/images/prod_camera.png" alt="Canon EOS M50 Mark II Camera" class="product-img">
+              </div>
+            </div>
+            <div class="product-card-bottom">
+              <div class="product-details">
+                <span class="product-cat">Camera</span>
+                <h3 class="product-name">Canon EOS M50 Mark II</h3>
+                <div class="product-price-row">
+                  <span class="price-current">₹54,990</span>
+                  <span class="price-original">₹59,999</span>
+                </div>
+              </div>
+              <button class="add-to-cart-btn" aria-label="Add Canon EOS M50 Mark II to cart" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Card 4 -->
+          <div class="product-card" data-product-id="4">
+            <div class="product-card-top">
+              <span class="discount-badge">-25%</span>
+              <button class="wishlist-btn" aria-label="Add Backpack to wishlist">
+                <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="product-img-wrapper">
+                <img src="assets/images/prod_backpack.png" alt="Urban Explorer Pro Backpack" class="product-img">
+              </div>
+            </div>
+            <div class="product-card-bottom">
+              <div class="product-details">
+                <span class="product-cat">Backpack</span>
+                <h3 class="product-name">Urban Explorer Pro</h3>
+                <div class="product-price-row">
+                  <span class="price-current">₹2,999</span>
+                  <span class="price-original">₹3,999</span>
+                </div>
+              </div>
+              <button class="add-to-cart-btn" aria-label="Add Urban Explorer Pro to cart" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Exclusive Deals Block -->
+        <div class="deals-block">
+          <div class="deals-content">
+            <span class="deals-badge">Exclusive</span>
+            <h3 class="deals-title">Deals Only<br><span class="deals-highlight">For You</span></h3>
+            
+            <div class="deals-line">
+              <svg viewBox="0 0 100 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 7 C 20 2, 40 12, 60 2 C 80 12, 90 2, 100 7" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+>>>>>>> origin/main
               </svg>
             </button>
           </div>
@@ -683,6 +924,146 @@
       </div>
     </div>
   </div>
+
+  <!-- Flipkart-inspired Authentication Modal Overlay -->
+  <div id="auth-modal-overlay" class="fk-modal-overlay">
+    <div class="fk-auth-modal" role="dialog" aria-modal="true" aria-labelledby="fk-banner-title">
+      <button id="fk-auth-close" class="fk-modal-close-btn" aria-label="Close dialog">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <!-- Left Hype Brand Hero Banner -->
+      <div class="fk-auth-banner hype-auth-banner">
+        <div class="hype-brand-header">
+          <h1 class="logo" style="font-size: 1.8rem; color: #ffffff; margin-bottom: 2px;">Hype<span class="logo-dot" style="color: var(--color-accent, #c2db3a);">.</span></h1>
+          <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0; font-weight: 500;">Style That Moves You</p>
+        </div>
+
+        <!-- Essential VIP Welcome Offer Card -->
+        <div class="hype-welcome-offer-card">
+          <span class="offer-tag">WELCOME PERK</span>
+          <h3 class="offer-heading">GET 10% OFF</h3>
+          <p class="offer-subtext">On your first purchase after signing in</p>
+          
+          <div class="offer-code-pill">
+            <span>PROMO: <strong>FIRST10</strong></span>
+          </div>
+
+          <div class="offer-image-wrapper">
+            <img src="assets/images/gift_box.png" alt="Exclusive Hype Gift Offer" class="offer-img">
+          </div>
+        </div>
+
+        <!-- Essential Social Proof Stats -->
+        <div class="hype-auth-stats-row">
+          <div class="stat-box">
+            <strong>50K+</strong>
+            <span>Shoppers</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <strong>4.9 ★</strong>
+            <span>Top Rated</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <strong>2-Day</strong>
+            <span>Express Delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="fk-auth-form-panel">
+        <!-- Error Alert Banner -->
+        <div id="fk-auth-error" class="fk-auth-alert" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="fk-error-text">Invalid login credentials.</span>
+        </div>
+
+        <!-- 1. LOGIN VIEW -->
+        <form id="fk-login-form" class="fk-auth-form">
+          <div class="fk-field-group">
+            <input type="text" id="fk-login-identifier" class="fk-input-field" placeholder=" " required autocomplete="username">
+            <label for="fk-login-identifier" class="fk-floating-label">Enter Email / Mobile Number</label>
+            <span class="fk-field-error" id="err-login-identifier"></span>
+          </div>
+
+          <div class="fk-field-group" id="fk-pwd-group">
+            <input type="password" id="fk-login-password" class="fk-input-field" placeholder=" " required autocomplete="current-password">
+            <label for="fk-login-password" class="fk-floating-label">Enter Password</label>
+            <span class="fk-field-error" id="err-login-password"></span>
+          </div>
+
+          <div class="fk-disclaimer-text">
+            By continuing, you agree to Hype's <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>.
+          </div>
+
+          <button type="submit" id="fk-login-submit" class="fk-btn-primary">
+            <span class="btn-text">Login</span>
+            <span class="btn-spinner" style="display: none;"></span>
+          </button>
+
+          <div class="fk-divider"><span>OR</span></div>
+
+          <button type="button" id="google-signin-btn" class="google-signin-btn">
+            <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <span>Sign in with Google</span>
+          </button>
+
+          <div class="fk-switch-footer">
+            <span>New to Hype?</span>
+            <button type="button" id="fk-link-to-signup" class="fk-link-btn">Create an account</button>
+          </div>
+        </form>
+
+        <!-- 3. SIGNUP VIEW (Hidden by default) -->
+        <form id="fk-signup-form" class="fk-auth-form" style="display: none;">
+          <div class="fk-field-group">
+            <input type="text" id="fk-signup-name" class="fk-input-field" placeholder=" " required autocomplete="name">
+            <label for="fk-signup-name" class="fk-floating-label">Full Name</label>
+            <span class="fk-field-error" id="err-signup-name"></span>
+          </div>
+
+          <div class="fk-field-group">
+            <input type="email" id="fk-signup-email" class="fk-input-field" placeholder=" " required autocomplete="email">
+            <label for="fk-signup-email" class="fk-floating-label">Email Address</label>
+            <span class="fk-field-error" id="err-signup-email"></span>
+          </div>
+
+          <div class="fk-field-group">
+            <input type="tel" id="fk-signup-mobile" class="fk-input-field" placeholder=" " required autocomplete="tel">
+            <label for="fk-signup-mobile" class="fk-floating-label">Mobile Number (10 digits)</label>
+            <span class="fk-field-error" id="err-signup-mobile"></span>
+          </div>
+
+          <div class="fk-field-group">
+            <input type="password" id="fk-signup-password" class="fk-input-field" placeholder=" " required autocomplete="new-password">
+            <label for="fk-signup-password" class="fk-floating-label">Set Password (Min 6 chars)</label>
+            <span class="fk-field-error" id="err-signup-password"></span>
+          </div>
+
+          <button type="submit" id="fk-signup-submit" class="fk-btn-primary">
+            <span class="btn-text">REGISTER & CONTINUE</span>
+            <span class="btn-spinner" style="display: none;"></span>
+          </button>
+
+          <div class="fk-switch-footer">
+            <span>Existing User?</span>
+            <button type="button" id="fk-link-to-login" class="fk-link-btn">Log in</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
 
   <!-- JavaScript -->
   <script src="app.js"></script>
