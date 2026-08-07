@@ -6117,3 +6117,106 @@ input {
 .lang-selector-btn.active .active-check {
   color: var(--color-accent) !important;
 }
+
+/* ==========================================================================
+   ShopSphere Global Premium Micro-Animations & View Transitions
+   ========================================================================== */
+
+/* 1. Staggered Fade-in/Slide-up transitions for pages */
+#view-container > * {
+  animation: fadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 2. Staggered loading animations for Catalog/Listings products */
+.product-card {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.product-card:nth-child(1) { animation-delay: 0.04s; }
+.product-card:nth-child(2) { animation-delay: 0.08s; }
+.product-card:nth-child(3) { animation-delay: 0.12s; }
+.product-card:nth-child(4) { animation-delay: 0.16s; }
+.product-card:nth-child(5) { animation-delay: 0.20s; }
+.product-card:nth-child(6) { animation-delay: 0.24s; }
+.product-card:nth-child(7) { animation-delay: 0.28s; }
+.product-card:nth-child(8) { animation-delay: 0.32s; }
+
+/* 3. Staggered loading animations for Homepage categories */
+.category-card {
+  animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.category-card:nth-child(1) { animation-delay: 0.03s; }
+.category-card:nth-child(2) { animation-delay: 0.06s; }
+.category-card:nth-child(3) { animation-delay: 0.09s; }
+.category-card:nth-child(4) { animation-delay: 0.12s; }
+.category-card:nth-child(5) { animation-delay: 0.15s; }
+.category-card:nth-child(6) { animation-delay: 0.18s; }
+
+/* 4. Ambient floating motion for circles and background visual elements */
+.hero-bg-circle {
+  animation: floatGlow 10s ease-in-out infinite alternate;
+}
+
+@keyframes floatGlow {
+  0% {
+    transform: translate(0, 0) scale(1);
+    filter: blur(80px);
+  }
+  100% {
+    transform: translate(-4%, 6%) scale(1.1);
+    filter: blur(100px);
+  }
+}
+
+/* 5. Fluid Micro-interactions & scale dynamics on buttons */
+.btn-primary-action, .add-to-cart-btn, .buy-now-btn, #checkout-pay-btn {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-primary-action:hover, .add-to-cart-btn:hover, .buy-now-btn:hover, #checkout-pay-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 22px var(--color-accent-bg) !important;
+}
+
+.btn-primary-action:active, .add-to-cart-btn:active, .buy-now-btn:active, #checkout-pay-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.btn-secondary-action, .sort-select, .color-palette-btn, .lang-selector-btn {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-secondary-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* 6. Premium navigation hover lift effects */
+.nav-links li a {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.nav-links li a:hover {
+  padding-left: 10px;
+  color: var(--color-accent) !important;
+}
+
+/* 7. Hover tilt effect on promotional badges */
+.hero-promo-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-promo-card:hover {
+  transform: translateY(-4px) rotate(1deg);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
