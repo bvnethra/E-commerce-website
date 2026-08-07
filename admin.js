@@ -197,29 +197,62 @@ function initializeAdminDatabases() {
 
   // 7. Products Database initialization fallback
   let storedProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
-  if (storedProds.length < 108) {
+  if (storedProds.length < 108 || storedProds[0]?.name.includes('Classic Black')) {
     const defaultProducts = [];
     const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
+    
+    const categoryProductNames = {
+      'Men': ['Shirt', 'T-Shirt', 'Pants', 'Jacket'],
+      'Women': ['Dress', 'Top', 'Skirt', 'Jeans'],
+      'Activewear': ['Gym Shorts', 'Sports Bra', 'Leggings', 'Tracksuit'],
+      'Sleepwear': ['Pajama Set', 'Nightgown', 'Robe', 'Sweatpants'],
+      'Shoes': ['Sneakers', 'Boots', 'Sandals', 'Formal Shoes'],
+      'Bags & Luggage': ['Backpack', 'Suitcase', 'Handbag', 'Laptop Bag'],
+      'Jewelry': ['Necklace', 'Ring', 'Earrings', 'Bracelet'],
+      'Accessories': ['Sunglasses', 'Wallet', 'Belt', 'Smartwatch'],
+      'Kids & Baby': ['Onesie', 'Kids T-Shirt', 'Kids Shorts', 'Baby Blanket'],
+      'Electronics': ['Smartphone', 'Laptop', 'Power Bank', 'Tablet'],
+      'Audio': ['Headphones', 'Earbuds', 'Bluetooth Speaker', 'Soundbar'],
+      'Gaming': ['Gaming Console', 'Game Controller', 'Gaming Headset', 'Video Game'],
+      'Smart Home': ['Smart Bulb', 'Security Camera', 'Smart Plug', 'Smart Lock'],
+      'Furniture': ['Sofa', 'Bed', 'Office Chair', 'Dining Table'],
+      'Home Decor': ['Wall Art', 'Vase', 'Scented Candle', 'Curtain'],
+      'Bedding & Bath': ['Bed Sheet', 'Comforter', 'Bath Towel', 'Pillow'],
+      'Kitchen & Dining': ['Frying Pan', 'Air Fryer', 'Water Bottle', 'Dinnerware Set'],
+      'Lighting': ['Desk Lamp', 'Ceiling Light', 'Floor Lamp', 'Solar Light'],
+      'Beauty & Skincare': ['Face Wash', 'Moisturizer', 'Sunscreen', 'Serum'],
+      'Fragrances': ['Perfume', 'Cologne', 'Body Mist', 'Room Diffuser'],
+      'Grooming': ['Beard Trimmer', 'Hair Dryer', 'Electric Razor', 'Electric Toothbrush'],
+      'Health & Wellness': ['Multivitamins', 'Protein Powder', 'Massage Gun', 'First Aid Kit'],
+      'Sports & Fitness': ['Dumbbell', 'Yoga Mat', 'Resistance Band', 'Basketball'],
+      'Outdoor & Camping': ['Camping Tent', 'Sleeping Bag', 'Hiking Backpack', 'Headlamp'],
+      'Office & Stationery': ['Notebook', 'Pen Set', 'Desk Organizer', 'Planner'],
+      'Toys & Games': ['Action Figure', 'Board Game', 'Building Blocks', 'Puzzle'],
+      'Pet Supplies': ['Dog Food', 'Pet Bed', 'Dog Leash', 'Pet Toy']
+    };
+
     let globalId = 1;
     categories.forEach(cat => {
-      const baseNames = [
-        { suffix: 'Premium Pack', price: 2999, originalPrice: 4999, badge: 'Best Seller' },
-        { suffix: 'Elite Edition', price: 5999, originalPrice: 8999, badge: 'Featured' },
-        { suffix: 'Deluxe Suite', price: 8999, originalPrice: 12999, badge: 'Hot' },
-        { suffix: 'Standard Choice', price: 1499, originalPrice: 2499, badge: 'New' }
+      const names = categoryProductNames[cat.name] || ['Item A', 'Item B', 'Item C', 'Item D'];
+      const baseDetails = [
+        { price: 1999, originalPrice: 2999, badge: 'Best Seller' },
+        { price: 3999, originalPrice: 5999, badge: 'Featured' },
+        { price: 6999, originalPrice: 9999, badge: 'Hot' },
+        { price: 999, originalPrice: 1499, badge: 'New' }
       ];
 
-      baseNames.forEach((item, index) => {
+      names.forEach((prodName, index) => {
+        const detail = baseDetails[index] || baseDetails[0];
         defaultProducts.push({
           id: globalId++,
-          name: `${cat.name} ${item.suffix}`,
+          name: `${cat.name} ${prodName}`,
           cat: cat.name,
           brand: 'HypeBrand',
-          price: `₹${item.price.toLocaleString('en-IN')}`,
-          originalPrice: `₹${item.originalPrice.toLocaleString('en-IN')}`,
-          numericPrice: item.price,
-          discount: Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100),
-          badge: item.badge,
+          price: `₹${detail.price.toLocaleString('en-IN')}`,
+          originalPrice: `₹${detail.originalPrice.toLocaleString('en-IN')}`,
+          numericPrice: detail.price,
+          discount: Math.round(((detail.originalPrice - detail.price) / detail.originalPrice) * 100),
+          badge: detail.badge,
           rating: Number((4.0 + Math.random() * 1.0).toFixed(1)),
           reviewCount: Math.floor(10 + Math.random() * 200),
           inStock: true,
@@ -229,7 +262,7 @@ function initializeAdminDatabases() {
           warranty: '1 Year Brand Warranty',
           returnPolicy: '30 Days Money Back Guarantee',
           sellerInfo: 'Hype Official Store • Verified Retailer',
-          shortDesc: `Premium quality ${cat.name} ${item.suffix} designed for maximum satisfaction.`,
+          shortDesc: `Premium quality ${cat.name} ${prodName} designed for maximum satisfaction.`,
           description: `Experience the finest selection of our ${cat.name} range. Handcrafted with top-grade materials and engineered to modern specifications.`,
           img: cat.img || 'assets/images/cat_accessories.png',
           images: [cat.img || 'assets/images/cat_accessories.png'],

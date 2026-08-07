@@ -2021,16 +2021,16 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         ],
         categories: [
-          { name: 'Men', subtitle: 'T-Shirts, Jeans & Jackets', bg: '#e0f2fe', img: 'assets/images/cat_accessories.png' },
-          { name: 'Women', subtitle: 'Dresses, Tops & Jeans', bg: '#fce7f3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Men', subtitle: 'T-Shirts, Jeans & Jackets', bg: '#e0f2fe', img: 'assets/images/cat_men.png' },
+          { name: 'Women', subtitle: 'Dresses, Tops & Jeans', bg: '#fce7f3', img: 'assets/images/cat_women.png' },
           { name: 'Activewear', subtitle: 'Gym Shorts & Leggings', bg: '#ccfbf1', img: 'assets/images/cat_activewear.png' },
           { name: 'Sleepwear', subtitle: 'Pajama Sets & Loungewear', bg: '#fae8ff', img: 'assets/images/cat_sleepwear.svg' },
-          { name: 'Shoes', subtitle: 'Sneakers, Boots & Sandals', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Shoes', subtitle: 'Sneakers, Boots & Sandals', bg: '#fef9c3', img: 'assets/images/cat_shoes.png' },
           { name: 'Bags & Luggage', subtitle: 'Backpacks & Suitcases', bg: '#e2e8f0', img: 'assets/images/prod_backpack.png' },
           { name: 'Jewelry', subtitle: 'Necklaces, Rings & Earrings', bg: '#ffe4e6', img: 'assets/images/cat_jewelry.svg' },
           { name: 'Accessories', subtitle: 'Smartwatches, Sunglasses & Wallets', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
-          { name: 'Kids & Baby', subtitle: 'Baby Onesies & Kids Apparel', bg: '#fae8ff', img: 'assets/images/cat_accessories.png' },
-          { name: 'Electronics', subtitle: 'Smartphones, Laptops & Accessories', bg: '#dcfce7', img: 'assets/images/cat_accessories.png' },
+          { name: 'Kids & Baby', subtitle: 'Baby Onesies & Kids Apparel', bg: '#fae8ff', img: 'assets/images/cat_kids.png' },
+          { name: 'Electronics', subtitle: 'Smartphones, Laptops & Accessories', bg: '#dcfce7', img: 'assets/images/cat_electronics.png' },
           { name: 'Audio', subtitle: 'Earbuds, Headphones & Speakers', bg: '#dbeafe', img: 'assets/images/prod_earbuds.png' },
           { name: 'Gaming', subtitle: 'Consoles, Controllers & Gear', bg: '#e2e8f0', img: 'assets/images/cat_gaming.svg' },
           { name: 'Smart Home', subtitle: 'Smart Bulbs, Cameras & Hubs', bg: '#f1f5f9', img: 'assets/images/cat_smarthome.svg' },
@@ -2039,15 +2039,15 @@ document.addEventListener('DOMContentLoaded', () => {
           { name: 'Bedding & Bath', subtitle: 'Sheets, Towels & Mats', bg: '#e0f2fe', img: 'assets/images/cat_bedding.svg' },
           { name: 'Kitchen & Dining', subtitle: 'Cookware, Blenders & Cutlery', bg: '#ffedd5', img: 'assets/images/cat_kitchen.png' },
           { name: 'Lighting', subtitle: 'Ceiling, Table & Desk Lamps', bg: '#fef9c3', img: 'assets/images/cat_lighting.svg' },
-          { name: 'Beauty & Skincare', subtitle: 'Cleansers, Serums & Makeup', bg: '#ffe4e6', img: 'assets/images/cat_accessories.png' },
+          { name: 'Beauty & Skincare', subtitle: 'Cleansers, Serums & Makeup', bg: '#ffe4e6', img: 'assets/images/cat_beauty.png' },
           { name: 'Fragrances', subtitle: 'Perfumes, Colognes & Mists', bg: '#fae8ff', img: 'assets/images/cat_fragrances.svg' },
           { name: 'Grooming', subtitle: 'Trimmers, Dryers & Razors', bg: '#fed7aa', img: 'assets/images/cat_grooming.png' },
           { name: 'Health & Wellness', subtitle: 'Vitamins & Protein Powders', bg: '#d1fae5', img: 'assets/images/cat_health.png' },
           { name: 'Sports & Fitness', subtitle: 'Dumbbells & Yoga Mats', bg: '#ffe4e6', img: 'assets/images/cat_sports.png' },
           { name: 'Outdoor & Camping', subtitle: 'Tents, Sleeping Bags & Gear', bg: '#ffedd5', img: 'assets/images/cat_outdoor.png' },
           { name: 'Office & Stationery', subtitle: 'Notebooks, Pens & Organizers', bg: '#ffedd5', img: 'assets/images/cat_office.svg' },
-          { name: 'Toys & Games', subtitle: 'Action Figures & Board Games', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
-          { name: 'Pet Supplies', subtitle: 'Food, Beds & Toys', bg: '#f5ebe0', img: 'assets/images/cat_accessories.png' }
+          { name: 'Toys & Games', subtitle: 'Action Figures & Board Games', bg: '#fef9c3', img: 'assets/images/cat_toys.png' },
+          { name: 'Pet Supplies', subtitle: 'Food, Beds & Toys', bg: '#f5ebe0', img: 'assets/images/cat_pets.png' }
         ],
         orders: OrderService.getAll(),
         wishlist: [],
@@ -2059,29 +2059,62 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       // Initialize/sync products database in localStorage if not set or outdated
       let storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
-      if (storedProducts.length < 108) {
+      if (storedProducts.length < 108 || storedProducts[0]?.name.includes('Classic Black')) {
         const generatedProducts = [];
         const categories = mockDb.categories;
+        
+        const categoryProductNames = {
+          'Men': ['Shirt', 'T-Shirt', 'Pants', 'Jacket'],
+          'Women': ['Dress', 'Top', 'Skirt', 'Jeans'],
+          'Activewear': ['Gym Shorts', 'Sports Bra', 'Leggings', 'Tracksuit'],
+          'Sleepwear': ['Pajama Set', 'Nightgown', 'Robe', 'Sweatpants'],
+          'Shoes': ['Sneakers', 'Boots', 'Sandals', 'Formal Shoes'],
+          'Bags & Luggage': ['Backpack', 'Suitcase', 'Handbag', 'Laptop Bag'],
+          'Jewelry': ['Necklace', 'Ring', 'Earrings', 'Bracelet'],
+          'Accessories': ['Sunglasses', 'Wallet', 'Belt', 'Smartwatch'],
+          'Kids & Baby': ['Onesie', 'Kids T-Shirt', 'Kids Shorts', 'Baby Blanket'],
+          'Electronics': ['Smartphone', 'Laptop', 'Power Bank', 'Tablet'],
+          'Audio': ['Headphones', 'Earbuds', 'Bluetooth Speaker', 'Soundbar'],
+          'Gaming': ['Gaming Console', 'Game Controller', 'Gaming Headset', 'Video Game'],
+          'Smart Home': ['Smart Bulb', 'Security Camera', 'Smart Plug', 'Smart Lock'],
+          'Furniture': ['Sofa', 'Bed', 'Office Chair', 'Dining Table'],
+          'Home Decor': ['Wall Art', 'Vase', 'Scented Candle', 'Curtain'],
+          'Bedding & Bath': ['Bed Sheet', 'Comforter', 'Bath Towel', 'Pillow'],
+          'Kitchen & Dining': ['Frying Pan', 'Air Fryer', 'Water Bottle', 'Dinnerware Set'],
+          'Lighting': ['Desk Lamp', 'Ceiling Light', 'Floor Lamp', 'Solar Light'],
+          'Beauty & Skincare': ['Face Wash', 'Moisturizer', 'Sunscreen', 'Serum'],
+          'Fragrances': ['Perfume', 'Cologne', 'Body Mist', 'Room Diffuser'],
+          'Grooming': ['Beard Trimmer', 'Hair Dryer', 'Electric Razor', 'Electric Toothbrush'],
+          'Health & Wellness': ['Multivitamins', 'Protein Powder', 'Massage Gun', 'First Aid Kit'],
+          'Sports & Fitness': ['Dumbbell', 'Yoga Mat', 'Resistance Band', 'Basketball'],
+          'Outdoor & Camping': ['Camping Tent', 'Sleeping Bag', 'Hiking Backpack', 'Headlamp'],
+          'Office & Stationery': ['Notebook', 'Pen Set', 'Desk Organizer', 'Planner'],
+          'Toys & Games': ['Action Figure', 'Board Game', 'Building Blocks', 'Puzzle'],
+          'Pet Supplies': ['Dog Food', 'Pet Bed', 'Dog Leash', 'Pet Toy']
+        };
+
         let globalId = 1;
         categories.forEach(cat => {
-          const baseNames = [
-            { suffix: 'Premium Pack', price: 2999, originalPrice: 4999, badge: 'Best Seller' },
-            { suffix: 'Elite Edition', price: 5999, originalPrice: 8999, badge: 'Featured' },
-            { suffix: 'Deluxe Suite', price: 8999, originalPrice: 12999, badge: 'Hot' },
-            { suffix: 'Standard Choice', price: 1499, originalPrice: 2499, badge: 'New' }
+          const names = categoryProductNames[cat.name] || ['Item A', 'Item B', 'Item C', 'Item D'];
+          const baseDetails = [
+            { price: 1999, originalPrice: 2999, badge: 'Best Seller' },
+            { price: 3999, originalPrice: 5999, badge: 'Featured' },
+            { price: 6999, originalPrice: 9999, badge: 'Hot' },
+            { price: 999, originalPrice: 1499, badge: 'New' }
           ];
 
-          baseNames.forEach((item, index) => {
+          names.forEach((prodName, index) => {
+            const detail = baseDetails[index] || baseDetails[0];
             generatedProducts.push({
               id: globalId++,
-              name: `${cat.name} ${item.suffix}`,
+              name: `${cat.name} ${prodName}`,
               cat: cat.name,
               brand: 'HypeBrand',
-              price: `₹${item.price.toLocaleString('en-IN')}`,
-              originalPrice: `₹${item.originalPrice.toLocaleString('en-IN')}`,
-              numericPrice: item.price,
-              discount: Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100),
-              badge: item.badge,
+              price: `₹${detail.price.toLocaleString('en-IN')}`,
+              originalPrice: `₹${detail.originalPrice.toLocaleString('en-IN')}`,
+              numericPrice: detail.price,
+              discount: Math.round(((detail.originalPrice - detail.price) / detail.originalPrice) * 100),
+              badge: detail.badge,
               rating: Number((4.0 + Math.random() * 1.0).toFixed(1)),
               reviewCount: Math.floor(10 + Math.random() * 200),
               inStock: true,
@@ -2091,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', () => {
               warranty: '1 Year Brand Warranty',
               returnPolicy: '30 Days Money Back Guarantee',
               sellerInfo: 'Hype Official Store • Verified Retailer',
-              shortDesc: `Premium quality ${cat.name} ${item.suffix} designed for maximum satisfaction.`,
+              shortDesc: `Premium quality ${cat.name} ${prodName} designed for maximum satisfaction.`,
               description: `Experience the finest selection of our ${cat.name} range. Handcrafted with top-grade materials and engineered to modern specifications.`,
               img: cat.img || 'assets/images/cat_accessories.png',
               images: [cat.img || 'assets/images/cat_accessories.png'],
@@ -2114,7 +2147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Initialize/sync categories database in localStorage if not set or outdated
       const storedCategories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
-      if (storedCategories.length >= 27) {
+      if (storedCategories.length >= 27 && storedCategories[0]?.img === 'assets/images/cat_men.png') {
         mockDb.categories = storedCategories;
       } else {
         localStorage.setItem('shopsphere_categories', JSON.stringify(mockDb.categories));
