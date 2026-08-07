@@ -470,6 +470,19 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
 
+        if (AppState.currentView === 'checkout') {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.address-action-btn') || e.target.closest('.address-set-default-btn')) {
+              return;
+            }
+            AddressService.setDefault(addr.id);
+            const overlay = document.getElementById('address-modal-overlay');
+            if (overlay) overlay.classList.add('hidden');
+            renderCheckoutView();
+          });
+        }
+
         listContainer.appendChild(card);
       });
       applyTranslations();
@@ -2520,6 +2533,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectAddr = document.getElementById('checkout-address-select');
     const manageAddrBtn = document.getElementById('checkout-manage-address-btn');
     const addAddrBtn = document.getElementById('checkout-add-address-btn');
+
+    if (selectAddr) {
+      selectAddr.addEventListener('change', (e) => {
+        AddressService.setDefault(e.target.value);
+        renderCheckoutView();
+      });
+    }
 
     if (manageAddrBtn) {
       manageAddrBtn.addEventListener('click', () => {
