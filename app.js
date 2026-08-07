@@ -19,13 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxIndex: 0,
     lightboxImages: [],
     listingFilters: {
-      category: 'all',
-      brand: 'all',
+      categories: [],
+      brands: [],
       minPrice: 0,
       maxPrice: 100000,
       minRating: 0,
-      stock: 'all',
-      discount: 0
+      discount: 0,
+      availability: [],
+      colors: [],
+      sizes: [],
+      shipping: [],
+      special: []
     }
   };
 
@@ -444,94 +448,15 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /* ==========================================================================
-     Exclusive Search Results View Engine
+     Exclusive Search Results View Engine (Combined Search & Multi-Filter)
      ========================================================================== */
   function renderSearchResultsView(query) {
     if (!viewContainer) return;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    const allProducts = ApiService.getMockData('products');
-    const q = (query || '').toLowerCase().trim();
-    const matchedProducts = allProducts.filter(p => {
-      return p.name.toLowerCase().includes(q) ||
-             p.cat.toLowerCase().includes(q) ||
-             p.brand.toLowerCase().includes(q) ||
-             (p.description && p.description.toLowerCase().includes(q));
-    });
-
-    if (matchedProducts.length === 0) {
-      viewContainer.innerHTML = `
-        <div class="view-section-header">
-          <div>
-            <h2 class="view-title">Search Results</h2>
-            <p class="view-subtitle">No matches found for "<strong style="color: var(--color-accent);">${query}</strong>"</p>
-          </div>
-        </div>
-        <div style="background: var(--bg-card); padding: 48px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--bg-body); display: flex; align-items: center; justify-content: center;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="width: 32px; height: 32px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </div>
-          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">No Products Matched Your Search</h3>
-          <p style="color: var(--text-secondary); max-width: 420px; font-size: 0.95rem;">Try checking for typos or searching for keywords like "Watch", "Earbuds", "Camera", "Backpack", or "Shoes".</p>
-          <button class="btn-primary-action" id="clear-search-btn" style="margin-top: 8px;">
-            <span>Browse All Products</span>
-          </button>
-        </div>
-      `;
-      const clearBtn = document.getElementById('clear-search-btn');
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-          const sInput = document.getElementById('search-input');
-          if (sInput) sInput.value = '';
-          AppState.searchQuery = '';
-          renderView('shop');
-        });
-      }
-      bindGlobalNavigationEvents();
-      return;
+    if (query !== undefined) {
+      AppState.searchQuery = query;
     }
-
-    const contentHtml = `
-      <div class="view-section-header">
-        <div>
-          <h2 class="view-title">Search Results</h2>
-          <p class="view-subtitle">Showing ${matchedProducts.length} matching product${matchedProducts.length > 1 ? 's' : ''} for "<strong style="color: var(--color-accent);">${query}</strong>"</p>
-        </div>
-      </div>
-
-      <div class="products-grid">
-        ${matchedProducts.map(p => `
-          <div class="product-card" data-product-id="${p.id}">
-            <div class="product-card-top">
-              <span class="discount-badge">${p.badge}</span>
-              <button class="wishlist-btn" aria-label="Add to wishlist">
-                <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              </button>
-              <div class="product-img-wrapper">
-                <img src="${p.img}" alt="${p.name}" class="product-img">
-              </div>
-            </div>
-            <div class="product-card-bottom">
-              <div class="product-details">
-                <span class="product-cat">${p.brand} • ${p.cat}</span>
-                <h3 class="product-name">${p.name}</h3>
-                <div class="product-price-row">
-                  <span class="price-current">${p.price}</span>
-                  <span class="price-original">${p.originalPrice}</span>
-                </div>
-              </div>
-              <button class="add-to-cart-btn" title="Add to Cart">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-              </button>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-
-    viewContainer.innerHTML = contentHtml;
-    bindProductCardListeners();
-    bindGlobalNavigationEvents();
+    AppState.currentView = 'shop';
+    renderProductListingView();
   }
 
   /* ==========================================================================
@@ -778,21 +703,157 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
-     MODULE 1 — Enhanced Product Listing Controller & Filtering Engine
+     MODULE 1 — Enhanced Enterprise Product Listing Controller & Filtering Engine
      ========================================================================== */
+  
+  // Dynamic URL Synchronization
+  function syncFiltersToURL() {
+    const params = new URLSearchParams();
+    const f = AppState.listingFilters;
+
+    if (f.categories && f.categories.length > 0) params.set('category', f.categories.join(','));
+    if (f.brands && f.brands.length > 0) params.set('brand', f.brands.join(','));
+    if (f.minPrice > 0) params.set('minPrice', f.minPrice);
+    if (f.maxPrice < 100000) params.set('maxPrice', f.maxPrice);
+    if (f.minRating > 0) params.set('minRating', f.minRating);
+    if (f.discount > 0) params.set('discount', f.discount);
+    if (f.availability && f.availability.length > 0) params.set('availability', f.availability.join(','));
+    if (f.colors && f.colors.length > 0) params.set('color', f.colors.join(','));
+    if (f.sizes && f.sizes.length > 0) params.set('size', f.sizes.join(','));
+    if (f.shipping && f.shipping.length > 0) params.set('shipping', f.shipping.join(','));
+    if (f.special && f.special.length > 0) params.set('special', f.special.join(','));
+    if (AppState.searchQuery) params.set('search', AppState.searchQuery);
+    if (AppState.sortOption && AppState.sortOption !== 'popularity') params.set('sort', AppState.sortOption);
+
+    const queryString = params.toString();
+    const newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
+    window.history.replaceState({ filters: f, search: AppState.searchQuery }, '', newUrl);
+  }
+
+  function loadFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const f = AppState.listingFilters;
+
+    if (params.has('category')) f.categories = params.get('category').split(',').filter(Boolean);
+    if (params.has('brand')) f.brands = params.get('brand').split(',').filter(Boolean);
+    if (params.has('minPrice')) f.minPrice = parseInt(params.get('minPrice'), 10) || 0;
+    if (params.has('maxPrice')) f.maxPrice = parseInt(params.get('maxPrice'), 10) || 100000;
+    if (params.has('minRating')) f.minRating = parseFloat(params.get('minRating')) || 0;
+    if (params.has('discount')) f.discount = parseInt(params.get('discount'), 10) || 0;
+    if (params.has('availability')) f.availability = params.get('availability').split(',').filter(Boolean);
+    if (params.has('color')) f.colors = params.get('color').split(',').filter(Boolean);
+    if (params.has('size')) f.sizes = params.get('size').split(',').filter(Boolean);
+    if (params.has('shipping')) f.shipping = params.get('shipping').split(',').filter(Boolean);
+    if (params.has('special')) f.special = params.get('special').split(',').filter(Boolean);
+    if (params.has('search')) {
+      AppState.searchQuery = params.get('search');
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) searchInput.value = AppState.searchQuery;
+    }
+    if (params.has('sort')) AppState.sortOption = params.get('sort');
+  }
+
+  window.addEventListener('popstate', () => {
+    loadFiltersFromURL();
+    if (AppState.currentView === 'shop') {
+      renderProductListingView();
+    }
+  });
+
+  // Calculate live product count for each brand
+  function getBrandProductCounts(allProducts) {
+    const counts = {};
+    allProducts.forEach(p => {
+      const b = p.brand || 'Hype';
+      counts[b] = (counts[b] || 0) + 1;
+    });
+    return counts;
+  }
+
+  // Multi-Filter Compound Engine
   function getFilteredProducts() {
     let allProducts = ApiService.getMockData('products');
-    const { category, brand, minPrice, maxPrice, minRating, stock, discount } = AppState.listingFilters;
+    const f = AppState.listingFilters;
     const query = (AppState.searchQuery || '').toLowerCase().trim();
 
     return allProducts.filter(p => {
-      if (category !== 'all' && p.cat.toLowerCase() !== category.toLowerCase()) return false;
-      if (brand !== 'all' && p.brand.toLowerCase() !== brand.toLowerCase()) return false;
-      if (p.numericPrice < minPrice || p.numericPrice > maxPrice) return false;
-      if (p.rating < minRating) return false;
-      if (stock === 'in-stock' && !p.inStock) return false;
-      if (discount > 0 && p.discount < discount) return false;
-      if (query && !p.name.toLowerCase().includes(query) && !p.cat.toLowerCase().includes(query) && !p.brand.toLowerCase().includes(query)) return false;
+      // 1. Search Query Filter
+      if (query) {
+        const nameMatch = p.name.toLowerCase().includes(query);
+        const catMatch = p.cat.toLowerCase().includes(query);
+        const brandMatch = (p.brand || '').toLowerCase().includes(query);
+        const descMatch = (p.description || p.shortDesc || '').toLowerCase().includes(query);
+        if (!nameMatch && !catMatch && !brandMatch && !descMatch) return false;
+      }
+
+      // 2. Multi-Select Categories
+      if (f.categories && f.categories.length > 0) {
+        const catName = p.cat.toLowerCase();
+        const matchesCategory = f.categories.some(c => c.toLowerCase() === catName);
+        if (!matchesCategory) return false;
+      }
+
+      // 3. Multi-Select Brands
+      if (f.brands && f.brands.length > 0) {
+        const brandName = (p.brand || 'Hype').toLowerCase();
+        const matchesBrand = f.brands.some(b => b.toLowerCase() === brandName);
+        if (!matchesBrand) return false;
+      }
+
+      // 4. Price Range (minPrice & maxPrice)
+      if (p.numericPrice < f.minPrice || p.numericPrice > f.maxPrice) return false;
+
+      // 5. Rating Threshold (minRating)
+      if (f.minRating > 0 && p.rating < f.minRating) return false;
+
+      // 6. Discount Threshold
+      if (f.discount > 0 && p.discount < f.discount) return false;
+
+      // 7. Availability Filter
+      if (f.availability && f.availability.length > 0) {
+        const status = p.inStock ? 'in-stock' : 'out-of-stock';
+        if (!f.availability.includes(status)) return false;
+      }
+
+      // 8. Color Swatches Filter
+      if (f.colors && f.colors.length > 0) {
+        const prodColors = (p.variants && p.variants.colors) ? p.variants.colors.map(c => c.toLowerCase()) : [];
+        const matchesColor = f.colors.some(c => prodColors.some(pc => pc.includes(c.toLowerCase()) || c.toLowerCase().includes(pc)));
+        if (!matchesColor) return false;
+      }
+
+      // 9. Size Pills Filter
+      if (f.sizes && f.sizes.length > 0) {
+        const prodSizes = (p.variants && p.variants.sizes) ? p.variants.sizes.map(s => s.toLowerCase()) : [];
+        const matchesSize = f.sizes.some(s => prodSizes.some(ps => ps.includes(s.toLowerCase()) || s.toLowerCase().includes(ps)));
+        if (!matchesSize) return false;
+      }
+
+      // 10. Shipping Filter
+      if (f.shipping && f.shipping.length > 0) {
+        const delBadge = (p.deliveryBadge || '').toLowerCase();
+        const matchesShipping = f.shipping.some(s => {
+          if (s === 'free') return delBadge.includes('free') || p.numericPrice > 999;
+          if (s === 'fast' || s === 'express') return delBadge.includes('express') || delBadge.includes('2 days');
+          return true;
+        });
+        if (!matchesShipping) return false;
+      }
+
+      // 11. Special Badges Filter
+      if (f.special && f.special.length > 0) {
+        const badgeText = (p.badge || '').toLowerCase();
+        const matchesSpecial = f.special.some(sp => {
+          if (sp === 'top-rated') return p.rating >= 4.7;
+          if (sp === 'best-sellers') return p.reviewCount > 150;
+          if (sp === 'featured') return p.discount > 20 || p.rating >= 4.8;
+          if (sp === 'new-arrivals') return p.id >= 4;
+          if (sp === 'trending') return p.reviewCount > 200;
+          return true;
+        });
+        if (!matchesSpecial) return false;
+      }
+
       return true;
     }).sort((a, b) => {
       switch (AppState.sortOption) {
@@ -801,18 +862,26 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'rating': return b.rating - a.rating;
         case 'newest': return b.id - a.id;
         case 'bestselling': return b.reviewCount - a.reviewCount;
-        default: return b.reviewCount * b.rating - a.reviewCount * a.rating; // Popularity
+        case 'discount': return b.discount - a.discount;
+        default: return (b.reviewCount * b.rating) - (a.reviewCount * a.rating); // Popularity
       }
     });
   }
 
+  // Render Product Listing View
   function renderProductListingView(overrideCategory = null) {
     if (!viewContainer) return;
 
     if (overrideCategory) {
-      AppState.listingFilters.category = overrideCategory;
+      if (!AppState.listingFilters.categories.includes(overrideCategory)) {
+        AppState.listingFilters.categories = [overrideCategory];
+      }
     }
 
+    syncFiltersToURL();
+
+    const allProducts = ApiService.getMockData('products');
+    const brandCounts = getBrandProductCounts(allProducts);
     const filtered = getFilteredProducts();
     const totalCount = filtered.length;
     const totalPages = Math.max(1, Math.ceil(totalCount / AppState.itemsPerPage));
@@ -821,51 +890,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const startIndex = (AppState.currentPage - 1) * AppState.itemsPerPage;
     const paginatedProducts = filtered.slice(startIndex, startIndex + AppState.itemsPerPage);
 
-    const brands = ['all', 'Noise', 'boAt', 'Canon', 'Hype'];
-    const categories = ['all', 'Smart Watch', 'Earbuds', 'Camera', 'Backpack', 'Shoes', 'Accessories', 'Men', 'Women'];
+    const availableBrands = ['Noise', 'boAt', 'Canon', 'Hype', 'Apple', 'Nike', 'Adidas', 'Sony'];
+    const availableCategories = ['Smart Watch', 'Earbuds', 'Camera', 'Backpack', 'Shoes', 'Accessories', 'Men', 'Women'];
+    const availableColors = [
+      { name: 'Black', hex: '#000000' },
+      { name: 'Silver', hex: '#C0C0C0' },
+      { name: 'Blue', hex: '#1E88E5' },
+      { name: 'Red', hex: '#E53935' },
+      { name: 'Grey', hex: '#757575' },
+      { name: 'White', hex: '#FFFFFF' },
+      { name: 'Brown', hex: '#6D4C41' }
+    ];
+    const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
-    const breadcrumbHtml = `
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="#home" data-nav-target="home">Home</a>
-        <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-current">Shop Catalog</span>
-        ${AppState.listingFilters.category !== 'all' ? `
-          <span class="breadcrumb-separator">/</span>
-          <span class="breadcrumb-current">${AppState.listingFilters.category}</span>
-        ` : ''}
-      </nav>
-    `;
-
+    // Active Filter Chips Builder
     const activeFilterPills = [];
-    if (AppState.listingFilters.category !== 'all') activeFilterPills.push({ key: 'category', val: AppState.listingFilters.category });
-    if (AppState.listingFilters.brand !== 'all') activeFilterPills.push({ key: 'brand', val: AppState.listingFilters.brand });
-    if (AppState.listingFilters.minRating > 0) activeFilterPills.push({ key: 'minRating', val: `${AppState.listingFilters.minRating}★ & above` });
-    if (AppState.searchQuery) activeFilterPills.push({ key: 'searchQuery', val: `"${AppState.searchQuery}"` });
+    const f = AppState.listingFilters;
+
+    if (AppState.searchQuery) {
+      activeFilterPills.push({ type: 'search', label: `Search: "${AppState.searchQuery}"` });
+    }
+    (f.categories || []).forEach(c => activeFilterPills.push({ type: 'category', val: c, label: `Category: ${c}` }));
+    (f.brands || []).forEach(b => activeFilterPills.push({ type: 'brand', val: b, label: `Brand: ${b}` }));
+    if (f.minPrice > 0 || f.maxPrice < 100000) {
+      activeFilterPills.push({ type: 'price', label: `₹${f.minPrice.toLocaleString()} - ₹${f.maxPrice.toLocaleString()}` });
+    }
+    if (f.minRating > 0) activeFilterPills.push({ type: 'rating', label: `${f.minRating}★ & Above` });
+    if (f.discount > 0) activeFilterPills.push({ type: 'discount', label: `${f.discount}%+ Off` });
+    (f.availability || []).forEach(a => activeFilterPills.push({ type: 'availability', val: a, label: a === 'in-stock' ? 'In Stock' : 'Out of Stock' }));
+    (f.colors || []).forEach(c => activeFilterPills.push({ type: 'color', val: c, label: `Color: ${c}` }));
+    (f.sizes || []).forEach(s => activeFilterPills.push({ type: 'size', val: s, label: `Size: ${s}` }));
+    (f.shipping || []).forEach(s => activeFilterPills.push({ type: 'shipping', val: s, label: s === 'free' ? 'Free Shipping' : 'Express Shipping' }));
+    (f.special || []).forEach(s => activeFilterPills.push({ type: 'special', val: s, label: s.replace('-', ' ').toUpperCase() }));
 
     const activeFiltersHtml = activeFilterPills.length > 0 ? `
       <div class="active-filters-bar">
-        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);">Active Filters:</span>
-        ${activeFilterPills.map(f => `
-          <span class="filter-pill">
-            ${f.val}
-            <button class="filter-pill-remove" data-remove-filter="${f.key}">×</button>
+        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);">Active Filters (${activeFilterPills.length}):</span>
+        ${activeFilterPills.map(chip => `
+          <span class="filter-chip-pill">
+            ${chip.label}
+            <button class="chip-remove-btn" data-remove-type="${chip.type}" data-remove-val="${chip.val || ''}">×</button>
           </span>
         `).join('')}
-        <button class="filter-pill" id="clear-all-filters-btn" style="background: var(--bg-card); border: 1px solid var(--border-color); cursor: pointer;">Clear All</button>
+        <button class="clear-all-chip-btn" id="clear-all-filters-btn">Clear All</button>
       </div>
     ` : '';
 
     const contentHtml = `
-      ${breadcrumbHtml}
-      
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="#home" data-nav-target="home">Home</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current">Shop Products</span>
+      </nav>
+
       <div class="listing-header-row">
         <div>
           <h2 class="view-title">Product Catalog</h2>
-          <p class="view-subtitle">Showing ${paginatedProducts.length} of ${totalCount} items</p>
+          <p class="view-subtitle">Showing ${paginatedProducts.length} of ${totalCount} matching products</p>
         </div>
 
         <div class="listing-controls-bar">
-          <!-- View Mode Toggle -->
+          <button class="mobile-filter-trigger-btn" id="open-mobile-filter-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>Filter (${activeFilterPills.length})</span>
+          </button>
+
           <div class="view-mode-toggle">
             <button class="view-mode-btn ${AppState.viewMode === 'grid' ? 'active' : ''}" id="view-mode-grid-btn" title="Grid View">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -875,7 +964,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
           </div>
 
-          <!-- Sort Select -->
           <select id="sort-select" class="sort-select" aria-label="Sort products">
             <option value="popularity" ${AppState.sortOption === 'popularity' ? 'selected' : ''}>Sort by: Popularity</option>
             <option value="newest" ${AppState.sortOption === 'newest' ? 'selected' : ''}>Sort by: Newest</option>
@@ -883,6 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="price-desc" ${AppState.sortOption === 'price-desc' ? 'selected' : ''}>Price: High → Low</option>
             <option value="rating" ${AppState.sortOption === 'rating' ? 'selected' : ''}>Highest Rated</option>
             <option value="bestselling" ${AppState.sortOption === 'bestselling' ? 'selected' : ''}>Best Selling</option>
+            <option value="discount" ${AppState.sortOption === 'discount' ? 'selected' : ''}>Discount %</option>
           </select>
         </div>
       </div>
@@ -890,45 +979,217 @@ document.addEventListener('DOMContentLoaded', () => {
       ${activeFiltersHtml}
 
       <div class="listing-layout">
-        <!-- Filter Sidebar -->
+        <!-- Desktop Filter Sidebar -->
         <aside class="filter-sidebar">
-          <div>
-            <div class="filter-group-header">Categories</div>
+          
+          <!-- Category Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Categories</span>
+            </div>
             <div class="filter-options-list">
-              ${categories.map(c => `
-                <label class="filter-option-item">
-                  <input type="radio" name="filter-category" value="${c}" ${AppState.listingFilters.category.toLowerCase() === c.toLowerCase() ? 'checked' : ''}>
-                  <span>${c === 'all' ? 'All Categories' : c}</span>
-                </label>
+              ${availableCategories.map(c => {
+                const checked = (f.categories || []).includes(c);
+                return `
+                  <div class="filter-checkbox-item" data-filter-type="category" data-filter-val="${c}">
+                    <div class="filter-checkbox-left">
+                      <div class="custom-checkbox ${checked ? 'checked' : ''}">
+                        <svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <span>${c}</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <!-- Brand Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Brands</span>
+            </div>
+            <div class="filter-options-list">
+              ${availableBrands.map(b => {
+                const checked = (f.brands || []).includes(b);
+                const count = brandCounts[b] || 0;
+                return `
+                  <div class="filter-checkbox-item" data-filter-type="brand" data-filter-val="${b}">
+                    <div class="filter-checkbox-left">
+                      <div class="custom-checkbox ${checked ? 'checked' : ''}">
+                        <svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <span>${b}</span>
+                    </div>
+                    <span class="item-count-badge">${count}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <!-- Price Filter (Slider & Inputs & Presets) -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Price Range</span>
+            </div>
+            <div class="price-inputs-row">
+              <div class="price-input-box">
+                <span>₹</span>
+                <input type="number" id="min-price-input" value="${f.minPrice}" min="0" max="100000" step="500">
+              </div>
+              <span style="color: var(--text-muted); font-weight: bold;">–</span>
+              <div class="price-input-box">
+                <span>₹</span>
+                <input type="number" id="max-price-input" value="${f.maxPrice}" min="0" max="100000" step="500">
+              </div>
+            </div>
+            <div class="price-slider-track">
+              <div class="price-slider-fill" style="left: ${(f.minPrice/100000)*100}%; right: ${100 - (f.maxPrice/100000)*100}%;"></div>
+            </div>
+            <div class="price-slider-range">
+              <input type="range" id="min-price-slider" min="0" max="100000" step="500" value="${f.minPrice}">
+              <input type="range" id="max-price-slider" min="0" max="100000" step="500" value="${f.maxPrice}">
+            </div>
+            <div class="price-preset-pills">
+              <button class="preset-pill" data-price-preset="0-500">₹0–₹500</button>
+              <button class="preset-pill" data-price-preset="500-1000">₹500–₹1k</button>
+              <button class="preset-pill" data-price-preset="1000-5000">₹1k–₹5k</button>
+              <button class="preset-pill" data-price-preset="5000-100000">₹5k+</button>
+            </div>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <!-- Rating Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Customer Rating</span>
+            </div>
+            <div class="rating-stars-list">
+              ${[4, 3, 2, 1].map(r => `
+                <div class="rating-filter-row ${f.minRating === r ? 'selected' : ''}" data-rating-val="${r}">
+                  <span class="gold-stars">${'★'.repeat(r)}${'☆'.repeat(5-r)}</span>
+                  <span>${r}★ & Above</span>
+                </div>
               `).join('')}
             </div>
           </div>
 
-          <div>
-            <div class="filter-group-header">Brands</div>
-            <div class="filter-options-list">
-              ${brands.map(b => `
-                <label class="filter-option-item">
-                  <input type="radio" name="filter-brand" value="${b}" ${AppState.listingFilters.brand.toLowerCase() === b.toLowerCase() ? 'checked' : ''}>
-                  <span>${b === 'all' ? 'All Brands' : b}</span>
-                </label>
+          <div class="filter-divider"></div>
+
+          <!-- Discount Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Discount</span>
+            </div>
+            <div class="badge-chips-wrap">
+              ${[10, 20, 30, 40, 50].map(d => `
+                <button class="badge-chip ${f.discount === d ? 'selected' : ''}" data-discount-val="${d}">
+                  ${d}%+ Off
+                </button>
               `).join('')}
             </div>
           </div>
 
-          <div>
-            <div class="filter-group-header">Minimum Rating</div>
+          <div class="filter-divider"></div>
+
+          <!-- Availability Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Availability</span>
+            </div>
             <div class="filter-options-list">
-              <label class="filter-option-item"><input type="radio" name="filter-rating" value="0" ${AppState.listingFilters.minRating === 0 ? 'checked' : ''}> All Ratings</label>
-              <label class="filter-option-item"><input type="radio" name="filter-rating" value="4.5" ${AppState.listingFilters.minRating === 4.5 ? 'checked' : ''}> 4.5★ & Above</label>
-              <label class="filter-option-item"><input type="radio" name="filter-rating" value="4.0" ${AppState.listingFilters.minRating === 4.0 ? 'checked' : ''}> 4.0★ & Above</label>
+              <div class="filter-checkbox-item" data-filter-type="availability" data-filter-val="in-stock">
+                <div class="filter-checkbox-left">
+                  <div class="custom-checkbox ${(f.availability||[]).includes('in-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <span>In Stock</span>
+                </div>
+              </div>
+              <div class="filter-checkbox-item" data-filter-type="availability" data-filter-val="out-of-stock">
+                <div class="filter-checkbox-left">
+                  <div class="custom-checkbox ${(f.availability||[]).includes('out-of-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <span>Out of Stock</span>
+                </div>
+              </div>
             </div>
           </div>
+
+          <div class="filter-divider"></div>
+
+          <!-- Color Swatches Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Colors</span>
+            </div>
+            <div class="color-swatches-grid">
+              ${availableColors.map(color => {
+                const selected = (f.colors || []).includes(color.name);
+                return `
+                  <button class="color-swatch-item ${selected ? 'selected' : ''}" data-color-val="${color.name}" style="background-color: ${color.hex};" title="${color.name}"></button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <!-- Size Filter -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Sizes</span>
+            </div>
+            <div class="size-pills-grid">
+              ${availableSizes.map(size => {
+                const selected = (f.sizes || []).includes(size);
+                return `
+                  <div class="size-pill-item ${selected ? 'selected' : ''}" data-size-val="${size}">
+                    ${size}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <!-- Special & Shipping Filters -->
+          <div class="filter-group">
+            <div class="filter-group-header">
+              <span>Special & Shipping</span>
+            </div>
+            <div class="badge-chips-wrap">
+              <button class="badge-chip ${(f.shipping||[]).includes('free') ? 'selected' : ''}" data-shipping-val="free">Free Shipping</button>
+              <button class="badge-chip ${(f.shipping||[]).includes('express') ? 'selected' : ''}" data-shipping-val="express">Express Delivery</button>
+              <button class="badge-chip ${(f.special||[]).includes('new-arrivals') ? 'selected' : ''}" data-special-val="new-arrivals">New Arrivals</button>
+              <button class="badge-chip ${(f.special||[]).includes('best-sellers') ? 'selected' : ''}" data-special-val="best-sellers">Best Sellers</button>
+              <button class="badge-chip ${(f.special||[]).includes('featured') ? 'selected' : ''}" data-special-val="featured">Featured</button>
+            </div>
+          </div>
+
         </aside>
 
         <!-- Product Grid / List Section -->
-        <div>
-          ${paginatedProducts.length === 0 ? EmptyStates.get('products') : `
+        <div id="product-grid-container">
+          ${paginatedProducts.length === 0 ? `
+            <div class="filter-empty-state-card">
+              <div class="empty-state-icon-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 36px; height: 36px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              </div>
+              <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">No Products Found</h3>
+              <p style="color: var(--text-secondary); max-width: 440px; font-size: 0.95rem; line-height: 1.5;">
+                We couldn't find any products matching all of your selected filters. Try broadening your criteria or clearing filters.
+              </p>
+              <div class="empty-state-actions-row">
+                <button class="btn-primary-action" id="empty-clear-filters-btn">Clear All Filters</button>
+                <button class="btn-secondary-action" id="empty-continue-btn">Continue Shopping</button>
+              </div>
+            </div>
+          ` : `
             <div class="products-grid ${AppState.viewMode === 'list' ? 'list-view' : ''}">
               ${paginatedProducts.map(p => `
                 <div class="product-card" data-product-id="${p.id}">
@@ -981,11 +1242,40 @@ document.addEventListener('DOMContentLoaded', () => {
           `}
         </div>
       </div>
+
+      <!-- Mobile Bottom Sheet Drawer -->
+      <div class="mobile-filter-drawer-backdrop" id="mobile-filter-backdrop"></div>
+      <div class="mobile-filter-bottom-sheet" id="mobile-filter-sheet">
+        <div class="mobile-sheet-header">
+          <span class="mobile-sheet-title">Filter Products</span>
+          <button id="close-mobile-filter-btn" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-primary);">✕</button>
+        </div>
+        <div class="mobile-sheet-body">
+          <p style="font-size:0.85rem; color:var(--text-muted);">Adjust your criteria to filter available items.</p>
+        </div>
+        <div class="mobile-sheet-footer">
+          <button class="btn-secondary-action" id="mobile-clear-btn" style="padding: 12px 20px;">Reset</button>
+          <button class="mobile-sheet-apply-btn" id="mobile-apply-btn">Apply Filters (${totalCount})</button>
+        </div>
+      </div>
     `;
 
     viewContainer.innerHTML = contentHtml;
     bindListingEvents();
     bindProductCardListeners();
+  }
+
+  // Bind All Listing & Filtering Interactive Events with Debounce
+  let filterDebounceTimer = null;
+  function triggerDebouncedFilterUpdate() {
+    const gridContainer = document.getElementById('product-grid-container');
+    if (gridContainer) gridContainer.innerHTML = Skeletons.productGrid(4);
+
+    clearTimeout(filterDebounceTimer);
+    filterDebounceTimer = setTimeout(() => {
+      AppState.currentPage = 1;
+      renderProductListingView();
+    }, 250);
   }
 
   function bindListingEvents() {
@@ -1000,42 +1290,209 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sortSelect) {
       sortSelect.addEventListener('change', (e) => {
         AppState.sortOption = e.target.value;
-        renderProductListingView();
+        triggerDebouncedFilterUpdate();
       });
     }
 
-    document.querySelectorAll('input[name="filter-category"]').forEach(r => {
-      r.addEventListener('change', (e) => { AppState.listingFilters.category = e.target.value; AppState.currentPage = 1; renderProductListingView(); });
+    // Checkbox Filters (Categories, Brands, Availability)
+    document.querySelectorAll('.filter-checkbox-item[data-filter-type]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = item.getAttribute('data-filter-type');
+        const val = item.getAttribute('data-filter-val');
+        const key = type === 'category' ? 'categories' : (type === 'brand' ? 'brands' : 'availability');
+        let arr = AppState.listingFilters[key] || [];
+
+        if (arr.includes(val)) {
+          arr = arr.filter(i => i !== val);
+        } else {
+          arr.push(val);
+        }
+        AppState.listingFilters[key] = arr;
+        triggerDebouncedFilterUpdate();
+      });
     });
-    document.querySelectorAll('input[name="filter-brand"]').forEach(r => {
-      r.addEventListener('change', (e) => { AppState.listingFilters.brand = e.target.value; AppState.currentPage = 1; renderProductListingView(); });
+
+    // Price Inputs & Sliders
+    const minInput = document.getElementById('min-price-input');
+    const maxInput = document.getElementById('max-price-input');
+    const minSlider = document.getElementById('min-price-slider');
+    const maxSlider = document.getElementById('max-price-slider');
+
+    if (minInput && maxInput && minSlider && maxSlider) {
+      const updatePrices = (minVal, maxVal) => {
+        AppState.listingFilters.minPrice = Math.max(0, parseInt(minVal, 10) || 0);
+        AppState.listingFilters.maxPrice = Math.min(100000, parseInt(maxVal, 10) || 100000);
+        triggerDebouncedFilterUpdate();
+      };
+
+      minInput.addEventListener('change', () => updatePrices(minInput.value, maxInput.value));
+      maxInput.addEventListener('change', () => updatePrices(minInput.value, maxInput.value));
+      minSlider.addEventListener('input', () => updatePrices(minSlider.value, maxSlider.value));
+      maxSlider.addEventListener('input', () => updatePrices(minSlider.value, maxSlider.value));
+    }
+
+    // Price Preset Buttons
+    document.querySelectorAll('[data-price-preset]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const [min, max] = btn.getAttribute('data-price-preset').split('-').map(Number);
+        AppState.listingFilters.minPrice = min;
+        AppState.listingFilters.maxPrice = max;
+        triggerDebouncedFilterUpdate();
+      });
     });
-    document.querySelectorAll('input[name="filter-rating"]').forEach(r => {
-      r.addEventListener('change', (e) => { AppState.listingFilters.minRating = parseFloat(e.target.value); AppState.currentPage = 1; renderProductListingView(); });
+
+    // Rating Filter Rows
+    document.querySelectorAll('[data-rating-val]').forEach(row => {
+      row.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = parseFloat(row.getAttribute('data-rating-val'));
+        AppState.listingFilters.minRating = AppState.listingFilters.minRating === val ? 0 : val;
+        triggerDebouncedFilterUpdate();
+      });
     });
+
+    // Discount Buttons
+    document.querySelectorAll('[data-discount-val]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = parseInt(btn.getAttribute('data-discount-val'), 10);
+        AppState.listingFilters.discount = AppState.listingFilters.discount === val ? 0 : val;
+        triggerDebouncedFilterUpdate();
+      });
+    });
+
+    // Color Swatches
+    document.querySelectorAll('[data-color-val]').forEach(swatch => {
+      swatch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = swatch.getAttribute('data-color-val');
+        let arr = AppState.listingFilters.colors || [];
+        if (arr.includes(val)) arr = arr.filter(c => c !== val);
+        else arr.push(val);
+        AppState.listingFilters.colors = arr;
+        triggerDebouncedFilterUpdate();
+      });
+    });
+
+    // Size Pills
+    document.querySelectorAll('[data-size-val]').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = pill.getAttribute('data-size-val');
+        let arr = AppState.listingFilters.sizes || [];
+        if (arr.includes(val)) arr = arr.filter(s => s !== val);
+        else arr.push(val);
+        AppState.listingFilters.sizes = arr;
+        triggerDebouncedFilterUpdate();
+      });
+    });
+
+    // Shipping Filters
+    document.querySelectorAll('[data-shipping-val]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = btn.getAttribute('data-shipping-val');
+        let arr = AppState.listingFilters.shipping || [];
+        if (arr.includes(val)) arr = arr.filter(s => s !== val);
+        else arr.push(val);
+        AppState.listingFilters.shipping = arr;
+        triggerDebouncedFilterUpdate();
+      });
+    });
+
+    // Special Filters
+    document.querySelectorAll('[data-special-val]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = btn.getAttribute('data-special-val');
+        let arr = AppState.listingFilters.special || [];
+        if (arr.includes(val)) arr = arr.filter(s => s !== val);
+        else arr.push(val);
+        AppState.listingFilters.special = arr;
+        triggerDebouncedFilterUpdate();
+      });
+    });
+
+    // Individual Chip Removal
+    document.querySelectorAll('[data-remove-type]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = btn.getAttribute('data-remove-type');
+        const val = btn.getAttribute('data-remove-val');
+        const f = AppState.listingFilters;
+
+        if (type === 'search') {
+          AppState.searchQuery = '';
+          const sInput = document.getElementById('search-input');
+          if (sInput) sInput.value = '';
+        } else if (type === 'category') f.categories = f.categories.filter(c => c !== val);
+        else if (type === 'brand') f.brands = f.brands.filter(b => b !== val);
+        else if (type === 'price') { f.minPrice = 0; f.maxPrice = 100000; }
+        else if (type === 'rating') f.minRating = 0;
+        else if (type === 'discount') f.discount = 0;
+        else if (type === 'availability') f.availability = f.availability.filter(a => a !== val);
+        else if (type === 'color') f.colors = f.colors.filter(c => c !== val);
+        else if (type === 'size') f.sizes = f.sizes.filter(s => s !== val);
+        else if (type === 'shipping') f.shipping = f.shipping.filter(s => s !== val);
+        else if (type === 'special') f.special = f.special.filter(s => s !== val);
+
+        triggerDebouncedFilterUpdate();
+      });
+    });
+
+    // Clear Filters (Preserves Active Search Query)
+    const clearFiltersOnly = () => {
+      AppState.listingFilters = {
+        categories: [], brands: [], minPrice: 0, maxPrice: 100000, minRating: 0,
+        discount: 0, availability: [], colors: [], sizes: [], shipping: [], special: []
+      };
+      triggerDebouncedFilterUpdate();
+    };
+
+    const clearAllWithSearch = () => {
+      clearFiltersOnly();
+      AppState.searchQuery = '';
+      const globalSearch = document.getElementById('search-input');
+      if (globalSearch) globalSearch.value = '';
+    };
 
     const clearBtn = document.getElementById('clear-all-filters-btn');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        AppState.listingFilters = { category: 'all', brand: 'all', minPrice: 0, maxPrice: 100000, minRating: 0, stock: 'all', discount: 0 };
-        AppState.searchQuery = '';
-        const globalSearch = document.getElementById('search-input');
-        if (globalSearch) globalSearch.value = '';
-        renderProductListingView();
-      });
+    const emptyClearBtn = document.getElementById('empty-clear-filters-btn');
+    if (clearBtn) clearBtn.addEventListener('click', clearFiltersOnly);
+    if (emptyClearBtn) emptyClearBtn.addEventListener('click', clearFiltersOnly);
+
+    const emptyContinueBtn = document.getElementById('empty-continue-btn');
+    if (emptyContinueBtn) emptyContinueBtn.addEventListener('click', clearAllWithSearch);
+
+    // Mobile Drawer Controls
+    const openMobileBtn = document.getElementById('open-mobile-filter-btn');
+    const closeMobileBtn = document.getElementById('close-mobile-filter-btn');
+    const mobileBackdrop = document.getElementById('mobile-filter-backdrop');
+    const mobileSheet = document.getElementById('mobile-filter-sheet');
+    const mobileClearBtn = document.getElementById('mobile-clear-btn');
+    const mobileApplyBtn = document.getElementById('mobile-apply-btn');
+
+    if (openMobileBtn && mobileSheet && mobileBackdrop) {
+      const toggleMobileDrawer = (show) => {
+        if (show) {
+          mobileBackdrop.classList.add('active');
+          mobileSheet.classList.add('active');
+        } else {
+          mobileBackdrop.classList.remove('active');
+          mobileSheet.classList.remove('active');
+        }
+      };
+
+      openMobileBtn.addEventListener('click', () => toggleMobileDrawer(true));
+      if (closeMobileBtn) closeMobileBtn.addEventListener('click', () => toggleMobileDrawer(false));
+      if (mobileBackdrop) mobileBackdrop.addEventListener('click', () => toggleMobileDrawer(false));
+      if (mobileClearBtn) mobileClearBtn.addEventListener('click', () => { clearAll(); toggleMobileDrawer(false); });
+      if (mobileApplyBtn) mobileApplyBtn.addEventListener('click', () => toggleMobileDrawer(false));
     }
 
-    document.querySelectorAll('[data-remove-filter]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.getAttribute('data-remove-filter');
-        if (key === 'searchQuery') AppState.searchQuery = '';
-        else if (key === 'category') AppState.listingFilters.category = 'all';
-        else if (key === 'brand') AppState.listingFilters.brand = 'all';
-        else if (key === 'minRating') AppState.listingFilters.minRating = 0;
-        renderProductListingView();
-      });
-    });
-
+    // Pagination Click Listeners
     document.querySelectorAll('[data-page]').forEach(btn => {
       btn.addEventListener('click', () => {
         AppState.currentPage = parseInt(btn.getAttribute('data-page'), 10);
@@ -1048,6 +1505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (prevBtn) prevBtn.addEventListener('click', () => { AppState.currentPage--; renderProductListingView(); });
     if (nextBtn) nextBtn.addEventListener('click', () => { AppState.currentPage++; renderProductListingView(); });
 
+    // Quick View Listeners
     document.querySelectorAll('[data-quick-view-id]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -2345,14 +2803,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const query = e.target.value.trim();
       AppState.searchQuery = query;
 
-      if (query.length > 0) {
-        renderSkeletonView('search');
-        searchDebounceTimer = setTimeout(() => {
-          renderSearchResultsView(query);
-        }, 300);
-      } else {
-        renderView('home');
-      }
+      searchDebounceTimer = setTimeout(() => {
+        if (AppState.currentView === 'shop' || query.length > 0) {
+          AppState.currentPage = 1;
+          renderProductListingView();
+        } else {
+          renderView('home');
+        }
+      }, 300);
     });
   }
 
@@ -2378,6 +2836,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initial bindings for static elements on initial DOM load
+  loadFiltersFromURL();
   bindProductCardListeners();
   bindGlobalNavigationEvents();
 
