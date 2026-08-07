@@ -2057,11 +2057,25 @@ document.addEventListener('DOMContentLoaded', () => {
           { user: 'Sarah Jenkins', rating: 4, comment: 'Great products, high durability. Highly recommended for daily use.', date: 'Jul 29, 2026' }
         ]
       };
+      // Initialize/sync products database in localStorage if not set
+      const storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+      if (storedProducts.length > 0) {
+        mockDb.products = storedProducts;
+      } else {
+        localStorage.setItem('shopsphere_products', JSON.stringify(mockDb.products));
+      }
+
+      // Initialize/sync categories database in localStorage if not set
+      const storedCategories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
+      if (storedCategories.length > 0) {
+        mockDb.categories = storedCategories;
+      } else {
+        localStorage.setItem('shopsphere_categories', JSON.stringify(mockDb.categories));
+      }
+
       if (viewName === 'wishlist') {
         const savedIds = WishlistService.getAll();
-        const allProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
-        const baseProducts = allProducts.length ? allProducts : mockDb.products;
-        return baseProducts.filter(p => savedIds.includes(p.id));
+        return mockDb.products.filter(p => savedIds.includes(p.id));
       }
       return mockDb[viewName] || mockDb.products;
     }
