@@ -5029,7 +5029,7 @@ input {
   height: 100vh;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(4px);
-  z-index: 2000;
+  z-index: 25000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5116,7 +5116,7 @@ input {
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 30000;
   opacity: 0;
   transition: opacity 0.25s ease;
   padding: 16px;
@@ -5545,7 +5545,7 @@ input {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 10000;
+  z-index: 40000;
   display: flex;
   flex-direction: column;
   gap: 10px;
