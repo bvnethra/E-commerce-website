@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: nameStr,
             email: identifier.includes('@') ? identifier : `${identifier}@example.com`,
             phone: !identifier.includes('@') ? identifier : '9876543210',
-            role: (identifier.toLowerCase().includes('admin') || identifier === 'admin') ? 'ADMIN' : 'CUSTOMER'
+            role: (identifier.toLowerCase() === 'shopsphere_admin' || identifier.toLowerCase() === 'shopsphere_admin@shopsphere.com') ? 'ADMIN' : 'CUSTOMER'
           };
 
           const token = this.generateMockJwt(user);
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: name.trim(),
             email: email.trim(),
             phone: mobile.trim(),
-            role: (email.toLowerCase().includes('admin') || name.toLowerCase().includes('admin')) ? 'ADMIN' : 'CUSTOMER'
+            role: (email.toLowerCase() === 'shopsphere_admin@shopsphere.com' || name.toLowerCase() === 'shopsphere_admin') ? 'ADMIN' : 'CUSTOMER'
           };
 
           const token = this.generateMockJwt(user);
