@@ -205,8 +205,14 @@
 
     <!-- VIEW 6: INVENTORY MANAGEMENT -->
     <section class="admin-view" id="view-inventory">
-      <div class="header" style="margin-bottom: 20px;">
+      <div class="header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <h2 style="font-size: 18px; font-weight: 700;">Inventory Status & Tracking</h2>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Filter by Category:</span>
+          <select id="inventory-category-select" class="form-control" onchange="renderInventoryTable()" style="width: 200px; padding: 6px 12px; height: auto;">
+            <option value="ALL">All Categories</option>
+          </select>
+        </div>
       </div>
       <div class="table-container">
         <table>

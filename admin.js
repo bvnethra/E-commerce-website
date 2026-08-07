@@ -422,6 +422,7 @@ function loadModuleView(tabName) {
       renderUsersTable();
       break;
     case 'inventory':
+      populateInventoryCategorySelectDropdown();
       renderInventoryTable();
       break;
     case 'coupons':
@@ -862,12 +863,37 @@ function deleteRegisteredUser(userId) {
 /* ==========================================================================
    MODULE 6: Inventory Management
    ========================================================================== */
+function populateInventoryCategorySelectDropdown() {
+  const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
+  const select = document.getElementById('inventory-category-select');
+  if (select) {
+    const currentVal = select.value;
+    select.innerHTML = '<option value="ALL">All Categories</option>';
+    categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.innerText = c.name;
+      if (c.name === currentVal) {
+        opt.selected = true;
+      }
+      select.appendChild(opt);
+    });
+  }
+}
+
 function renderInventoryTable() {
   const products = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
   const tableBody = document.getElementById('inventory-table-body');
   tableBody.innerHTML = '';
 
+  const filterSelect = document.getElementById('inventory-category-select');
+  const selectedCategory = filterSelect ? filterSelect.value : 'ALL';
+
   products.forEach(p => {
+    if (selectedCategory !== 'ALL' && p.cat !== selectedCategory) {
+      return;
+    }
+
     const statusText = p.stockCount <= 0 ? 'Out of Stock' : (p.stockCount <= 5 ? 'Low Stock' : 'In Stock');
     const colorClass = p.stockCount <= 0 ? 'var(--color-danger)' : (p.stockCount <= 5 ? 'var(--color-warning)' : 'var(--color-success)');
 
