@@ -541,6 +541,13 @@ function renderUsersTable() {
   tableBody.innerHTML = '';
 
   users.forEach(u => {
+    let deleteActionHtml = '';
+    if (u.role === 'ADMIN') {
+      deleteActionHtml = `<span style="font-size: 12.5px; color: var(--text-secondary); font-style: italic;">Protected</span>`;
+    } else {
+      deleteActionHtml = `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 11.5px;" onclick="deleteRegisteredUser('${u.id}')">Delete</button>`;
+    }
+
     const row = document.createElement('tr');
     row.innerHTML = `
       <td style="font-family: monospace; font-size: 13px;">${u.id}</td>
@@ -548,9 +555,29 @@ function renderUsersTable() {
       <td>${u.email}</td>
       <td>${u.phone || 'N/A'}</td>
       <td><span style="font-weight: 700; color: ${u.role === 'ADMIN' ? 'var(--color-success)' : 'inherit'}">${u.role || 'CUSTOMER'}</span></td>
+      <td style="text-align: right;">${deleteActionHtml}</td>
     `;
     tableBody.appendChild(row);
   });
+}
+
+function deleteRegisteredUser(userId) {
+  if (!confirm('Are you sure you want to delete this customer account?')) return;
+  let users = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+  users = users.filter(u => String(u.id) !== String(userId));
+  localStorage.setItem('aura_registered_users', JSON.stringify(users));
+
+  // Clear storefront active session if this was the active customer
+  try {
+    const active = JSON.parse(localStorage.getItem('aura_user') || 'null');
+    if (active && String(active.id) === String(userId)) {
+      localStorage.removeItem('aura_user');
+      localStorage.removeItem('aura_jwt_token');
+    }
+  } catch (e) {}
+
+  renderUsersTable();
+  renderKPIs();
 }
 
 /* ==========================================================================

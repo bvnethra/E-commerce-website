@@ -139,8 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'usr_' + Math.floor(1000 + Math.random() * 9000),
             name: nameStr,
             email: identifier.includes('@') ? identifier : `${identifier}@example.com`,
-            phone: !identifier.includes('@') ? identifier : '9876543210'
+            phone: !identifier.includes('@') ? identifier : '9876543210',
+            role: (identifier.toLowerCase() === 'admin_ss' || identifier.toLowerCase() === 'admin_ss@shopsphere.com') ? 'ADMIN' : 'CUSTOMER'
           };
+
+          // Save to user registry
+          try {
+            const registeredUsers = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+            const exists = registeredUsers.some(u => u.email.toLowerCase() === user.email.toLowerCase());
+            if (!exists) {
+              registeredUsers.push(user);
+              localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
+            }
+          } catch (e) {}
 
           const token = this.generateMockJwt(user);
           localStorage.setItem('aura_jwt_token', token);
@@ -167,8 +178,19 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'usr_' + Math.floor(1000 + Math.random() * 9000),
             name: name.trim(),
             email: email.trim(),
-            phone: mobile.trim()
+            phone: mobile.trim(),
+            role: (email.toLowerCase() === 'admin_ss@shopsphere.com' || name.toLowerCase() === 'admin_ss') ? 'ADMIN' : 'CUSTOMER'
           };
+
+          // Save to user registry
+          try {
+            const registeredUsers = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+            const exists = registeredUsers.some(u => u.email.toLowerCase() === user.email.toLowerCase());
+            if (!exists) {
+              registeredUsers.push(user);
+              localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
+            }
+          } catch (e) {}
 
           const token = this.generateMockJwt(user);
           localStorage.setItem('aura_jwt_token', token);
