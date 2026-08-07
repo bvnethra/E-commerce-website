@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentLocationLabel = document.getElementById('current-location');
       if (currentLocationLabel) {
         const def = this.getDefault();
-        if (def && AuthService.isAuthenticated()) {
+        if (def) {
           currentLocationLabel.textContent = `${def.city} - ${def.pincode}`;
         } else {
           currentLocationLabel.textContent = 'India';
