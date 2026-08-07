@@ -1,6 +1,53 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ==========================================================================
+     Helper Star Rating Persistence Functions
+     ========================================================================== */
+  window.getSavedProductRating = function(userId, productId) {
+    try {
+      const ratings = JSON.parse(localStorage.getItem('shopsphere_product_ratings') || '{}');
+      return ratings[`${userId}_${productId}`] || 0;
+    } catch(e) {
+      return 0;
+    }
+  };
+
+  window.saveProductRating = function(userId, productId, rating) {
+    try {
+      const ratings = JSON.parse(localStorage.getItem('shopsphere_product_ratings') || '{}');
+      ratings[`${userId}_${productId}`] = rating;
+      localStorage.setItem('shopsphere_product_ratings', JSON.stringify(ratings));
+      updateCatalogProductAverageRating(productId);
+    } catch(e) {}
+  };
+
+  function updateCatalogProductAverageRating(productId) {
+    try {
+      const products = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+      const ratings = JSON.parse(localStorage.getItem('shopsphere_product_ratings') || '{}');
+      
+      const productRatings = [];
+      for (const key in ratings) {
+        if (key.endsWith(`_${productId}`)) {
+          productRatings.push(ratings[key]);
+        }
+      }
+      
+      if (productRatings.length > 0) {
+        const sum = productRatings.reduce((a, b) => a + b, 0);
+        const avg = parseFloat((sum / productRatings.length).toFixed(1));
+        
+        const index = products.findIndex(p => String(p.id) === String(productId));
+        if (index !== -1) {
+          products[index].rating = avg;
+          products[index].reviewCount = (products[index].reviewCount || 0) + 1;
+          localStorage.setItem('shopsphere_products', JSON.stringify(products));
+        }
+      }
+    } catch (e) {}
+  }
+
+  /* ==========================================================================
      Application Global State & API Service
      ========================================================================== */
   /* ==========================================================================
@@ -173,20 +220,68 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      Saved Order Management Service
      ========================================================================== */
-  const OrderService = {
+  /* ==========================================================================
+     Saved Wishlist Management Service
+     ========================================================================== */
+  const WishlistService = {
+    getWishlistKey() {
+      const u = AuthService.getUser();
+      return u ? `shopsphere_wishlist_${u.id}` : 'shopsphere_wishlist_guest';
+    },
     getAll() {
       try {
-        const stored = localStorage.getItem('shopsphere_orders');
+        const stored = localStorage.getItem(this.getWishlistKey());
         return stored ? JSON.parse(stored) : [];
       } catch (e) {
         return [];
       }
     },
+    toggle(productId) {
+      const items = this.getAll();
+      const index = items.indexOf(productId);
+      let active = false;
+      if (index !== -1) {
+        items.splice(index, 1);
+      } else {
+        items.push(productId);
+        active = true;
+      }
+      localStorage.setItem(this.getWishlistKey(), JSON.stringify(items));
+      return active;
+    },
+    has(productId) {
+      return this.getAll().includes(productId);
+    }
+  };
+
+  /* ==========================================================================
+     Saved Order Management Service
+     ========================================================================== */
+  const OrderService = {
+    getAll() {
+      try {
+        const stored = localStorage.getItem('shopsphere_orders');
+        const allOrders = stored ? JSON.parse(stored) : [];
+        const currentUser = AuthService.getUser();
+        if (currentUser) {
+          // Storefront shows only the logged-in customer's orders
+          return allOrders.filter(o => o.userId === currentUser.id || o.userEmail === currentUser.email);
+        }
+        return [];
+      } catch (e) {
+        return [];
+      }
+    },
     add(order) {
-      const orders = this.getAll();
-      orders.unshift(order);
-      localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
-      return order;
+      try {
+        const stored = localStorage.getItem('shopsphere_orders');
+        const orders = stored ? JSON.parse(stored) : [];
+        orders.unshift(order);
+        localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
+        return order;
+      } catch (e) {
+        return order;
+      }
     }
   };
 
@@ -1927,6 +2022,12 @@ document.addEventListener('DOMContentLoaded', () => {
           { user: 'Sarah Jenkins', rating: 4, comment: 'Great products, high durability. Highly recommended for daily use.', date: 'Jul 29, 2026' }
         ]
       };
+      if (viewName === 'wishlist') {
+        const savedIds = WishlistService.getAll();
+        const allProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+        const baseProducts = allProducts.length ? allProducts : mockDb.products;
+        return baseProducts.filter(p => savedIds.includes(p.id));
+      }
       return mockDb[viewName] || mockDb.products;
     }
   };
@@ -2680,8 +2781,18 @@ document.addEventListener('DOMContentLoaded', () => {
           // Create new order object
           const newOrder = {
             id: 'HYP-' + Math.floor(100000 + Math.random() * 900000),
+            userId: AppState.user?.id || 'guest',
+            userEmail: AppState.user?.email || 'guest@example.com',
+            customerName: AppState.user?.name || 'Guest User',
             date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
             items: AppState.cart.reduce((s, i) => s + i.qty, 0),
+            itemsDetail: AppState.cart.map(item => ({
+              id: item.product.id,
+              name: item.product.name,
+              img: item.product.img,
+              price: item.product.price,
+              quantity: item.qty
+            })),
             total: `₹${total.toLocaleString('en-IN')}`,
             status: 'Processing',
             statusClass: 'pending',
@@ -4697,12 +4808,75 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
     } else if (viewName === 'profile') {
-      const u = AuthService.getUser() || { name: 'User', email: 'user@example.com', phone: '+91 98765 43210' };
+      const u = AuthService.getUser() || { id: 'usr_guest', name: 'User', email: 'user@example.com', phone: '+91 98765 43210' };
       const initials = (u.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
       const defaultAddr = typeof AddressService !== 'undefined' ? AddressService.getDefault() : null;
       const defaultAddressString = defaultAddr 
         ? `${defaultAddr.addressLine}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
         : 'No address saved yet.';
+
+      // Fetch user's previous orders
+      const ordersList = [];
+      try {
+        const stored = localStorage.getItem('shopsphere_orders');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          ordersList.push(...parsed.filter(o => o.userId === u.id || o.userEmail === u.email || o.customerName === u.name));
+        }
+      } catch (err) {}
+
+      let ordersHtml = '';
+      if (ordersList.length === 0) {
+        ordersHtml = `<p style="font-size: 0.9rem; color: var(--text-secondary);">No previous orders found. Place an order to see it here!</p>`;
+      } else {
+        ordersHtml = ordersList.map(o => {
+          const details = o.itemsDetail || [
+            { id: 1, name: 'Noise Ultra 2 Max', price: o.total, img: 'assets/images/prod_watch.png', quantity: o.items || 1 }
+          ];
+          
+          const itemsListHtml = details.map(item => {
+            const currentSavedRating = typeof getSavedProductRating === 'function' ? getSavedProductRating(u.id, item.id) : 0;
+            return `
+              <div class="product-purchase-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <img src="${item.img}" style="width: 45px; height: 45px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-body);">
+                  <div>
+                    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">${item.name}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${item.price} x ${item.quantity}</div>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Rate this product:</span>
+                  <div class="profile-star-rating-widget" data-product-id="${item.id}" style="display: flex; gap: 4px; color: #a0a4b8; cursor: pointer;">
+                    ${[1, 2, 3, 4, 5].map(star => `
+                      <span class="profile-star-item" data-value="${star}" style="font-size: 1.25rem; transition: color 0.15s; color: ${currentSavedRating >= star ? '#ffb703' : 'inherit'};">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          return `
+            <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <div>
+                  <span style="font-size: 0.82rem; font-weight: bold; font-family: monospace; color: var(--text-primary);">ORDER #${o.id}</span>
+                  <span style="font-size: 0.78rem; color: var(--text-secondary); margin-left: 8px;">(${o.date})</span>
+                </div>
+                <span class="status-pill ${o.statusClass || 'success'}">${o.status}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                ${itemsListHtml}
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.9rem;">
+                <span style="color: var(--text-secondary);">Payment Method: <strong>${o.paymentMethod || 'COD'}</strong></span>
+                <span style="font-weight: 700; color: var(--text-primary);">Total Paid: ${o.total}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
 
       contentHtml = `
         <div class="view-section-header">
@@ -4738,6 +4912,14 @@ document.addEventListener('DOMContentLoaded', () => {
               <button id="profile-logout-action-btn" class="btn-secondary-action" data-i18n="logout_session" style="padding: 8px 16px; font-size: 0.85rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Logout Session</button>
             </div>
           </div>
+
+          <!-- Purchase History & Product Review Ratings Section -->
+          <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+            <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">Purchase History & Ratings</h4>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${ordersHtml}
+            </div>
+          </div>
         </div>
       `;
     } else {
@@ -4768,6 +4950,31 @@ document.addEventListener('DOMContentLoaded', () => {
           AuthService.logout();
         });
       }
+
+      // Bind interactive product ratings stars
+      const widgets = document.querySelectorAll('.profile-star-rating-widget');
+      widgets.forEach(w => {
+        const stars = w.querySelectorAll('.profile-star-item');
+        stars.forEach(star => {
+          star.addEventListener('click', () => {
+            const val = parseInt(star.getAttribute('data-value'));
+            const pid = parseInt(w.getAttribute('data-product-id'));
+            const u = AuthService.getUser();
+            if (u && pid && val) {
+              if (typeof saveProductRating === 'function') {
+                saveProductRating(u.id, pid, val);
+              }
+              
+              // Refresh star coloring immediately
+              stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                s.style.color = sVal <= val ? '#ffb703' : 'inherit';
+              });
+              showToast('Thank you! Rating submitted successfully.', 'success');
+            }
+          });
+        });
+      });
     } else if (viewName === 'wishlist') {
       const wishlistBrowseBtn = document.getElementById('wishlist-empty-browse-btn');
       if (wishlistBrowseBtn) {
@@ -4940,16 +5147,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const wishlistButtons = document.querySelectorAll('.wishlist-btn');
     wishlistButtons.forEach(button => {
+      const card = button.closest('.product-card');
+      const pid = button.dataset.productId || card?.getAttribute('data-product-id');
+      
+      // Sync active styling state with wishlist service
+      if (pid && WishlistService.has(parseInt(pid))) {
+        button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
+
       if (button.dataset.wishBound) return;
       button.dataset.wishBound = 'true';
 
       button.addEventListener('click', (e) => {
         e.stopPropagation();
-        const card = button.closest('.product-card');
-        const pid = card?.getAttribute('data-product-id');
+        const freshCard = button.closest('.product-card');
+        const freshPid = button.dataset.productId || freshCard?.getAttribute('data-product-id');
+        if (!freshPid) return;
 
-        requireAuth('WISHLIST', { pid }, () => {
-          const isActive = button.classList.toggle('active');
+        requireAuth('WISHLIST', { pid: freshPid }, () => {
+          const isActive = WishlistService.toggle(parseInt(freshPid));
+          if (isActive) {
+            button.classList.add('active');
+          } else {
+            button.classList.remove('active');
+          }
           button.style.transform = 'scale(0.8)';
           setTimeout(() => {
             button.style.transform = isActive ? 'scale(1.1)' : 'scale(1)';
@@ -4958,6 +5181,11 @@ document.addEventListener('DOMContentLoaded', () => {
             button.style.transform = 'none';
           }, 250);
           showToast(isActive ? 'Item added to Wishlist' : 'Item removed from Wishlist', isActive ? 'success' : 'info');
+
+          // If currently on wishlist page, immediately re-render view to reflect removal
+          if (AppState.activeView === 'wishlist') {
+            renderView('wishlist');
+          }
         });
       });
     });
