@@ -199,7 +199,7 @@ function initializeAdminDatabases() {
   }
 
   // 7. Products Database initialization fallback
-  const CURRENT_DB_VERSION_PROD = 'v7';
+  const CURRENT_DB_VERSION_PROD = 'v8';
   let storedProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
   if (storedProds.length < 108 || currentDbVersion !== CURRENT_DB_VERSION_PROD || !storedProds[0]?.name.includes('Shirt')) {
     const defaultProducts = [];
@@ -360,7 +360,7 @@ function initializeAdminDatabases() {
         const detail = baseDetails[index] || baseDetails[0];
         defaultProducts.push({
           id: globalId++,
-          name: `${cat.name} ${prodName}`,
+          name: prodName,
           cat: cat.name,
           brand: 'HypeBrand',
           price: `₹${detail.price.toLocaleString('en-IN')}`,
