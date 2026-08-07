@@ -5974,3 +5974,104 @@ input {
   color: #ff3b30;
   background-color: rgba(255, 59, 48, 0.08);
 }
+
+/* ==========================================================================
+   Settings & Language Drawer Styles
+   ========================================================================== */
+.settings-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 2100;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-drawer-card {
+  background: var(--bg-card);
+  border-left: 1px solid var(--border-color);
+  width: 340px;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.25);
+  animation: drawerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes drawerSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.settings-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.settings-drawer-header h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.settings-drawer-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.settings-drawer-close-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.settings-drawer-close-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.color-palette-btn {
+  transition: transform var(--transition-fast), border var(--transition-fast);
+}
+
+.color-palette-btn:hover {
+  transform: scale(1.08);
+}
+
+.color-palette-btn.active {
+  border: 3px solid var(--text-primary) !important;
+}
+
+.lang-selector-btn {
+  transition: all var(--transition-fast);
+}
+
+.lang-selector-btn:hover {
+  border-color: var(--color-accent) !important;
+}
+
+.lang-selector-btn.active {
+  border-color: var(--color-accent) !important;
+  background-color: var(--color-accent-bg) !important;
+}
+
+.lang-selector-btn.active .active-check {
+  color: var(--color-accent) !important;
+}

@@ -458,6 +458,218 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Address Modal triggers
   initAddressModal();
 
+  /* ==========================================================================
+     Translation & Localization Engine (i18n)
+     ========================================================================== */
+  const TRANSLATIONS = {
+    en: {
+      home: "Home",
+      shop: "Shop",
+      categories: "Categories",
+      wishlist: "Wishlist",
+      orders: "Orders",
+      profile: "Profile",
+      search_placeholder: "Search for products, brands and more...",
+      deliver_to: "Deliver to",
+      login: "Login",
+      logout: "Logout",
+      welcome: "Welcome",
+      my_profile: "My Profile",
+      addresses: "Addresses",
+      cart_empty: "Your Cart is Empty",
+      wishlist_empty: "Your Wishlist is Empty",
+      orders_empty: "No Orders Yet"
+    },
+    ta: {
+      home: "முகப்பு",
+      shop: "கடை",
+      categories: "பிரிவுகள்",
+      wishlist: "விருப்பப் பட்டியல்",
+      orders: "ஆர்டர்கள்",
+      profile: "சுயவிவரம்",
+      search_placeholder: "தயாரிப்புகள், பிராண்டுகள் மற்றும் பலவற்றைத் தேடுங்கள்...",
+      deliver_to: "விநியோகிக்கவும்",
+      login: "உள்நுழைக",
+      logout: "வெளியேறு",
+      welcome: "வரவேற்கிறோம்",
+      my_profile: "எனது சுயவிவரம்",
+      addresses: "முகவரிகள்",
+      cart_empty: "உங்கள் வண்டி காலியாக உள்ளது",
+      wishlist_empty: "உங்கள் விருப்பப் பட்டியல் காலியாக உள்ளது",
+      orders_empty: "இன்னும் ஆர்டர்கள் இல்லை"
+    },
+    hi: {
+      home: "मुख्य पृष्ठ",
+      shop: "दुकान",
+      categories: "श्रेणियाँ",
+      wishlist: "इच्छा सूची",
+      orders: "ऑर्डर",
+      profile: "प्रोफ़ाइल",
+      search_placeholder: "उत्पाद, ब्रांड और बहुत कुछ खोजें...",
+      deliver_to: "यहाँ भेजें",
+      login: "लॉगिन",
+      logout: "लॉगआउट",
+      welcome: "स्वागत है",
+      my_profile: "मेरी प्रोफ़ाइल",
+      addresses: "पते",
+      cart_empty: "आपकी कार्ट खाली है",
+      wishlist_empty: "आपकी इच्छा सूची खाली है",
+      orders_empty: "अभी तक कोई ऑर्डर नहीं"
+    }
+  };
+
+  AppState.language = localStorage.getItem('shopsphere_language') || 'en';
+
+  function applyTranslations() {
+    const lang = AppState.language;
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key]) el.textContent = dict[key];
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (dict[key]) el.setAttribute('placeholder', dict[key]);
+    });
+  }
+
+  /* ==========================================================================
+     Theme Color Palette Engine
+     ========================================================================== */
+  const COLOR_PALETTES = {
+    lime: { accent: '#c2db3a', hover: '#b1c830', bg: 'rgba(194, 219, 58, 0.15)' },
+    blue: { accent: '#2563eb', hover: '#1d4ed8', bg: 'rgba(37, 99, 235, 0.15)' },
+    green: { accent: '#10b981', hover: '#059669', bg: 'rgba(16, 185, 129, 0.15)' },
+    orange: { accent: '#ff5a36', hover: '#e04322', bg: 'rgba(255, 90, 54, 0.15)' },
+    purple: { accent: '#8b5cf6', hover: '#7c3aed', bg: 'rgba(139, 92, 246, 0.15)' },
+    pink: { accent: '#ec4899', hover: '#db2777', bg: 'rgba(236, 72, 153, 0.15)' }
+  };
+
+  AppState.colorTheme = localStorage.getItem('shopsphere_color_theme') || 'lime';
+
+  function applyColorTheme(themeName) {
+    const theme = COLOR_PALETTES[themeName] || COLOR_PALETTES['lime'];
+    document.documentElement.style.setProperty('--color-accent', theme.accent);
+    document.documentElement.style.setProperty('--color-accent-hover', theme.hover);
+    document.documentElement.style.setProperty('--color-accent-bg', theme.bg);
+    localStorage.setItem('shopsphere_color_theme', themeName);
+    AppState.colorTheme = themeName;
+
+    // Highlight selected color palette button
+    document.querySelectorAll('.color-palette-btn').forEach(btn => {
+      if (btn.getAttribute('data-theme-name') === themeName) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  /* ==========================================================================
+     Settings & Language Drawer Bindings
+     ========================================================================== */
+  function initSettingsDrawer() {
+    const settingsBtn = document.getElementById('settings-btn');
+    const overlay = document.getElementById('settings-drawer-overlay');
+    const closeBtn = document.getElementById('settings-drawer-close');
+    
+    if (!overlay) return;
+
+    // Toggle drawer
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
+        overlay.classList.remove('hidden');
+        updateSettingsDrawerUI();
+      });
+    }
+
+    closeBtn.addEventListener('click', () => overlay.classList.add('hidden'));
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.add('hidden');
+    });
+
+    // Theme mode switch buttons inside drawer
+    const modeLight = document.getElementById('settings-mode-light');
+    const modeDark = document.getElementById('settings-mode-dark');
+    
+    if (modeLight && modeDark) {
+      modeLight.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        AppState.theme = 'light';
+        updateSettingsDrawerUI();
+      });
+      modeDark.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        AppState.theme = 'dark';
+        updateSettingsDrawerUI();
+      });
+    }
+
+    // Color palette click buttons
+    document.querySelectorAll('.color-palette-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const themeName = btn.getAttribute('data-theme-name');
+        applyColorTheme(themeName);
+      });
+    });
+
+    // Language selection buttons
+    document.querySelectorAll('.lang-selector-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang');
+        AppState.language = lang;
+        localStorage.setItem('shopsphere_language', lang);
+        applyTranslations();
+        updateSettingsDrawerUI();
+        showToast('Language updated', 'success');
+      });
+    });
+
+    function updateSettingsDrawerUI() {
+      // Theme Mode Highlight
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (modeLight && modeDark) {
+        if (isDark) {
+          modeLight.classList.remove('active');
+          modeDark.classList.add('active');
+        } else {
+          modeLight.classList.add('active');
+          modeDark.classList.remove('active');
+        }
+      }
+
+      // Color Palette highlight
+      document.querySelectorAll('.color-palette-btn').forEach(btn => {
+        if (btn.getAttribute('data-theme-name') === AppState.colorTheme) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Language highlight
+      document.querySelectorAll('.lang-selector-btn').forEach(btn => {
+        const check = btn.querySelector('.active-check');
+        if (btn.getAttribute('data-lang') === AppState.language) {
+          btn.classList.add('active');
+          if (check) check.style.display = 'block';
+        } else {
+          btn.classList.remove('active');
+          if (check) check.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  // Load Theme and Translations
+  applyColorTheme(AppState.colorTheme);
+  applyTranslations();
+  initSettingsDrawer();
+
   function requireAuth(actionType, payload, callback) {
     if (AuthService.isAuthenticated()) {
       callback();
@@ -568,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bannerHeading.textContent = 'Secure Checkout';
         bannerSubtext.textContent = 'Sign in to access saved addresses and 1-click payment options.';
       } else if (actionType === 'SIGNUP') {
-        bannerHeading.textContent = 'Join Hype';
+        bannerHeading.textContent = 'Join ShopSphere';
         bannerSubtext.textContent = 'Create an account to get 10% off your first order and access member-only deals.';
       } else {
         bannerHeading.textContent = 'Welcome Back';
@@ -600,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signupForm) signupForm.style.display = viewName === 'signup' ? 'flex' : 'none';
 
     if (viewName === 'signup' && bannerTitle && bannerSubtext) {
-      bannerTitle.textContent = "Join Hype. Today";
+      bannerTitle.textContent = "Join ShopSphere Today";
       bannerSubtext.textContent = "Create an account to receive 10% OFF your first purchase & member perks.";
     } else if (viewName === 'otp' && bannerTitle && bannerSubtext) {
       bannerTitle.textContent = "Verify Security OTP";
@@ -794,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .then(() => {
             setBtnLoading(submitBtn, false);
             closeAuthModal();
-            showToast(`Account created! Welcome to Hype, ${AppState.user.name}!`, 'success');
+            showToast(`Account created! Welcome to ShopSphere, ${AppState.user.name}!`, 'success');
             resumePendingAction();
           })
           .catch((err) => {
@@ -1482,7 +1694,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', () => {
         requireAuth('CHECKOUT', {}, () => {
-          showToast('Order placed successfully! Thank you for shopping with Hype.', 'success');
+          showToast('Order placed successfully! Thank you for shopping with ShopSphere.', 'success');
           if (typeof addNotification === 'function') {
             addNotification({
               id: 'notif_' + Date.now(),
@@ -3866,12 +4078,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadNotificationsFromStorage() {
-    const stored = localStorage.getItem('hype_notifications');
+    const stored = localStorage.getItem('shopsphere_notifications');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          // Filter out the old hardcoded mock notifications if they exist in localStorage
           const filtered = parsed.filter(n => typeof n.id === 'string' && !n.id.startsWith('notif_10'));
           return filtered;
         }
@@ -3879,14 +4090,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Failed to parse notifications from localStorage', e);
       }
     }
-    localStorage.setItem('hype_notifications', JSON.stringify(DEFAULT_NOTIFICATIONS));
+    localStorage.setItem('shopsphere_notifications', JSON.stringify(DEFAULT_NOTIFICATIONS));
     return DEFAULT_NOTIFICATIONS;
   }
 
   function saveNotificationsToStorage(notifs) {
     try {
       AppState.notifications = notifs;
-      localStorage.setItem('hype_notifications', JSON.stringify(notifs));
+      localStorage.setItem('shopsphere_notifications', JSON.stringify(notifs));
       updateNotificationBadge();
     } catch (error) {
       console.error('Failed to save notifications:', error);
