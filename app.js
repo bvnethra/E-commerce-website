@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.querySelectorAll('.promo-signup-btn').forEach(btn => {
-      btn.addEventListener('click', () => openAuthModal('SIGNUP'));
+      btn.addEventListener('click', () => openAuthModal('LOGIN'));
     });
 
     const userTrigger = document.getElementById('header-user-trigger');
