@@ -465,6 +465,22 @@
     </div>
   </div>
 
+  <!-- Payment Verification Modal -->
+  <div class="modal" id="payment-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Payment Verification Details</h3>
+        <button onclick="closePaymentModal()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body" id="payment-modal-body">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closePaymentModal()">Close Details</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Core admin scripts loading -->
   <script src="admin.js"></script>
 

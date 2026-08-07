@@ -665,7 +665,6 @@ function renderPaymentsTable() {
   }
 
   orders.forEach(o => {
-    // If Cash On Delivery, payment status defaults to pending until marked delivered
     const defaultStatus = o.paymentMethod === 'COD' ? 'Pending (COD)' : 'Verified';
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -674,7 +673,7 @@ function renderPaymentsTable() {
       <td style="font-weight: bold;">${o.total}</td>
       <td><span class="badge-status status-delivered">${defaultStatus}</span></td>
       <td>
-        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="alert('Transaction receipt checked successfully.')">Verify Details</button>
+        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="openPaymentDetailsModal('${o.id}')">Verify Details</button>
       </td>
     `;
     tableBody.appendChild(row);
@@ -875,4 +874,66 @@ function saveAdminSettings() {
   const settings = { taxRate, shippingPrice, gateway };
   localStorage.setItem('shopsphere_settings', JSON.stringify(settings));
   alert('Global settings stored successfully.');
+}
+
+/* ==========================================================================
+   Payment Details Modal Managers
+   ========================================================================== */
+function openPaymentDetailsModal(orderId) {
+  const orders = JSON.parse(localStorage.getItem('shopsphere_orders') || '[]');
+  const o = orders.find(ord => String(ord.id) === String(orderId));
+  if (!o) return;
+
+  const details = o.itemsDetail || [
+    { id: 1, name: 'Noise Ultra 2 Max', price: o.total, img: 'assets/images/prod_watch.png', quantity: o.items || 1 }
+  ];
+
+  const itemsHtml = details.map(item => `
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed var(--border-color); padding: 8px 0;">
+      <span style="font-size: 13px; font-weight:600; color:var(--text-primary);">${item.name} (x${item.quantity})</span>
+      <span style="font-size: 13px; font-weight:bold; color:var(--text-primary);">${item.price}</span>
+    </div>
+  `).join('');
+
+  const dateStr = o.date || new Date().toLocaleDateString('en-IN');
+  const timeStr = o.time || '10:45 AM';
+
+  document.getElementById('payment-modal-body').innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+      <div>
+        <span style="font-size: 11px; color: var(--text-secondary); font-weight:bold; text-transform:uppercase; letter-spacing:0.3px;">Customer Name</span>
+        <div style="font-size: 14.5px; font-weight:600; color:var(--text-primary); margin-top:2px;">${o.customerName || 'Guest User'}</div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div>
+          <span style="font-size: 11px; color: var(--text-secondary); font-weight:bold; text-transform:uppercase; letter-spacing:0.3px;">Date of Payment</span>
+          <div style="font-size: 14px; font-weight:600; color:var(--text-primary); margin-top:2px;">${dateStr}</div>
+        </div>
+        <div>
+          <span style="font-size: 11px; color: var(--text-secondary); font-weight:bold; text-transform:uppercase; letter-spacing:0.3px;">Time of Payment</span>
+          <div style="font-size: 14px; font-weight:600; color:var(--text-primary); margin-top:2px;">${timeStr}</div>
+        </div>
+      </div>
+      <div>
+        <span style="font-size: 11px; color: var(--text-secondary); font-weight:bold; text-transform:uppercase; letter-spacing:0.3px;">Method of Payment</span>
+        <div style="font-size: 14px; font-weight:600; color:var(--text-primary); margin-top:2px;">${o.paymentMethod || 'COD'}</div>
+      </div>
+      <div style="margin-top: 8px; border-top:1px solid var(--border-color); padding-top:10px;">
+        <span style="font-size: 11px; color: var(--text-secondary); font-weight:bold; text-transform:uppercase; letter-spacing:0.3px;">Items Ordered</span>
+        <div style="margin-top: 6px; max-height:160px; overflow-y:auto; padding-right:4px;">
+          ${itemsHtml}
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:14.5px; font-weight:700; border-top:1px solid var(--border-color); padding-top:10px;">
+        <span>Total Transaction Amount:</span>
+        <span style="color:var(--color-success);">${o.total}</span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('payment-modal').style.display = 'flex';
+}
+
+function closePaymentModal() {
+  document.getElementById('payment-modal').style.display = 'none';
 }
