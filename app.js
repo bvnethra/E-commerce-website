@@ -5466,6 +5466,79 @@ document.addEventListener('DOMContentLoaded', () => {
      Search Bar Matching & Filter Engine
      ========================================================================== */
   const searchInput = document.getElementById('search-input');
+  const voiceBtn = document.getElementById('voice-search-btn');
+
+  if (voiceBtn && searchInput) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      let isListening = false;
+
+      voiceBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isListening) {
+          recognition.stop();
+          return;
+        }
+
+        try {
+          recognition.start();
+        } catch (err) {
+          showToast('Speech recognition is already running.', 'warning');
+        }
+      });
+
+      recognition.onstart = () => {
+        isListening = true;
+        voiceBtn.style.color = '#ef4444';
+        voiceBtn.classList.add('pulse-mic');
+        const micIcon = voiceBtn.querySelector('.mic-icon');
+        if (micIcon) micIcon.style.transform = 'scale(1.2)';
+        showToast('Listening... Speak now', 'info');
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        voiceBtn.style.color = 'var(--text-secondary)';
+        voiceBtn.classList.remove('pulse-mic');
+        const micIcon = voiceBtn.querySelector('.mic-icon');
+        if (micIcon) micIcon.style.transform = 'scale(1)';
+      };
+
+      recognition.onerror = (e) => {
+        isListening = false;
+        voiceBtn.style.color = 'var(--text-secondary)';
+        voiceBtn.classList.remove('pulse-mic');
+        const micIcon = voiceBtn.querySelector('.mic-icon');
+        if (micIcon) micIcon.style.transform = 'scale(1)';
+        showToast('Voice search error: ' + e.error, 'error');
+      };
+
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        if (transcript) {
+          searchInput.value = transcript;
+          AppState.searchQuery = transcript.toLowerCase();
+          AppState.currentPage = 1;
+          renderView('shop');
+          showToast(`Searching for: "${transcript}"`, 'success');
+        }
+      };
+    } else {
+      voiceBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showToast('Voice search is not supported in this browser. Please use Chrome or Edge.', 'warning');
+      });
+    }
+  }
+
   if (searchInput) {
     let searchDebounceTimer;
     searchInput.addEventListener('input', (e) => {
