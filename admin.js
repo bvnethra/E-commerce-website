@@ -281,13 +281,19 @@ function renderKPIs() {
 /* ==========================================================================
    MODULE 2: Product Management
    ========================================================================== */
+let currentProductCategoryFilter = 'ALL';
+
 function renderProductsTable() {
-  const products = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+  let products = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
   const tableBody = document.getElementById('products-table-body');
   tableBody.innerHTML = '';
 
+  if (currentProductCategoryFilter !== 'ALL') {
+    products = products.filter(p => String(p.cat).toUpperCase() === currentProductCategoryFilter.toUpperCase());
+  }
+
   if (products.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">No catalog products found. Add a new one to start!</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">No catalog products found for this category. Add a new one to start!</td></tr>`;
     return;
   }
 
@@ -310,16 +316,40 @@ function renderProductsTable() {
   });
 }
 
+function filterProductsByCategory(val) {
+  currentProductCategoryFilter = val;
+  renderProductsTable();
+}
+
 function populateCategorySelectDropdown() {
   const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
+  
+  // 1. Form dropdown
   const select = document.getElementById('prod-form-cat');
-  select.innerHTML = '';
-  categories.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.name;
-    opt.innerText = c.name;
-    select.appendChild(opt);
-  });
+  if (select) {
+    select.innerHTML = '';
+    categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.innerText = c.name;
+      select.appendChild(opt);
+    });
+  }
+
+  // 2. Filter dropdown
+  const filterSelect = document.getElementById('admin-product-category-filter');
+  if (filterSelect) {
+    filterSelect.innerHTML = '<option value="ALL">All Categories</option>';
+    categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.innerText = c.name;
+      if (c.name.toUpperCase() === currentProductCategoryFilter.toUpperCase()) {
+        opt.selected = true;
+      }
+      filterSelect.appendChild(opt);
+    });
+  }
 }
 
 function openProductModal() {
