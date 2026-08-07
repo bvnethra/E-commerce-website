@@ -2985,10 +2985,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="listing-controls-bar">
-          <button class="mobile-filter-trigger-btn" id="open-mobile-filter-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-            <span>Filter (${activeFilterPills.length})</span>
-          </button>
 
           <div class="view-mode-toggle">
             <button class="view-mode-btn ${AppState.viewMode === 'grid' ? 'active' : ''}" id="view-mode-grid-btn" title="Grid View">
@@ -3278,21 +3274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
 
-      <!-- Mobile Bottom Sheet Drawer -->
-      <div class="mobile-filter-drawer-backdrop" id="mobile-filter-backdrop"></div>
-      <div class="mobile-filter-bottom-sheet" id="mobile-filter-sheet">
-        <div class="mobile-sheet-header">
-          <span class="mobile-sheet-title">Filter Products</span>
-          <button id="close-mobile-filter-btn" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-primary);">✕</button>
-        </div>
-        <div class="mobile-sheet-body">
-          <p style="font-size:0.85rem; color:var(--text-muted);">Adjust your criteria to filter available items.</p>
-        </div>
-        <div class="mobile-sheet-footer">
-          <button class="btn-secondary-action" id="mobile-clear-btn" style="padding: 12px 20px;">Reset</button>
-          <button class="mobile-sheet-apply-btn" id="mobile-apply-btn">Apply Filters (${totalCount})</button>
-        </div>
-      </div>
     `;
 
     viewContainer.innerHTML = contentHtml;
