@@ -415,10 +415,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         card.querySelector('.delete').addEventListener('click', () => {
-          if (confirm('Are you sure you want to delete this address?')) {
-            AddressService.delete(addr.id);
-            showToast('Address deleted successfully', 'info');
-            renderAddressList();
+          const deleteOverlay = document.getElementById('addr-delete-modal-overlay');
+          const cancelBtn = document.getElementById('addr-delete-cancel-btn');
+          const confirmBtn = document.getElementById('addr-delete-confirm-btn');
+
+          if (deleteOverlay && cancelBtn && confirmBtn) {
+            deleteOverlay.classList.remove('hidden');
+
+            const closeDeleteModal = () => {
+              deleteOverlay.classList.add('hidden');
+              // Clone nodes to purge all dynamic event listeners and prevent action stacking
+              const newConfirm = confirmBtn.cloneNode(true);
+              confirmBtn.replaceWith(newConfirm);
+              const newCancel = cancelBtn.cloneNode(true);
+              cancelBtn.replaceWith(newCancel);
+            };
+
+            cancelBtn.addEventListener('click', closeDeleteModal);
+            confirmBtn.addEventListener('click', () => {
+              AddressService.delete(addr.id);
+              showToast('Address deleted successfully', 'info');
+              closeDeleteModal();
+              renderAddressList();
+            });
           }
         });
 
