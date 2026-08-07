@@ -2058,8 +2058,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
       };
       // Initialize/sync products database in localStorage if not set or outdated
+      const CURRENT_DB_VERSION = 'v5';
       let storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
-      if (storedProducts.length < 108 || storedProducts[0]?.name.includes('Classic Black')) {
+      const currentDbVersion = localStorage.getItem('shopsphere_db_version');
+      if (storedProducts.length < 108 || currentDbVersion !== CURRENT_DB_VERSION || !storedProducts[0]?.name.includes('Shirt')) {
         const generatedProducts = [];
         const categories = mockDb.categories;
         
@@ -2141,16 +2143,19 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
         localStorage.setItem('shopsphere_products', JSON.stringify(generatedProducts));
+        localStorage.setItem('shopsphere_db_version', CURRENT_DB_VERSION);
         storedProducts = generatedProducts;
       }
       mockDb.products = storedProducts;
 
       // Initialize/sync categories database in localStorage if not set or outdated
       const storedCategories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
-      if (storedCategories.length >= 27 && storedCategories[0]?.img === 'assets/images/cat_men.png') {
+      const currentCatVersion = localStorage.getItem('shopsphere_db_version');
+      if (storedCategories.length >= 27 && currentCatVersion === CURRENT_DB_VERSION && storedCategories[0]?.img === 'assets/images/cat_men.png') {
         mockDb.categories = storedCategories;
       } else {
         localStorage.setItem('shopsphere_categories', JSON.stringify(mockDb.categories));
+        localStorage.setItem('shopsphere_db_version', CURRENT_DB_VERSION);
       }
 
       if (viewName === 'wishlist') {
