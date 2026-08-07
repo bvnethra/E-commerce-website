@@ -2021,33 +2021,33 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         ],
         categories: [
-          { name: 'Men', subtitle: 'Collection', bg: '#dcfce7', img: 'assets/images/cat_men.png' },
-          { name: 'Women', subtitle: 'Collection', bg: '#ffedd5', img: 'assets/images/cat_women.png' },
-          { name: 'Electronics', subtitle: 'Gadgets', bg: '#e0f2fe', img: 'assets/images/cat_electronics.png' },
-          { name: 'Shoes', subtitle: 'Collection', bg: '#f5ece4', img: 'assets/images/cat_shoes.png' },
-          { name: 'Accessories', subtitle: 'Collection', bg: '#f3e8ff', img: 'assets/images/cat_accessories.png' },
-          { name: 'Kids & Baby', subtitle: 'Apparel & Essentials', bg: '#fef9c3', img: 'assets/images/cat_kids.png' },
-          { name: 'Activewear', subtitle: 'Sportswear & Gym', bg: '#ccfbf1', img: 'assets/images/cat_activewear.png' },
-          { name: 'Bags & Luggage', subtitle: 'Travel & Daily', bg: '#e2e8f0', img: 'assets/images/prod_backpack.png' },
-          { name: 'Jewelry', subtitle: 'Fine & Fashion', bg: '#ffe4e6', img: 'assets/images/cat_jewelry.svg' },
-          { name: 'Sleepwear', subtitle: 'Lounge & Comfort', bg: '#fae8ff', img: 'assets/images/cat_sleepwear.svg' },
-          { name: 'Home Decor', subtitle: 'Living & Style', bg: '#f7fee7', img: 'assets/images/cat_homedecor.svg' },
-          { name: 'Kitchen & Dining', subtitle: 'Cookware & Dining', bg: '#ffedd5', img: 'assets/images/cat_kitchen.png' },
-          { name: 'Furniture', subtitle: 'Indoor & Outdoor', bg: '#ecfccb', img: 'assets/images/cat_furniture.png' },
-          { name: 'Bedding & Bath', subtitle: 'Comfort Essentials', bg: '#e0f2fe', img: 'assets/images/cat_bedding.svg' },
-          { name: 'Lighting', subtitle: 'Lamps & Ambiance', bg: '#fef9c3', img: 'assets/images/cat_lighting.svg' },
-          { name: 'Beauty & Skincare', subtitle: 'Self-Care & Glow', bg: '#ffe4e6', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="35" y="40" width="30" height="45" rx="8" fill="#fb7185"/><rect x="42" y="25" width="16" height="15" fill="#f43f5e"/><circle cx="50" cy="18" r="7" fill="#fda4af"/></svg>' },
-          { name: 'Fragrances', subtitle: 'Perfumes & Scents', bg: '#fae8ff', img: 'assets/images/cat_fragrances.svg' },
-          { name: 'Grooming', subtitle: 'Personal Care', bg: '#fed7aa', img: 'assets/images/cat_grooming.png' },
-          { name: 'Health & Wellness', subtitle: 'Vitamins & Care', bg: '#d1fae5', img: 'assets/images/cat_health.png' },
-          { name: 'Gaming', subtitle: 'Consoles & Gear', bg: '#e2e8f0', img: 'assets/images/cat_gaming.svg' },
-          { name: 'Audio', subtitle: 'Speakers & Sound', bg: '#dbeafe', img: 'assets/images/prod_earbuds.png' },
-          { name: 'Smart Home', subtitle: 'Automation & Security', bg: '#f1f5f9', img: 'assets/images/cat_smarthome.svg' },
-          { name: 'Office & Stationery', subtitle: 'Desks & Supplies', bg: '#ffedd5', img: 'assets/images/cat_office.svg' },
-          { name: 'Sports & Fitness', subtitle: 'Training Equipment', bg: '#ffe4e6', img: 'assets/images/cat_sports.png' },
-          { name: 'Outdoor & Camping', subtitle: 'Adventure Gear', bg: '#ffedd5', img: 'assets/images/cat_outdoor.png' },
-          { name: 'Toys & Games', subtitle: 'Play & Collectibles', bg: '#fef9c3', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="25" y="55" width="22" height="22" rx="3" fill="#ef4444"/><rect x="52" y="55" width="22" height="22" rx="3" fill="#3b82f6"/><rect x="38" y="30" width="22" height="22" rx="3" fill="#eab308"/></svg>' },
-          { name: 'Pet Supplies', subtitle: 'Food & Accessories', bg: '#f5ebe0', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><ellipse cx="50" cy="65" rx="30" ry="15" fill="#d97706"/><circle cx="35" cy="40" r="8" fill="#b45309"/><circle cx="65" cy="40" r="8" fill="#b45309"/><circle cx="50" cy="35" r="10" fill="#b45309"/></svg>' }
+          { name: 'Men', subtitle: 'T-Shirts, Jeans & Jackets', bg: '#e0f2fe', img: 'assets/images/cat_accessories.png' },
+          { name: 'Women', subtitle: 'Dresses, Tops & Jeans', bg: '#fce7f3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Activewear', subtitle: 'Gym Shorts & Leggings', bg: '#ccfbf1', img: 'assets/images/cat_activewear.png' },
+          { name: 'Sleepwear', subtitle: 'Pajama Sets & Loungewear', bg: '#fae8ff', img: 'assets/images/cat_sleepwear.svg' },
+          { name: 'Shoes', subtitle: 'Sneakers, Boots & Sandals', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Bags & Luggage', subtitle: 'Backpacks & Suitcases', bg: '#e2e8f0', img: 'assets/images/prod_backpack.png' },
+          { name: 'Jewelry', subtitle: 'Necklaces, Rings & Earrings', bg: '#ffe4e6', img: 'assets/images/cat_jewelry.svg' },
+          { name: 'Accessories', subtitle: 'Smartwatches, Sunglasses & Wallets', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Kids & Baby', subtitle: 'Baby Onesies & Kids Apparel', bg: '#fae8ff', img: 'assets/images/cat_accessories.png' },
+          { name: 'Electronics', subtitle: 'Smartphones, Laptops & Accessories', bg: '#dcfce7', img: 'assets/images/cat_accessories.png' },
+          { name: 'Audio', subtitle: 'Earbuds, Headphones & Speakers', bg: '#dbeafe', img: 'assets/images/prod_earbuds.png' },
+          { name: 'Gaming', subtitle: 'Consoles, Controllers & Gear', bg: '#e2e8f0', img: 'assets/images/cat_gaming.svg' },
+          { name: 'Smart Home', subtitle: 'Smart Bulbs, Cameras & Hubs', bg: '#f1f5f9', img: 'assets/images/cat_smarthome.svg' },
+          { name: 'Furniture', subtitle: 'Sofas, Beds & Office Desks', bg: '#ecfccb', img: 'assets/images/cat_furniture.png' },
+          { name: 'Home Decor', subtitle: 'Wall Art, Cushions & Rugs', bg: '#f7fee7', img: 'assets/images/cat_homedecor.svg' },
+          { name: 'Bedding & Bath', subtitle: 'Sheets, Towels & Mats', bg: '#e0f2fe', img: 'assets/images/cat_bedding.svg' },
+          { name: 'Kitchen & Dining', subtitle: 'Cookware, Blenders & Cutlery', bg: '#ffedd5', img: 'assets/images/cat_kitchen.png' },
+          { name: 'Lighting', subtitle: 'Ceiling, Table & Desk Lamps', bg: '#fef9c3', img: 'assets/images/cat_lighting.svg' },
+          { name: 'Beauty & Skincare', subtitle: 'Cleansers, Serums & Makeup', bg: '#ffe4e6', img: 'assets/images/cat_accessories.png' },
+          { name: 'Fragrances', subtitle: 'Perfumes, Colognes & Mists', bg: '#fae8ff', img: 'assets/images/cat_fragrances.svg' },
+          { name: 'Grooming', subtitle: 'Trimmers, Dryers & Razors', bg: '#fed7aa', img: 'assets/images/cat_grooming.png' },
+          { name: 'Health & Wellness', subtitle: 'Vitamins & Protein Powders', bg: '#d1fae5', img: 'assets/images/cat_health.png' },
+          { name: 'Sports & Fitness', subtitle: 'Dumbbells & Yoga Mats', bg: '#ffe4e6', img: 'assets/images/cat_sports.png' },
+          { name: 'Outdoor & Camping', subtitle: 'Tents, Sleeping Bags & Gear', bg: '#ffedd5', img: 'assets/images/cat_outdoor.png' },
+          { name: 'Office & Stationery', subtitle: 'Notebooks, Pens & Organizers', bg: '#ffedd5', img: 'assets/images/cat_office.svg' },
+          { name: 'Toys & Games', subtitle: 'Action Figures & Board Games', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Pet Supplies', subtitle: 'Food, Beds & Toys', bg: '#f5ebe0', img: 'assets/images/cat_accessories.png' }
         ],
         orders: OrderService.getAll(),
         wishlist: [],
@@ -2065,9 +2065,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('shopsphere_products', JSON.stringify(mockDb.products));
       }
 
-      // Initialize/sync categories database in localStorage if not set
+      // Initialize/sync categories database in localStorage if not set or outdated
       const storedCategories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
-      if (storedCategories.length > 0) {
+      if (storedCategories.length >= 27) {
         mockDb.categories = storedCategories;
       } else {
         localStorage.setItem('shopsphere_categories', JSON.stringify(mockDb.categories));
