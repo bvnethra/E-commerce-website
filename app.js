@@ -3011,19 +3011,21 @@ document.addEventListener('DOMContentLoaded', () => {
               <p class="view-subtitle">Your wishlist is currently empty</p>
             </div>
           </div>
-          <div class="cart-empty-container">
-            <div class="cart-empty-icon-circle" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <div class="empty-state-card">
+            <div class="empty-state-illustration" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #ec4899;">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             </div>
-            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Your Wishlist is Empty</h3>
-            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px; text-align: center; max-width: 320px;">
+            <h3 class="empty-state-title">Your Wishlist is Empty</h3>
+            <p class="empty-state-desc">
               Save your favorite items here to track their availability, price drops, and get notifications!
             </p>
-            <button class="btn-primary-action" id="wishlist-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
-              Browse Products &nbsp; ➜
-            </button>
+            <div class="empty-state-actions">
+              <button class="btn-primary-action" id="wishlist-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
+                Browse Products &nbsp; ➜
+              </button>
+            </div>
           </div>
         `;
       } else {
@@ -3093,21 +3095,23 @@ document.addEventListener('DOMContentLoaded', () => {
               <p class="view-subtitle">No orders found</p>
             </div>
           </div>
-          <div class="cart-empty-container">
-            <div class="cart-empty-icon-circle" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <div class="empty-state-card">
+            <div class="empty-state-illustration" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: #2563eb;">
                 <polyline points="21 8 21 21 3 21 3 8"/>
                 <rect x="1" y="3" width="22" height="5"/>
                 <line x1="10" y1="12" x2="14" y2="12"/>
               </svg>
             </div>
-            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">No Orders Yet</h3>
-            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px; text-align: center; max-width: 320px;">
+            <h3 class="empty-state-title">No Orders Yet</h3>
+            <p class="empty-state-desc">
               You have not placed any orders yet. Once you complete a purchase, your order history will appear here!
             </p>
-            <button class="btn-primary-action" id="orders-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
-              Shop Now &nbsp; ➜
-            </button>
+            <div class="empty-state-actions">
+              <button class="btn-primary-action" id="orders-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
+                Shop Now &nbsp; ➜
+              </button>
+            </div>
           </div>
         `;
       } else {
