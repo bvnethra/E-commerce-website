@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
       listContainer.innerHTML = '';
 
       if (addrs.length === 0) {
-        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.88rem; margin: 20px 0;">No saved addresses found. Add one above!</p>';
+        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.88rem; margin: 20px 0;" data-i18n="no_addresses_found">No saved addresses found. Add one above!</p>';
         return;
       }
 
@@ -377,10 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
         card.innerHTML = `
           <div class="address-card-header">
             <span class="address-badge ${addr.isDefault ? 'default' : ''}">
-              ${addr.type} ${addr.isDefault ? '(Default)' : ''}
+              <span data-i18n="address_type_${addr.type.toLowerCase()}">${addr.type}</span>${addr.isDefault ? ' <span data-i18n="default_label">(Default)</span>' : ''}
             </span>
             <div style="font-size: 0.78rem; font-weight: 700; color: var(--color-accent); cursor: pointer;" class="address-set-default-btn" data-id="${addr.id}">
-              ${addr.isDefault ? '' : 'Set as Default'}
+              ${addr.isDefault ? '' : '<span data-i18n="set_as_default">Set as Default</span>'}
             </div>
           </div>
           <div style="margin-top: 4px;">
@@ -391,8 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ${addr.addressLine}, ${addr.city}, ${addr.state} - ${addr.pincode}
           </div>
           <div class="address-card-actions">
-            <button class="address-action-btn edit" data-id="${addr.id}">Edit</button>
-            <button class="address-action-btn delete" data-id="${addr.id}" style="color: #ef4444;">Delete</button>
+            <button class="address-action-btn edit" data-id="${addr.id}" data-i18n="edit">Edit</button>
+            <button class="address-action-btn delete" data-id="${addr.id}" data-i18n="delete" style="color: #ef4444;">Delete</button>
           </div>
         `;
 
@@ -452,6 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         listContainer.appendChild(card);
       });
+      applyTranslations();
     }
   }
 
@@ -576,7 +577,109 @@ document.addEventListener('DOMContentLoaded', () => {
       placeholder_email: "Email Address",
       enter_password: "Enter Password",
       existing_user: "Existing User?",
-      and: "and"
+      and: "and",
+
+      // Additional Homepage & Profile localization keys
+      new_collection: "NEW COLLECTION",
+      style_moves_you_html: "STYLE THAT<br>MOVES <span class=\"highlight-text\">YOU</span>",
+      hero_description: "Discover everything you need to elevate your everyday.",
+      shop_now_upper: "SHOP NOW",
+      happy_customers: "Happy Customers",
+      summer_sale: "Summer Sale",
+      up_to: "UP TO",
+      off: "OFF",
+      all_categories: "All Categories",
+      product_catalog: "Product Catalog",
+      shop_products: "Shop Products",
+      brands: "Brands",
+      colors: "Colors",
+      sizes: "Sizes",
+      in_stock: "In Stock",
+      availability: "Availability",
+      sort_popularity: "Sort by: Popularity",
+      sort_newest: "Sort by: Newest",
+      sort_bestselling: "Best Selling",
+      sort_discount: "Discount %",
+      on_first_order: "on your first order",
+      signup_btn: "SIGN UP",
+      exclusive: "Exclusive",
+      deals_only_for_you_html: "Deals Only<br><span class=\"deals-highlight\">For You</span>",
+      grab_best_offers: "Grab the best offers before they're gone!",
+      account_security: "Account Security",
+      jwt_security_desc: "Session is protected with 256-bit encryption JWT tokens.",
+      logout_session: "Logout Session",
+      no_address_saved: "No address saved yet.",
+      no_addresses_found: "No saved addresses found. Add one above!",
+      default_label: "(Default)",
+      edit: "Edit",
+
+      // Service Footer items
+      free_shipping: "Free Shipping",
+      free_shipping_desc: "On orders above ₹999",
+      easy_returns: "Easy Returns",
+      easy_returns_desc: "30 days return policy",
+      secure_payment: "Secure Payment",
+      secure_payment_desc: "100% secure payment",
+      support_247: "24/7 Support",
+      support_247_desc: "Dedicated support",
+
+      // Toasts & Alerts
+      lang_updated: "Language updated",
+
+      // Category titles
+      category_men: "Men",
+      category_women: "Women",
+      category_electronics: "Electronics",
+      category_shoes: "Shoes",
+      category_accessories: "Accessories",
+      category_kids_and_baby: "Kids & Baby",
+      category_activewear: "Activewear",
+      category_bags_and_luggage: "Bags & Luggage",
+      category_jewelry: "Jewelry",
+      category_sleepwear: "Sleepwear",
+      category_home_decor: "Home Decor",
+      category_kitchen_and_dining: "Kitchen & Dining",
+      category_furniture: "Furniture",
+      category_bedding_and_bath: "Bedding & Bath",
+      category_lighting: "Lighting",
+      category_beauty_and_skincare: "Beauty & Skincare",
+      category_fragrances: "Fragrances",
+      category_grooming: "Grooming",
+      category_health_and_wellness: "Health & Wellness",
+      category_gaming: "Gaming",
+      category_audio: "Audio",
+      category_smart_home: "Smart Home",
+      category_office_and_stationery: "Office & Stationery",
+      category_sports_and_fitness: "Sports & Fitness",
+      category_outdoor_and_camping: "Outdoor & Camping",
+      category_toys_and_games: "Toys & Games",
+      category_pet_supplies: "Pet Supplies",
+
+      // Subtitles
+      subtitle_collection: "Collection",
+      subtitle_gadgets: "Gadgets",
+      subtitle_apparel_and_essentials: "Apparel & Essentials",
+      subtitle_sportswear_and_gym: "Sportswear & Gym",
+      subtitle_travel_and_daily: "Travel & Daily",
+      subtitle_fine_and_fashion: "Fine & Fashion",
+      subtitle_lounge_and_comfort: "Lounge & Comfort",
+      subtitle_living_and_style: "Living & Style",
+      subtitle_cookware_and_dining: "Cookware & Dining",
+      subtitle_indoor_and_outdoor: "Indoor & Outdoor",
+      subtitle_comfort_essentials: "Comfort Essentials",
+      subtitle_lamps_and_ambiance: "Lamps & Ambiance",
+      subtitle_self_care_and_glow: "Self-Care & Glow",
+      subtitle_perfumes_and_scents: "Perfumes & Scents",
+      subtitle_personal_care: "Personal Care",
+      subtitle_vitamins_and_care: "Vitamins & Care",
+      subtitle_consoles_and_gear: "Consoles & Gear",
+      subtitle_speakers_and_sound: "Speakers & Sound",
+      subtitle_automation_and_security: "Automation & Security",
+      subtitle_desks_and_supplies: "Desks & Supplies",
+      subtitle_training_equipment: "Training Equipment",
+      subtitle_adventure_gear: "Adventure Gear",
+      subtitle_play_and_collectibles: "Play & Collectibles",
+      subtitle_food_and_accessories: "Food & Accessories"
     },
     ta: {
       // Sidebar & Navigation
@@ -677,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
       welcome_perk: "வரவேற்பு சலுகை",
       get_10_off: "10% தள்ளுபடி பெறுங்கள்",
       login_or_signup: "உள்நுழைவு அல்லது பதிவு",
-      enter_mobile_email: "அலைபேसी எண் அல்லது மின்னஞ்சலை உள்ளிடவும்",
+      enter_mobile_email: "அலைபேசி எண் அல்லது மின்னஞ்சலை உள்ளிடவும்",
       continue_btn: "தொடரவும்",
       verify_otp: "OTP சரிபார்ப்பு",
       enter_code: "குறியீட்டை உள்ளிடவும்",
@@ -692,7 +795,109 @@ document.addEventListener('DOMContentLoaded', () => {
       placeholder_email: "மின்னஞ்சல் முகவரி",
       enter_password: "கடவுச்சொல்லை உள்ளிடவும்",
       existing_user: "ஏற்கனவே உள்ள பயனரா?",
-      and: "மற்றும்"
+      and: "மற்றும்",
+
+      // Additional Homepage & Profile localization keys
+      new_collection: "புதிய சேகரிப்பு",
+      style_moves_you_html: "உங்களை<br>கவரும் <span class=\"highlight-text\">ஸ்டைல்</span>",
+      hero_description: "உங்கள் அன்றாட வாழ்க்கையை மேம்படுத்த தேவையான அனைத்தையும் கண்டறியவும்.",
+      shop_now_upper: "இப்போது வாங்குங்கள்",
+      happy_customers: "மகிழ்ச்சியான வாடிக்கையாளர்கள்",
+      summer_sale: "கோடைகால விற்பனை",
+      up_to: "வரை",
+      off: "தள்ளுபடி",
+      all_categories: "அனைத்து பிரிவுகள்",
+      product_catalog: "தயாரிப்பு பட்டியல்",
+      shop_products: "தயாரிப்புகளை வாங்குங்கள்",
+      brands: "பிராண்டுகள்",
+      colors: "வண்ணங்கள்",
+      sizes: "அளவுகள்",
+      in_stock: "இருப்பில் உள்ளது",
+      availability: "இருப்பு நிலை",
+      sort_popularity: "வரிசைப்படுத்து: புகழ்",
+      sort_newest: "வரிசைப்படுத்து: புதியது",
+      sort_bestselling: "அதிக விற்பனையாகும்",
+      sort_discount: "தள்ளுபடி %",
+      on_first_order: "உங்களது முதல் ஆர்டரில்",
+      signup_btn: "பதிவு செய்க",
+      exclusive: "பிரத்தியேக",
+      deals_only_for_you_html: "உங்களுக்கான<br><span class=\"deals-highlight\">பிரத்தியேக சலுகைகள்</span>",
+      grab_best_offers: "சிறந்த சலுகைகள் முடிவதற்குள் அவற்றைப்பெறுங்கள்!",
+      account_security: "கணக்கு பாதுகாப்பு",
+      jwt_security_desc: "அமர்வு 256-பிட் குறியாக்க JWT டோக்கன்களுடன் பாதுகாக்கப்படுகிறது.",
+      logout_session: "அமர்வை வெளியேறுக",
+      no_address_saved: "இன்னும் முகவரி சேமிக்கப்படவில்லை.",
+      no_addresses_found: "சேமிக்கப்பட்ட முகவரிகள் எதுவும் இல்லை. மேலே ஒன்றைச் சேர்க்கவும்!",
+      default_label: "(இயல்புநிலை)",
+      edit: "திருத்து",
+
+      // Service Footer items
+      free_shipping: "இலவச ஷிப்பிங்",
+      free_shipping_desc: "₹999 க்கு மேல் ஆர்டர் செய்தால்",
+      easy_returns: "எளிதான வருமானம்",
+      easy_returns_desc: "30 நாட்கள் ரிட்டர்ன் பாலிசி",
+      secure_payment: "பாதுகாப்பான கட்டணம்",
+      secure_payment_desc: "100% பாதுகாப்பான பரிவர்த்தனை",
+      support_247: "24/7 ஆதரவு",
+      support_247_desc: "அர்ப்பணிக்கப்பட்ட ஆதரவு",
+
+      // Toasts & Alerts
+      lang_updated: "மொழி புதுப்பிக்கப்பட்டது",
+
+      // Category titles
+      category_men: "ஆண்கள்",
+      category_women: "பெண்கள்",
+      category_electronics: "மின்னணுவியல்",
+      category_shoes: "காலணிகள்",
+      category_accessories: "ஆபரணங்கள்",
+      category_kids_and_baby: "குழந்தைகள் & பாப்பாக்கள்",
+      category_activewear: "விளையாட்டு உடைகள்",
+      category_bags_and_luggage: "பைகள் & லக்கேஜ்",
+      category_jewelry: "நகைகள்",
+      category_sleepwear: "இரவு உடைகள்",
+      category_home_decor: "வீட்டு அலங்காரம்",
+      category_kitchen_and_dining: "சமையலறை & உணவு",
+      category_furniture: "தளபாடங்கள்",
+      category_bedding_and_bath: "படுக்கை மற்றும் குளியல்",
+      category_lighting: "விளக்குகள்",
+      category_beauty_and_skincare: "அழகு & தோல் பராமரிப்பு",
+      category_fragrances: "நறுமண திரவியங்கள்",
+      category_grooming: "ஆட அலங்காரம்",
+      category_health_and_wellness: "சுகாதாரம் & ஆரோக்கியம்",
+      category_gaming: "கேமிங்",
+      category_audio: "ஆடியோ",
+      category_smart_home: "ஸ்மார்ட் ஹோம்",
+      category_office_and_stationery: "அலுவலகம் & எழுதுபொருட்கள்",
+      category_sports_and_fitness: "விளையாட்டு & உடற்பயிற்சி",
+      category_outdoor_and_camping: "வெளிப்புறம் & முகாம்",
+      category_toys_and_games: "பொம்மைகள் & விளையாட்டுகள்",
+      category_pet_supplies: "செல்லப்பிராணி பொருட்கள்",
+
+      // Subtitles
+      subtitle_collection: "சேகரிப்பு",
+      subtitle_gadgets: "சாதனங்கள்",
+      subtitle_apparel_and_essentials: "உடைகள் & அத்தியாவசிய பொருட்கள்",
+      subtitle_sportswear_and_gym: "விளையாட்டு உடைகள் & உடற்பயிற்சி கூடம்",
+      subtitle_travel_and_daily: "பயணம் மற்றும் அன்றாட பயன்பாடு",
+      subtitle_fine_and_fashion: "அழகிய மற்றும் பேஷன்",
+      subtitle_lounge_and_comfort: "ஓய்வு & ஆறுதல்",
+      subtitle_living_and_style: "வாழ்க்கை & ஸ்டைல்",
+      subtitle_cookware_and_dining: "சமையல் பாத்திரங்கள் & உணவு",
+      subtitle_indoor_and_outdoor: "உட்புறம் & வெளிப்புறம்",
+      subtitle_comfort_essentials: "ஆறுதல் அத்தியாவசியங்கள்",
+      subtitle_lamps_and_ambiance: "விளக்குகள் & சூழல்",
+      subtitle_self_care_and_glow: "சுய பாதுகாப்பு & பொலிவு",
+      subtitle_perfumes_and_scents: "வாசனை திரவியங்கள்",
+      subtitle_personal_care: "தனிநபர் பராமரிப்பு",
+      subtitle_vitamins_and_care: "வைட்டமின்கள் & பராமரிப்பு",
+      subtitle_consoles_and_gear: "கன்சோல்கள் & கியர்",
+      subtitle_speakers_and_sound: "ஸ்பீக்கர்கள் & ஒலி",
+      subtitle_automation_and_security: "ஆட்டோமேஷன் & பாதுகாப்பு",
+      subtitle_desks_and_supplies: "மேசைகள் & பொருட்கள்",
+      subtitle_training_equipment: "பயிற்சி உபகரணங்கள்",
+      subtitle_adventure_gear: "சாகச உபகரணங்கள்",
+      subtitle_play_and_collectibles: "விளையாட்டு & சேகரிப்புகள்",
+      subtitle_food_and_accessories: "உணவு & பாகங்கள்"
     },
     hi: {
       // Sidebar & Navigation
@@ -797,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
       continue_btn: "जारी रखें",
       verify_otp: "OTP सत्यापित करें",
       enter_code: "कोड दर्ज करें",
-      verify_proceed: "सत्यापित करें और आगे बढ़ें",
+      verify_proceed: "सत्यापित करें & आगे बढ़ें",
       create_password: "पासवर्ड बनाएं",
       continue_signup: "साइनअप जारी रखें",
       new_to_shopsphere: "ShopSphere में नए हैं?",
@@ -863,21 +1068,94 @@ document.addEventListener('DOMContentLoaded', () => {
      Theme Color Palette Engine
      ========================================================================== */
   const COLOR_PALETTES = {
-    lime: { accent: '#c2db3a', hover: '#b1c830', bg: 'rgba(194, 219, 58, 0.15)' },
-    blue: { accent: '#2563eb', hover: '#1d4ed8', bg: 'rgba(37, 99, 235, 0.15)' },
-    green: { accent: '#10b981', hover: '#059669', bg: 'rgba(16, 185, 129, 0.15)' },
-    orange: { accent: '#ff5a36', hover: '#e04322', bg: 'rgba(255, 90, 54, 0.15)' },
-    purple: { accent: '#8b5cf6', hover: '#7c3aed', bg: 'rgba(139, 92, 246, 0.15)' },
-    pink: { accent: '#ec4899', hover: '#db2777', bg: 'rgba(236, 72, 153, 0.15)' }
+    lime: { 
+      accent: '#c2db3a', 
+      hover: '#b1c830', 
+      bg: 'rgba(194, 219, 58, 0.15)',
+      heroCircleLight: '#e6edd9',
+      heroCircleDark: '#2a2e23',
+      promoBgLight: '#f1f3e7',
+      promoBgDark: '#1e201b',
+      glowLight: 'rgba(194, 219, 58, 0.04)',
+      glowDark: 'rgba(194, 219, 58, 0.08)'
+    },
+    blue: { 
+      accent: '#2563eb', 
+      hover: '#1d4ed8', 
+      bg: 'rgba(37, 99, 235, 0.15)',
+      heroCircleLight: '#dbeafe',
+      heroCircleDark: '#1e293b',
+      promoBgLight: '#eff6ff',
+      promoBgDark: '#1e293b',
+      glowLight: 'rgba(37, 99, 235, 0.04)',
+      glowDark: 'rgba(37, 99, 235, 0.08)'
+    },
+    green: { 
+      accent: '#10b981', 
+      hover: '#059669', 
+      bg: 'rgba(16, 185, 129, 0.15)',
+      heroCircleLight: '#d1fae5',
+      heroCircleDark: '#064e3b',
+      promoBgLight: '#ecfdf5',
+      promoBgDark: '#064e3b',
+      glowLight: 'rgba(16, 185, 129, 0.04)',
+      glowDark: 'rgba(16, 185, 129, 0.08)'
+    },
+    orange: { 
+      accent: '#ff5a36', 
+      hover: '#e04322', 
+      bg: 'rgba(255, 90, 54, 0.15)',
+      heroCircleLight: '#ffedd5',
+      heroCircleDark: '#431407',
+      promoBgLight: '#fff7ed',
+      promoBgDark: '#431407',
+      glowLight: 'rgba(255, 90, 54, 0.04)',
+      glowDark: 'rgba(255, 90, 54, 0.08)'
+    },
+    purple: { 
+      accent: '#8b5cf6', 
+      hover: '#7c3aed', 
+      bg: 'rgba(139, 92, 246, 0.15)',
+      heroCircleLight: '#f3e8ff',
+      heroCircleDark: '#2e1065',
+      promoBgLight: '#faf5ff',
+      promoBgDark: '#2e1065',
+      glowLight: 'rgba(139, 92, 246, 0.04)',
+      glowDark: 'rgba(139, 92, 246, 0.08)'
+    },
+    pink: { 
+      accent: '#ec4899', 
+      hover: '#db2777', 
+      bg: 'rgba(236, 72, 153, 0.15)',
+      heroCircleLight: '#fce7f3',
+      heroCircleDark: '#500724',
+      promoBgLight: '#fdf2f8',
+      promoBgDark: '#500724',
+      glowLight: 'rgba(236, 72, 153, 0.04)',
+      glowDark: 'rgba(236, 72, 153, 0.08)'
+    }
   };
 
   AppState.colorTheme = localStorage.getItem('shopsphere_color_theme') || 'lime';
 
   function applyColorTheme(themeName) {
     const theme = COLOR_PALETTES[themeName] || COLOR_PALETTES['lime'];
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    
     document.documentElement.style.setProperty('--color-accent', theme.accent);
     document.documentElement.style.setProperty('--color-accent-hover', theme.hover);
     document.documentElement.style.setProperty('--color-accent-bg', theme.bg);
+    
+    if (isDark) {
+      document.documentElement.style.setProperty('--hero-bg-circle', theme.heroCircleDark);
+      document.documentElement.style.setProperty('--sidebar-promo-bg', theme.promoBgDark);
+      document.documentElement.style.setProperty('--body-glow', theme.glowDark);
+    } else {
+      document.documentElement.style.setProperty('--hero-bg-circle', theme.heroCircleLight);
+      document.documentElement.style.setProperty('--sidebar-promo-bg', theme.promoBgLight);
+      document.documentElement.style.setProperty('--body-glow', theme.glowLight);
+    }
+
     localStorage.setItem('shopsphere_color_theme', themeName);
     AppState.colorTheme = themeName;
 
@@ -923,12 +1201,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
         AppState.theme = 'light';
+        applyColorTheme(AppState.colorTheme);
         updateSettingsDrawerUI();
       });
       modeDark.addEventListener('click', () => {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
         AppState.theme = 'dark';
+        applyColorTheme(AppState.colorTheme);
         updateSettingsDrawerUI();
       });
     }
@@ -949,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('shopsphere_language', lang);
         applyTranslations();
         updateSettingsDrawerUI();
-        showToast('Language updated', 'success');
+        showToast('lang_updated', 'success');
       });
     });
 
@@ -1035,7 +1315,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.createElement('div');
     toast.className = `toast-message toast-${type}`;
     const icon = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
-    toast.innerHTML = `<span style="font-size: 1.1rem; color: ${type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6')}">${icon}</span> <span>${message}</span>`;
+    
+    const lang = AppState.language;
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+    const translatedMessage = dict[message] || message;
+
+    toast.innerHTML = `<span style="font-size: 1.1rem; color: ${type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6')}">${icon}</span> <span>${translatedMessage}</span>`;
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
@@ -2280,14 +2565,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const contentHtml = `
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="#home" data-nav-target="home">Home</a>
+        <a href="#home" data-nav-target="home" data-i18n="home">Home</a>
         <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-current">Shop Products</span>
+        <span class="breadcrumb-current" data-i18n="shop_products">Shop Products</span>
       </nav>
 
       <div class="listing-header-row">
         <div>
-          <h2 class="view-title">Product Catalog</h2>
+          <h2 class="view-title" data-i18n="product_catalog">Product Catalog</h2>
           <p class="view-subtitle">Showing ${paginatedProducts.length} of ${totalCount} matching products</p>
         </div>
 
@@ -2307,13 +2592,13 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <select id="sort-select" class="sort-select" aria-label="Sort products">
-            <option value="popularity" ${AppState.sortOption === 'popularity' ? 'selected' : ''}>Sort by: Popularity</option>
-            <option value="newest" ${AppState.sortOption === 'newest' ? 'selected' : ''}>Sort by: Newest</option>
-            <option value="price-asc" ${AppState.sortOption === 'price-asc' ? 'selected' : ''}>Price: Low → High</option>
-            <option value="price-desc" ${AppState.sortOption === 'price-desc' ? 'selected' : ''}>Price: High → Low</option>
-            <option value="rating" ${AppState.sortOption === 'rating' ? 'selected' : ''}>Highest Rated</option>
-            <option value="bestselling" ${AppState.sortOption === 'bestselling' ? 'selected' : ''}>Best Selling</option>
-            <option value="discount" ${AppState.sortOption === 'discount' ? 'selected' : ''}>Discount %</option>
+            <option value="popularity" ${AppState.sortOption === 'popularity' ? 'selected' : ''} data-i18n="sort_popularity">Sort by: Popularity</option>
+            <option value="newest" ${AppState.sortOption === 'newest' ? 'selected' : ''} data-i18n="sort_newest">Sort by: Newest</option>
+            <option value="price-asc" ${AppState.sortOption === 'price-asc' ? 'selected' : ''} data-i18n="sort_low_high">Price: Low → High</option>
+            <option value="price-desc" ${AppState.sortOption === 'price-desc' ? 'selected' : ''} data-i18n="sort_high_low">Price: High → Low</option>
+            <option value="rating" ${AppState.sortOption === 'rating' ? 'selected' : ''} data-i18n="sort_rating">Highest Rated</option>
+            <option value="bestselling" ${AppState.sortOption === 'bestselling' ? 'selected' : ''} data-i18n="sort_bestselling">Best Selling</option>
+            <option value="discount" ${AppState.sortOption === 'discount' ? 'selected' : ''} data-i18n="sort_discount">Discount %</option>
           </select>
         </div>
       </div>
@@ -2327,7 +2612,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Category Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Categories</span>
+              <span data-i18n="categories">Categories</span>
             </div>
             <div class="filter-options-list">
               ${availableCategories.map(c => {
@@ -2338,7 +2623,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       <div class="custom-checkbox ${checked ? 'checked' : ''}">
                         <svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
                       </div>
-                      <span>${c}</span>
+                      <span data-i18n="category_${c.toLowerCase().replace(/ & /g, '_and_').replace(/ /g, '_')}">${c}</span>
                     </div>
                   </div>
                 `;
@@ -2351,7 +2636,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Brand Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Brands</span>
+              <span data-i18n="brands">Brands</span>
             </div>
             <div class="filter-options-list">
               ${availableBrands.map(b => {
@@ -2377,7 +2662,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Price Filter (Slider & Inputs & Presets) -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Price Range</span>
+              <span data-i18n="price_range">Price Range</span>
             </div>
             <div class="price-inputs-row">
               <div class="price-input-box">
@@ -2410,7 +2695,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Rating Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Customer Rating</span>
+              <span data-i18n="customer_rating">Customer Rating</span>
             </div>
             <div class="rating-stars-list">
               ${[4, 3, 2, 1].map(r => `
@@ -2427,7 +2712,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Discount Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Discount</span>
+              <span data-i18n="discount">Discount</span>
             </div>
             <div class="badge-chips-wrap">
               ${[10, 20, 30, 40, 50].map(d => `
@@ -2443,19 +2728,19 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Availability Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Availability</span>
+              <span data-i18n="availability">Availability</span>
             </div>
             <div class="filter-options-list">
               <div class="filter-checkbox-item" data-filter-type="availability" data-filter-val="in-stock">
                 <div class="filter-checkbox-left">
                   <div class="custom-checkbox ${(f.availability || []).includes('in-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
-                  <span>In Stock</span>
+                  <span data-i18n="in_stock">In Stock</span>
                 </div>
               </div>
               <div class="filter-checkbox-item" data-filter-type="availability" data-filter-val="out-of-stock">
                 <div class="filter-checkbox-left">
                   <div class="custom-checkbox ${(f.availability || []).includes('out-of-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
-                  <span>Out of Stock</span>
+                  <span data-i18n="out_of_stock">Out of Stock</span>
                 </div>
               </div>
             </div>
@@ -2466,7 +2751,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Color Swatches Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Colors</span>
+              <span data-i18n="colors">Colors</span>
             </div>
             <div class="color-swatches-grid">
               ${availableColors.map(color => {
@@ -2483,7 +2768,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Size Filter -->
           <div class="filter-group">
             <div class="filter-group-header">
-              <span>Sizes</span>
+              <span data-i18n="sizes">Sizes</span>
             </div>
             <div class="size-pills-grid">
               ${availableSizes.map(size => {
@@ -3905,8 +4190,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ${data.map(c => `
             <a href="#" class="category-card" style="--card-bg: ${c.bg};" data-category="${c.name}">
               <div class="category-info">
-                <span class="category-title">${c.name}</span>
-                <span class="category-subtitle">${c.subtitle}</span>
+                <span class="category-title" data-i18n="category_${c.name.toLowerCase().replace(/ & /g, '_and_').replace(/ /g, '_')}">${c.name}</span>
+                <span class="category-subtitle" data-i18n="subtitle_${c.subtitle.toLowerCase().replace(/ & /g, '_and_').replace(/ /g, '_')}">${c.subtitle}</span>
               </div>
               ${c.img ? `<img src="${c.img}" alt="${c.name}" class="category-img">` : (c.svg || '')}
             </a>
@@ -4054,9 +4339,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <button id="profile-manage-address-btn" class="btn-secondary-action" data-i18n="manage_addresses" style="padding: 8px 16px; font-size: 0.85rem;">Manage Addresses</button>
             </div>
             <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Account Security</h4>
-              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">Session is protected with 256-bit encryption JWT tokens.</p>
-              <button id="profile-logout-action-btn" class="btn-secondary-action" style="padding: 8px 16px; font-size: 0.85rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Logout Session</button>
+              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;" data-i18n="account_security">Account Security</h4>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;" data-i18n="jwt_security_desc">Session is protected with 256-bit encryption JWT tokens.</p>
+              <button id="profile-logout-action-btn" class="btn-secondary-action" data-i18n="logout_session" style="padding: 8px 16px; font-size: 0.85rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Logout Session</button>
             </div>
           </div>
         </div>

@@ -95,6 +95,8 @@
 body {
   font-family: var(--font-main);
   background-color: var(--bg-body);
+  background-image: radial-gradient(circle at 80% 20%, var(--body-glow, rgba(0,0,0,0)) 0%, transparent 60%);
+  background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
   display: flex;
