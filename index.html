@@ -194,7 +194,7 @@
       <!-- Header Right Utilities -->
       <div class="header-right">
         <!-- Location Selector -->
-        <div class="location-selector" id="location-select">
+        <div class="location-selector" id="location-select" style="cursor: default;">
           <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -202,18 +202,8 @@
           </svg>
           <div class="location-info">
             <span class="location-label" data-i18n="deliver_to">Deliver to</span>
-            <button class="location-value-btn" aria-haspopup="listbox" aria-expanded="false">
-              <span id="current-location">India</span>
-              <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
+            <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">India</span>
           </div>
-          <!-- Dropdown Options -->
-          <ul class="location-dropdown" id="location-dropdown" role="listbox" aria-label="Locations">
-            <li role="option" aria-selected="true" data-value="India">India</li>
-          </ul>
         </div>
 
         <!-- Cart Icon -->

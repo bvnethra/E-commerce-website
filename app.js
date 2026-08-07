@@ -5281,33 +5281,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationBtn = locationSelector.querySelector('.location-value-btn');
     const locationDropdown = document.getElementById('location-dropdown');
     const currentLocationLabel = document.getElementById('current-location');
-    const dropdownItems = locationDropdown.querySelectorAll('li');
+    
+    if (locationBtn && locationDropdown) {
+      const dropdownItems = locationDropdown.querySelectorAll('li');
 
-    locationBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isExpanded = locationBtn.getAttribute('aria-expanded') === 'true';
-      locationBtn.setAttribute('aria-expanded', !isExpanded);
-      locationDropdown.classList.toggle('show');
-    });
-
-    dropdownItems.forEach(item => {
-      item.addEventListener('click', (e) => {
+      locationBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const selectedValue = item.getAttribute('data-value');
-        currentLocationLabel.textContent = selectedValue;
-        dropdownItems.forEach(li => li.setAttribute('aria-selected', 'false'));
-        item.setAttribute('aria-selected', 'true');
-        locationBtn.setAttribute('aria-expanded', 'false');
-        locationDropdown.classList.remove('show');
+        const isExpanded = locationBtn.getAttribute('aria-expanded') === 'true';
+        locationBtn.setAttribute('aria-expanded', !isExpanded);
+        locationDropdown.classList.toggle('show');
       });
-    });
 
-    document.addEventListener('click', (e) => {
-      if (!locationSelector.contains(e.target)) {
-        locationBtn.setAttribute('aria-expanded', 'false');
-        locationDropdown.classList.remove('show');
-      }
-    });
+      dropdownItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const selectedValue = item.getAttribute('data-value');
+          if (currentLocationLabel) currentLocationLabel.textContent = selectedValue;
+          dropdownItems.forEach(li => li.setAttribute('aria-selected', 'false'));
+          item.setAttribute('aria-selected', 'true');
+          locationBtn.setAttribute('aria-expanded', 'false');
+          locationDropdown.classList.remove('show');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!locationSelector.contains(e.target)) {
+          locationBtn.setAttribute('aria-expanded', 'false');
+          locationDropdown.classList.remove('show');
+        }
+      });
+    }
   }
 
   /* ==========================================================================
