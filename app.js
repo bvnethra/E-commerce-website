@@ -757,16 +757,9 @@ document.addEventListener('DOMContentLoaded', () => {
           { name: 'Toys & Games', subtitle: 'Play & Collectibles', bg: '#fef9c3', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="25" y="55" width="22" height="22" rx="3" fill="#ef4444"/><rect x="52" y="55" width="22" height="22" rx="3" fill="#3b82f6"/><rect x="38" y="30" width="22" height="22" rx="3" fill="#eab308"/></svg>' },
           { name: 'Pet Supplies', subtitle: 'Food & Accessories', bg: '#f5ebe0', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><ellipse cx="50" cy="65" rx="30" ry="15" fill="#d97706"/><circle cx="35" cy="40" r="8" fill="#b45309"/><circle cx="65" cy="40" r="8" fill="#b45309"/><circle cx="50" cy="35" r="10" fill="#b45309"/></svg>' }
         ],
-        orders: [
-          { id: '#ORD-9824', date: 'August 4, 2026', items: 3, total: '₹9,297', status: 'Delivered', statusClass: 'success' },
-          { id: '#ORD-8711', date: 'July 28, 2026', items: 1, total: '₹4,999', status: 'In Transit', statusClass: 'pending' },
-          { id: '#ORD-7502', date: 'June 15, 2026', items: 2, total: '₹3,498', status: 'Delivered', statusClass: 'success' }
-        ],
-        notifications: [
-          { id: 1, title: 'Summer Flash Sale is Live!', desc: 'Get up to 50% discount on select accessories and apparel today.', time: '10 mins ago', unread: true },
-          { id: 2, title: 'Order Delivered', desc: 'Your order #ORD-9824 has been safely delivered to your address.', time: '2 hours ago', unread: true },
-          { id: 3, title: 'Price Drop Alert', desc: 'Noise Ultra 2 Max is now available at ₹4,999. Grab it fast!', time: '1 day ago', unread: false }
-        ],
+        orders: [],
+        wishlist: [],
+        notifications: [],
         reviews: [
           { user: 'Alex Rivera', rating: 5, comment: 'Outstanding quality and fast delivery! Super impressed with Hype.', date: 'Aug 2, 2026' },
           { user: 'Sarah Jenkins', rating: 4, comment: 'Great products, high durability. Highly recommended for daily use.', date: 'Jul 29, 2026' }
@@ -2999,42 +2992,67 @@ document.addEventListener('DOMContentLoaded', () => {
       renderProductListingView();
       return;
     } else if (viewName === 'wishlist') {
-      contentHtml = `
-        <div class="view-section-header">
-          <div>
-            <h2 class="view-title">Saved Wishlist</h2>
-            <p class="view-subtitle">Showing ${data.length} premium items</p>
+      if (!data || data.length === 0) {
+        contentHtml = `
+          <div class="view-section-header">
+            <div>
+              <h2 class="view-title">Saved Wishlist</h2>
+              <p class="view-subtitle">Your wishlist is currently empty</p>
+            </div>
           </div>
-        </div>
-        <div class="products-grid">
-          ${data.map(p => `
-            <div class="product-card" data-product-id="${p.id}">
-              <div class="product-card-top">
-                <span class="discount-badge">${p.badge}</span>
-                <button class="wishlist-btn active" aria-label="Add to wishlist">
-                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                </button>
-                <div class="product-img-wrapper">
-                  <img src="${p.img}" alt="${p.name}" class="product-img">
-                </div>
-              </div>
-              <div class="product-card-bottom">
-                <div class="product-details">
-                  <span class="product-cat">${p.cat}</span>
-                  <h3 class="product-name">${p.name}</h3>
-                  <div class="product-price-row">
-                    <span class="price-current">${p.price}</span>
-                    <span class="price-original">${p.originalPrice}</span>
+          <div class="cart-empty-container">
+            <div class="cart-empty-icon-circle" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Your Wishlist is Empty</h3>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px; text-align: center; max-width: 320px;">
+              Save your favorite items here to track their availability, price drops, and get notifications!
+            </p>
+            <button class="btn-primary-action" id="wishlist-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
+              Browse Products &nbsp; ➜
+            </button>
+          </div>
+        `;
+      } else {
+        contentHtml = `
+          <div class="view-section-header">
+            <div>
+              <h2 class="view-title">Saved Wishlist</h2>
+              <p class="view-subtitle">Showing ${data.length} premium items</p>
+            </div>
+          </div>
+          <div class="products-grid">
+            ${data.map(p => `
+              <div class="product-card" data-product-id="${p.id}">
+                <div class="product-card-top">
+                  <span class="discount-badge">${p.badge}</span>
+                  <button class="wishlist-btn active" aria-label="Add to wishlist">
+                    <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  </button>
+                  <div class="product-img-wrapper">
+                    <img src="${p.img}" alt="${p.name}" class="product-img">
                   </div>
                 </div>
-                <button class="add-to-cart-btn" title="Add to Cart">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                </button>
+                <div class="product-card-bottom">
+                  <div class="product-details">
+                    <span class="product-cat">${p.cat}</span>
+                    <h3 class="product-name">${p.name}</h3>
+                    <div class="product-price-row">
+                      <span class="price-current">${p.price}</span>
+                      <span class="price-original">${p.originalPrice}</span>
+                    </div>
+                  </div>
+                  <button class="add-to-cart-btn" title="Add to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </button>
+                </div>
               </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+            `).join('')}
+          </div>
+        `;
+      }
     } else if (viewName === 'categories') {
       contentHtml = `
         <div class="view-section-header" style="margin-bottom: 24px;">
@@ -3056,32 +3074,59 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
     } else if (viewName === 'orders') {
-      contentHtml = `
-        <div class="view-section-header">
-          <div>
-            <h2 class="view-title">My Orders</h2>
-            <p class="view-subtitle">Track recent purchases</p>
+      if (!data || data.length === 0) {
+        contentHtml = `
+          <div class="view-section-header">
+            <div>
+              <h2 class="view-title">Your Orders</h2>
+              <p class="view-subtitle">No orders found</p>
+            </div>
           </div>
-        </div>
-        <div class="data-table-card">
-          <table class="app-table">
-            <thead>
-              <tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              ${data.map(o => `
-                <tr>
-                  <td><strong>${o.id}</strong></td>
-                  <td>${o.date}</td>
-                  <td>${o.items} items</td>
-                  <td>${o.total}</td>
-                  <td><span class="status-pill ${o.statusClass}">${o.status}</span></td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
+          <div class="cart-empty-container">
+            <div class="cart-empty-icon-circle" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="21 8 21 21 3 21 3 8"/>
+                <rect x="1" y="3" width="22" height="5"/>
+                <line x1="10" y1="12" x2="14" y2="12"/>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">No Orders Yet</h3>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px; text-align: center; max-width: 320px;">
+              You have not placed any orders yet. Once you complete a purchase, your order history will appear here!
+            </p>
+            <button class="btn-primary-action" id="orders-empty-browse-btn" style="padding: 12px 30px; border-radius: 30px; background: var(--text-primary); color: var(--bg-body); font-weight: 700;">
+              Shop Now &nbsp; ➜
+            </button>
+          </div>
+        `;
+      } else {
+        contentHtml = `
+          <div class="view-section-header">
+            <div>
+              <h2 class="view-title">My Orders</h2>
+              <p class="view-subtitle">Track recent purchases</p>
+            </div>
+          </div>
+          <div class="data-table-card">
+            <table class="app-table">
+              <thead>
+                <tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                ${data.map(o => `
+                  <tr>
+                    <td><strong>${o.id}</strong></td>
+                    <td>${o.date}</td>
+                    <td>${o.items} items</td>
+                    <td>${o.total}</td>
+                    <td><span class="status-pill ${o.statusClass}">${o.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
     } else if (viewName === 'notifications') {
       contentHtml = `
         <div class="view-section-header">
@@ -3197,6 +3242,16 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', () => {
           AuthService.logout();
         });
+      }
+    } else if (viewName === 'wishlist') {
+      const wishlistBrowseBtn = document.getElementById('wishlist-empty-browse-btn');
+      if (wishlistBrowseBtn) {
+        wishlistBrowseBtn.addEventListener('click', () => renderView('shop'));
+      }
+    } else if (viewName === 'orders') {
+      const ordersBrowseBtn = document.getElementById('orders-empty-browse-btn');
+      if (ordersBrowseBtn) {
+        ordersBrowseBtn.addEventListener('click', () => renderView('shop'));
       }
     }
 
@@ -3483,112 +3538,7 @@ document.addEventListener('DOMContentLoaded', () => {
      MODULE — Enterprise Notification Center Implementation
      ========================================================================== */
 
-  const DEFAULT_NOTIFICATIONS = [
-    {
-      id: 'notif_101',
-      category: 'order',
-      subType: 'Out for Delivery',
-      title: 'Order Out for Delivery',
-      desc: 'Your order #HYP-9824 with Noise Ultra 2 Max is out for delivery today with delivery agent Raj.',
-      time: '12 mins ago',
-      timestamp: Date.now() - 12 * 60 * 1000,
-      unread: true,
-      priority: 'high',
-      actionUrl: 'orders',
-      actionText: 'Track Order'
-    },
-    {
-      id: 'notif_102',
-      category: 'wishlist',
-      subType: 'Price Drop',
-      title: 'Price Drop Alert! 🎉',
-      desc: 'Noise Ultra 2 Max from your wishlist dropped by 28%! Now available for ₹4,999.',
-      time: '45 mins ago',
-      timestamp: Date.now() - 45 * 60 * 1000,
-      unread: true,
-      priority: 'high',
-      actionUrl: 'wishlist',
-      actionText: 'View Wishlist'
-    },
-    {
-      id: 'notif_103',
-      category: 'offer',
-      subType: 'Flash Sales',
-      title: 'Summer Flash Sale is Live!',
-      desc: 'Get up to 50% discount on select accessories and apparel for the next 24 hours.',
-      time: '2 hours ago',
-      timestamp: Date.now() - 2 * 3600 * 1000,
-      unread: true,
-      priority: 'high',
-      actionUrl: 'shop',
-      actionText: 'Shop Deals'
-    },
-    {
-      id: 'notif_104',
-      category: 'cart',
-      subType: 'Items Left in Cart',
-      title: 'Don\'t miss out on your Cart!',
-      desc: 'You left 2 items in your cart. Stock is limited for boAt Airdopes 181.',
-      time: '4 hours ago',
-      timestamp: Date.now() - 4 * 3600 * 1000,
-      unread: true,
-      priority: 'normal',
-      actionUrl: 'cart',
-      actionText: 'Go to Cart'
-    },
-    {
-      id: 'notif_105',
-      category: 'payment',
-      subType: 'Payment Successful',
-      title: 'Payment Successful',
-      desc: 'Payment of ₹4,999 via UPI was successfully completed for Order #ORD-8711.',
-      time: '1 day ago',
-      timestamp: Date.now() - 24 * 3600 * 1000,
-      unread: false,
-      priority: 'normal',
-      actionUrl: 'orders',
-      actionText: 'View Invoice'
-    },
-    {
-      id: 'notif_106',
-      category: 'account',
-      subType: 'Security Alerts',
-      title: 'New Login Detected',
-      desc: 'Security Alert: New login detected from Chrome Browser on Windows (Mumbai, IN).',
-      time: '2 days ago',
-      timestamp: Date.now() - 48 * 3600 * 1000,
-      unread: true,
-      priority: 'high',
-      actionUrl: 'profile',
-      actionText: 'Account Activity'
-    },
-    {
-      id: 'notif_107',
-      category: 'system',
-      subType: 'Feature Updates',
-      title: 'New Feature: AR Try-On',
-      desc: 'Try our brand new Virtual AR Try-On experience for footwear and smart watches.',
-      time: '3 days ago',
-      timestamp: Date.now() - 72 * 3600 * 1000,
-      unread: false,
-      priority: 'low',
-      actionUrl: 'shop',
-      actionText: 'Explore Feature'
-    },
-    {
-      id: 'notif_108',
-      category: 'order',
-      subType: 'Delivered',
-      title: 'Order Delivered Successfully',
-      desc: 'Your package #ORD-9824 has been delivered to your saved address.',
-      time: '4 days ago',
-      timestamp: Date.now() - 96 * 3600 * 1000,
-      unread: false,
-      priority: 'normal',
-      actionUrl: 'orders',
-      actionText: 'Order Details'
-    }
-  ];
+  const DEFAULT_NOTIFICATIONS = [];
 
   function initNotificationModule() {
     AppState.notifications = loadNotificationsFromStorage();
@@ -3609,8 +3559,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          // Filter out the old hardcoded mock notifications if they exist in localStorage
+          const filtered = parsed.filter(n => typeof n.id === 'string' && !n.id.startsWith('notif_10'));
+          return filtered;
         }
       } catch (e) {
         console.error('Failed to parse notifications from localStorage', e);
