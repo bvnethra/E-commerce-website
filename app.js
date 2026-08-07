@@ -257,7 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!overlay) return;
 
     resetAuthForms();
-    showAuthView('login');
+    if (actionType === 'SIGNUP') {
+      showAuthView('signup');
+    } else {
+      showAuthView('login');
+    }
 
     const bannerHeading = document.getElementById('fk-banner-title');
     const bannerSubtext = document.getElementById('fk-banner-subtext');
@@ -272,6 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (actionType === 'CHECKOUT') {
         bannerHeading.textContent = 'Secure Checkout';
         bannerSubtext.textContent = 'Sign in to access saved addresses and 1-click payment options.';
+      } else if (actionType === 'SIGNUP') {
+        bannerHeading.textContent = 'Join Hype';
+        bannerSubtext.textContent = 'Create an account to get 10% off your first order and access member-only deals.';
       } else {
         bannerHeading.textContent = 'Welcome Back';
         bannerSubtext.textContent = 'Log in to manage orders, saved wishlist items, and personal recommendations.';
@@ -382,6 +389,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (headerLoginBtn) {
       headerLoginBtn.addEventListener('click', () => openAuthModal('LOGIN'));
     }
+
+    document.querySelectorAll('.promo-signup-btn').forEach(btn => {
+      btn.addEventListener('click', () => openAuthModal('SIGNUP'));
+    });
 
     const userTrigger = document.getElementById('header-user-trigger');
     const userMenu = document.getElementById('user-dropdown-menu');
