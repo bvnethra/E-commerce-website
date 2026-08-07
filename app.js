@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedVariant: { color: null, size: null },
     lightboxIndex: 0,
     lightboxImages: [],
+    notifications: [],
+    unreadNotificationCount: 0,
+    notificationFilter: 'all',
+    notificationSearchQuery: '',
+    selectedNotificationIds: new Set(),
     user: null,
     pendingAction: null,
     listingFilters: {
@@ -1183,6 +1188,21 @@ document.addEventListener('DOMContentLoaded', () => {
       checkoutBtn.addEventListener('click', () => {
         requireAuth('CHECKOUT', {}, () => {
           showToast('Order placed successfully! Thank you for shopping with Hype.', 'success');
+          if (typeof addNotification === 'function') {
+            addNotification({
+              id: 'notif_' + Date.now(),
+              category: 'order',
+              subType: 'Order Placed',
+              title: 'Order Placed Successfully! 🛒',
+              desc: 'Your order #HYP-' + Math.floor(1000 + Math.random() * 9000) + ' has been placed and is being processed.',
+              time: 'Just now',
+              timestamp: Date.now(),
+              unread: true,
+              priority: 'high',
+              actionUrl: 'orders',
+              actionText: 'View Order'
+            });
+          }
           AppState.cart = [];
           updateCartBadge();
           renderCartView();
@@ -1196,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      MODULE 1 — Enhanced Enterprise Product Listing Controller & Filtering Engine
      ========================================================================== */
-  
+
   // Dynamic URL Synchronization
   function syncFiltersToURL() {
     const params = new URLSearchParams();
@@ -1480,8 +1500,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="filter-options-list">
               ${availableCategories.map(c => {
-                const checked = (f.categories || []).includes(c);
-                return `
+      const checked = (f.categories || []).includes(c);
+      return `
                   <div class="filter-checkbox-item" data-filter-type="category" data-filter-val="${c}">
                     <div class="filter-checkbox-left">
                       <div class="custom-checkbox ${checked ? 'checked' : ''}">
@@ -1491,7 +1511,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                   </div>
                 `;
-              }).join('')}
+    }).join('')}
             </div>
           </div>
 
@@ -1504,9 +1524,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="filter-options-list">
               ${availableBrands.map(b => {
-                const checked = (f.brands || []).includes(b);
-                const count = brandCounts[b] || 0;
-                return `
+      const checked = (f.brands || []).includes(b);
+      const count = brandCounts[b] || 0;
+      return `
                   <div class="filter-checkbox-item" data-filter-type="brand" data-filter-val="${b}">
                     <div class="filter-checkbox-left">
                       <div class="custom-checkbox ${checked ? 'checked' : ''}">
@@ -1517,7 +1537,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="item-count-badge">${count}</span>
                   </div>
                 `;
-              }).join('')}
+    }).join('')}
             </div>
           </div>
 
@@ -1540,7 +1560,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             </div>
             <div class="price-slider-track">
-              <div class="price-slider-fill" style="left: ${(f.minPrice/100000)*100}%; right: ${100 - (f.maxPrice/100000)*100}%;"></div>
+              <div class="price-slider-fill" style="left: ${(f.minPrice / 100000) * 100}%; right: ${100 - (f.maxPrice / 100000) * 100}%;"></div>
             </div>
             <div class="price-slider-range">
               <input type="range" id="min-price-slider" min="0" max="100000" step="500" value="${f.minPrice}">
@@ -1564,7 +1584,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="rating-stars-list">
               ${[4, 3, 2, 1].map(r => `
                 <div class="rating-filter-row ${f.minRating === r ? 'selected' : ''}" data-rating-val="${r}">
-                  <span class="gold-stars">${'★'.repeat(r)}${'☆'.repeat(5-r)}</span>
+                  <span class="gold-stars">${'★'.repeat(r)}${'☆'.repeat(5 - r)}</span>
                   <span>${r}★ & Above</span>
                 </div>
               `).join('')}
@@ -1597,13 +1617,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="filter-options-list">
               <div class="filter-checkbox-item" data-filter-type="availability" data-filter-val="in-stock">
                 <div class="filter-checkbox-left">
-                  <div class="custom-checkbox ${(f.availability||[]).includes('in-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="custom-checkbox ${(f.availability || []).includes('in-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
                   <span>In Stock</span>
                 </div>
               </div>
               <div class="filter-checkbox-item" data-filter-type="availability" data-filter-val="out-of-stock">
                 <div class="filter-checkbox-left">
-                  <div class="custom-checkbox ${(f.availability||[]).includes('out-of-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="custom-checkbox ${(f.availability || []).includes('out-of-stock') ? 'checked' : ''}"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
                   <span>Out of Stock</span>
                 </div>
               </div>
@@ -1619,11 +1639,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="color-swatches-grid">
               ${availableColors.map(color => {
-                const selected = (f.colors || []).includes(color.name);
-                return `
+      const selected = (f.colors || []).includes(color.name);
+      return `
                   <button class="color-swatch-item ${selected ? 'selected' : ''}" data-color-val="${color.name}" style="background-color: ${color.hex};" title="${color.name}"></button>
                 `;
-              }).join('')}
+    }).join('')}
             </div>
           </div>
 
@@ -1636,13 +1656,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="size-pills-grid">
               ${availableSizes.map(size => {
-                const selected = (f.sizes || []).includes(size);
-                return `
+      const selected = (f.sizes || []).includes(size);
+      return `
                   <div class="size-pill-item ${selected ? 'selected' : ''}" data-size-val="${size}">
                     ${size}
                   </div>
                 `;
-              }).join('')}
+    }).join('')}
             </div>
           </div>
 
@@ -1654,11 +1674,11 @@ document.addEventListener('DOMContentLoaded', () => {
               <span>Special & Shipping</span>
             </div>
             <div class="badge-chips-wrap">
-              <button class="badge-chip ${(f.shipping||[]).includes('free') ? 'selected' : ''}" data-shipping-val="free">Free Shipping</button>
-              <button class="badge-chip ${(f.shipping||[]).includes('express') ? 'selected' : ''}" data-shipping-val="express">Express Delivery</button>
-              <button class="badge-chip ${(f.special||[]).includes('new-arrivals') ? 'selected' : ''}" data-special-val="new-arrivals">New Arrivals</button>
-              <button class="badge-chip ${(f.special||[]).includes('best-sellers') ? 'selected' : ''}" data-special-val="best-sellers">Best Sellers</button>
-              <button class="badge-chip ${(f.special||[]).includes('featured') ? 'selected' : ''}" data-special-val="featured">Featured</button>
+              <button class="badge-chip ${(f.shipping || []).includes('free') ? 'selected' : ''}" data-shipping-val="free">Free Shipping</button>
+              <button class="badge-chip ${(f.shipping || []).includes('express') ? 'selected' : ''}" data-shipping-val="express">Express Delivery</button>
+              <button class="badge-chip ${(f.special || []).includes('new-arrivals') ? 'selected' : ''}" data-special-val="new-arrivals">New Arrivals</button>
+              <button class="badge-chip ${(f.special || []).includes('best-sellers') ? 'selected' : ''}" data-special-val="best-sellers">Best Sellers</button>
+              <button class="badge-chip ${(f.special || []).includes('featured') ? 'selected' : ''}" data-special-val="featured">Featured</button>
             </div>
           </div>
 
@@ -2800,6 +2820,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (viewName === 'notifications') {
+      renderNotificationsView(overrideState);
+      return;
+    }
+
     // Routing Integration for Product Details (`product/1`) & Category filter (`category/men`)
     if (viewName.startsWith('product/')) {
       const pid = viewName.split('/')[1];
@@ -3453,6 +3478,886 @@ document.addEventListener('DOMContentLoaded', () => {
       openAuthModal('LOGIN');
     }, 400);
   }
+
+  /* ==========================================================================
+     MODULE — Enterprise Notification Center Implementation
+     ========================================================================== */
+
+  const DEFAULT_NOTIFICATIONS = [
+    {
+      id: 'notif_101',
+      category: 'order',
+      subType: 'Out for Delivery',
+      title: 'Order Out for Delivery',
+      desc: 'Your order #HYP-9824 with Noise Ultra 2 Max is out for delivery today with delivery agent Raj.',
+      time: '12 mins ago',
+      timestamp: Date.now() - 12 * 60 * 1000,
+      unread: true,
+      priority: 'high',
+      actionUrl: 'orders',
+      actionText: 'Track Order'
+    },
+    {
+      id: 'notif_102',
+      category: 'wishlist',
+      subType: 'Price Drop',
+      title: 'Price Drop Alert! 🎉',
+      desc: 'Noise Ultra 2 Max from your wishlist dropped by 28%! Now available for ₹4,999.',
+      time: '45 mins ago',
+      timestamp: Date.now() - 45 * 60 * 1000,
+      unread: true,
+      priority: 'high',
+      actionUrl: 'wishlist',
+      actionText: 'View Wishlist'
+    },
+    {
+      id: 'notif_103',
+      category: 'offer',
+      subType: 'Flash Sales',
+      title: 'Summer Flash Sale is Live!',
+      desc: 'Get up to 50% discount on select accessories and apparel for the next 24 hours.',
+      time: '2 hours ago',
+      timestamp: Date.now() - 2 * 3600 * 1000,
+      unread: true,
+      priority: 'high',
+      actionUrl: 'shop',
+      actionText: 'Shop Deals'
+    },
+    {
+      id: 'notif_104',
+      category: 'cart',
+      subType: 'Items Left in Cart',
+      title: 'Don\'t miss out on your Cart!',
+      desc: 'You left 2 items in your cart. Stock is limited for boAt Airdopes 181.',
+      time: '4 hours ago',
+      timestamp: Date.now() - 4 * 3600 * 1000,
+      unread: true,
+      priority: 'normal',
+      actionUrl: 'cart',
+      actionText: 'Go to Cart'
+    },
+    {
+      id: 'notif_105',
+      category: 'payment',
+      subType: 'Payment Successful',
+      title: 'Payment Successful',
+      desc: 'Payment of ₹4,999 via UPI was successfully completed for Order #ORD-8711.',
+      time: '1 day ago',
+      timestamp: Date.now() - 24 * 3600 * 1000,
+      unread: false,
+      priority: 'normal',
+      actionUrl: 'orders',
+      actionText: 'View Invoice'
+    },
+    {
+      id: 'notif_106',
+      category: 'account',
+      subType: 'Security Alerts',
+      title: 'New Login Detected',
+      desc: 'Security Alert: New login detected from Chrome Browser on Windows (Mumbai, IN).',
+      time: '2 days ago',
+      timestamp: Date.now() - 48 * 3600 * 1000,
+      unread: true,
+      priority: 'high',
+      actionUrl: 'profile',
+      actionText: 'Account Activity'
+    },
+    {
+      id: 'notif_107',
+      category: 'system',
+      subType: 'Feature Updates',
+      title: 'New Feature: AR Try-On',
+      desc: 'Try our brand new Virtual AR Try-On experience for footwear and smart watches.',
+      time: '3 days ago',
+      timestamp: Date.now() - 72 * 3600 * 1000,
+      unread: false,
+      priority: 'low',
+      actionUrl: 'shop',
+      actionText: 'Explore Feature'
+    },
+    {
+      id: 'notif_108',
+      category: 'order',
+      subType: 'Delivered',
+      title: 'Order Delivered Successfully',
+      desc: 'Your package #ORD-9824 has been delivered to your saved address.',
+      time: '4 days ago',
+      timestamp: Date.now() - 96 * 3600 * 1000,
+      unread: false,
+      priority: 'normal',
+      actionUrl: 'orders',
+      actionText: 'Order Details'
+    }
+  ];
+
+  function initNotificationModule() {
+    AppState.notifications = loadNotificationsFromStorage();
+    updateNotificationBadge();
+    initNotificationDropdown();
+    initNotificationModal();
+
+    // Auto-simulate notification after 45s of user activity
+    setTimeout(() => {
+      if (AppState.notifications.length > 0 && Math.random() > 0.4) {
+        simulateRandomAlert();
+      }
+    }, 45000);
+  }
+
+  function loadNotificationsFromStorage() {
+    const stored = localStorage.getItem('hype_notifications');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Failed to parse notifications from localStorage', e);
+      }
+    }
+    localStorage.setItem('hype_notifications', JSON.stringify(DEFAULT_NOTIFICATIONS));
+    return DEFAULT_NOTIFICATIONS;
+  }
+
+  function saveNotificationsToStorage(notifs) {
+    try {
+      AppState.notifications = notifs;
+      localStorage.setItem('hype_notifications', JSON.stringify(notifs));
+      updateNotificationBadge();
+    } catch (error) {
+      console.error('Failed to save notifications:', error);
+      showErrorToastNotification('Failed to update notifications.');
+    }
+  }
+
+  function showErrorToastNotification(message) {
+    document.querySelectorAll('.app-toast-alert').forEach(t => t.remove());
+    const toast = document.createElement('div');
+    toast.className = 'app-toast-alert error';
+    toast.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger)" stroke-width="2.5" style="width: 20px; height: 20px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  function markNotificationAsRead(id) {
+    const notifs = (AppState.notifications || []).map(n => {
+      if (n.id === id) return { ...n, unread: false };
+      return n;
+    });
+    saveNotificationsToStorage(notifs);
+    renderNotificationDropdownList();
+    if (AppState.currentView === 'notifications') {
+      renderNotificationsView();
+    }
+  }
+
+  function markAllNotificationsAsRead() {
+    const notifs = (AppState.notifications || []).map(n => ({ ...n, unread: false }));
+    saveNotificationsToStorage(notifs);
+    renderNotificationDropdownList();
+    if (AppState.currentView === 'notifications') {
+      renderNotificationsView();
+    }
+  }
+
+  function deleteNotification(id) {
+    const notifs = (AppState.notifications || []).filter(n => n.id !== id);
+    AppState.selectedNotificationIds.delete(id);
+    saveNotificationsToStorage(notifs);
+    renderNotificationDropdownList();
+    if (AppState.currentView === 'notifications') {
+      renderNotificationsView();
+    }
+  }
+
+  function deleteSelectedNotifications() {
+    if (AppState.selectedNotificationIds.size === 0) return;
+    const notifs = (AppState.notifications || []).filter(n => !AppState.selectedNotificationIds.has(n.id));
+    AppState.selectedNotificationIds.clear();
+    saveNotificationsToStorage(notifs);
+    renderNotificationDropdownList();
+    if (AppState.currentView === 'notifications') {
+      renderNotificationsView();
+    }
+  }
+
+  function clearAllNotifications() {
+    AppState.selectedNotificationIds.clear();
+    saveNotificationsToStorage([]);
+    renderNotificationDropdownList();
+    if (AppState.currentView === 'notifications') {
+      renderNotificationsView();
+    }
+  }
+
+  function addNotification(newNotif) {
+    const notifs = [newNotif, ...(AppState.notifications || [])];
+    saveNotificationsToStorage(notifs);
+    renderNotificationDropdownList();
+    if (AppState.currentView === 'notifications') {
+      renderNotificationsView();
+    }
+  }
+
+  function updateNotificationBadge() {
+    const notifs = AppState.notifications || [];
+    const unreadCount = notifs.filter(n => n.unread).length;
+    AppState.unreadNotificationCount = unreadCount;
+
+    const headerBadge = document.getElementById('notification-badge');
+    if (headerBadge) {
+      headerBadge.textContent = unreadCount;
+      if (unreadCount > 0) {
+        headerBadge.classList.remove('hidden');
+        headerBadge.classList.add('pulse');
+      } else {
+        headerBadge.classList.add('hidden');
+        headerBadge.classList.remove('pulse');
+      }
+    }
+
+    const sidebarBadge = document.getElementById('sidebar-notif-badge');
+    if (sidebarBadge) {
+      sidebarBadge.textContent = unreadCount;
+      if (unreadCount > 0) {
+        sidebarBadge.classList.remove('hidden');
+      } else {
+        sidebarBadge.classList.add('hidden');
+      }
+    }
+
+    const dropdownPill = document.getElementById('notif-dropdown-unread-count');
+    if (dropdownPill) {
+      dropdownPill.textContent = `${unreadCount} New`;
+    }
+  }
+
+  function getNotificationCategoryMeta(category, subType) {
+    const metaMap = {
+      order: {
+        label: 'Order',
+        pillClass: 'cat-order',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8L12 3 3 8v10l9 5 9-5V8z"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="23" x2="12" y2="13"/></svg>`
+      },
+      offer: {
+        label: 'Offer',
+        pillClass: 'cat-offer',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`
+      },
+      wishlist: {
+        label: 'Wishlist',
+        pillClass: 'cat-wishlist',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
+      },
+      cart: {
+        label: 'Cart',
+        pillClass: 'cat-cart',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`
+      },
+      payment: {
+        label: 'Payment',
+        pillClass: 'cat-payment',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`
+      },
+      account: {
+        label: 'Account',
+        pillClass: 'cat-account',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+      },
+      system: {
+        label: 'System',
+        pillClass: 'cat-system',
+        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+      }
+    };
+    return metaMap[category] || metaMap.system;
+  }
+
+  function initNotificationDropdown() {
+    const bellBtn = document.getElementById('header-notif-btn');
+    const dropdown = document.getElementById('notification-dropdown');
+    const markAllBtn = document.getElementById('notif-dropdown-mark-all-read');
+    const viewAllBtn = document.getElementById('notif-dropdown-view-all');
+
+    if (bellBtn && dropdown) {
+      bellBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isHidden = dropdown.classList.contains('hidden');
+        if (isHidden) {
+          renderNotificationDropdownList();
+          dropdown.classList.remove('hidden');
+          bellBtn.setAttribute('aria-expanded', 'true');
+        } else {
+          dropdown.classList.add('hidden');
+          bellBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        const wrapper = document.getElementById('notif-wrapper');
+        if (wrapper && !wrapper.contains(e.target) && !dropdown.classList.contains('hidden')) {
+          dropdown.classList.add('hidden');
+          bellBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if ((e.key === 'Escape' || e.key === 'Esc') && !dropdown.classList.contains('hidden')) {
+          dropdown.classList.add('hidden');
+          bellBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    if (markAllBtn) {
+      markAllBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        markAllNotificationsAsRead();
+      });
+    }
+
+    if (viewAllBtn) {
+      viewAllBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (dropdown) dropdown.classList.add('hidden');
+        if (bellBtn) bellBtn.setAttribute('aria-expanded', 'false');
+        renderView('notifications');
+      });
+    }
+  }
+
+  function renderNotificationDropdownList() {
+    const listEl = document.getElementById('notif-dropdown-list');
+    if (!listEl) return;
+
+    const notifs = AppState.notifications || [];
+    const unreadCount = notifs.filter(n => n.unread).length;
+
+    const markAllBtn = document.getElementById('notif-dropdown-mark-all-read');
+    if (markAllBtn) {
+      markAllBtn.style.opacity = unreadCount === 0 ? '0.5' : '1';
+      markAllBtn.style.cursor = unreadCount === 0 ? 'default' : 'pointer';
+      markAllBtn.disabled = unreadCount === 0;
+    }
+
+    if (notifs.length === 0) {
+      listEl.innerHTML = `
+        <div class="notif-dropdown-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <p>No notifications yet</p>
+        </div>
+      `;
+      return;
+    }
+
+    const recent = notifs.slice(0, 5);
+    listEl.innerHTML = recent.map(n => {
+      const meta = getNotificationCategoryMeta(n.category, n.subType);
+      return `
+        <div class="notif-dropdown-item ${n.unread ? 'unread' : ''}" data-id="${n.id}">
+          <div class="notif-item-icon ${meta.pillClass}">
+            ${meta.iconSvg}
+          </div>
+          <div class="notif-item-content">
+            <div class="notif-item-title-row">
+              <span class="notif-item-title">${n.title}</span>
+              <span class="notif-item-time">${n.time}</span>
+            </div>
+            <p class="notif-item-desc">${n.desc}</p>
+          </div>
+          <div class="notif-item-actions">
+            ${n.unread ? `<button class="notif-action-icon-btn mark-read-btn" data-id="${n.id}" title="Mark as read"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></button>` : ''}
+            <button class="notif-action-icon-btn delete-btn" data-id="${n.id}" title="Delete notification"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('.notif-dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.notif-action-icon-btn')) return;
+        const id = item.getAttribute('data-id');
+        const targetNotif = AppState.notifications.find(n => n.id === id);
+        if (targetNotif) {
+          markNotificationAsRead(id);
+          const dropdown = document.getElementById('notification-dropdown');
+          const bellBtn = document.getElementById('header-notif-btn');
+          if (dropdown) dropdown.classList.add('hidden');
+          if (bellBtn) bellBtn.setAttribute('aria-expanded', 'false');
+          if (targetNotif.actionUrl) {
+            renderView(targetNotif.actionUrl);
+          }
+        }
+      });
+    });
+
+    listEl.querySelectorAll('.mark-read-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        markNotificationAsRead(id);
+      });
+    });
+
+    listEl.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        deleteNotification(id);
+      });
+    });
+  }
+  function initNotificationModal() {
+    const modalOverlay = document.getElementById('notif-modal-overlay');
+    const cancelBtn = document.getElementById('notif-modal-cancel-btn');
+    const confirmBtn = document.getElementById('notif-modal-confirm-btn');
+
+    if (cancelBtn && modalOverlay) {
+      cancelBtn.addEventListener('click', () => {
+        modalOverlay.classList.add('hidden');
+      });
+    }
+
+    if (confirmBtn && modalOverlay) {
+      confirmBtn.addEventListener('click', () => {
+        modalOverlay.classList.add('hidden');
+        clearAllNotifications();
+      });
+    }
+
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+          modalOverlay.classList.add('hidden');
+        }
+      });
+    }
+  }
+
+  function openClearAllModal() {
+    const modalOverlay = document.getElementById('notif-modal-overlay');
+    if (modalOverlay) {
+      modalOverlay.classList.remove('hidden');
+    }
+  }
+
+  function simulateRandomAlert() {
+    const pool = [
+      { category: 'offer', subType: 'Discount Offers', title: 'Limited Time Deal: 20% OFF', desc: 'Use promo code SPEED20 for extra 20% savings at checkout.', actionUrl: 'shop', actionText: 'Redeem Offer', priority: 'high' },
+      { category: 'wishlist', subType: 'Back in Stock', title: 'Wishlist Item Back in Stock!', desc: 'Urban Explorer Pro Backpack is now back in stock with 25% discount.', actionUrl: 'wishlist', actionText: 'View Item', priority: 'normal' },
+      { category: 'order', subType: 'Packed', title: 'Order Packed & Ready', desc: 'Your order #ORD-9824 has been packed and handed to courier services.', actionUrl: 'orders', actionText: 'Track Order', priority: 'normal' },
+      { category: 'cart', subType: 'Low Stock', title: 'Hurry! Low Stock Alert', desc: 'Only 3 items remaining for Noise Ultra 2 Max in your cart.', actionUrl: 'cart', actionText: 'Checkout Now', priority: 'high' },
+      { category: 'account', subType: 'Profile Updated', title: 'Password Changed Successfully', desc: 'Your account security password was recently updated from settings.', actionUrl: 'profile', actionText: 'Security Settings', priority: 'normal' }
+    ];
+
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const newNotif = {
+      id: 'notif_' + Date.now(),
+      ...pick,
+      time: 'Just now',
+      timestamp: Date.now(),
+      unread: true
+    };
+    addNotification(newNotif);
+  }
+
+  function renderNotificationsView(overrideState) {
+    if (!viewContainer) return;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const targetState = overrideState || AppState.simulatedState;
+
+    if (targetState === 'loading') {
+      viewContainer.innerHTML = `
+        <div class="view-section-header">
+          <div>
+            <h2 class="view-title">Notification Center</h2>
+            <p class="view-subtitle">Fetching latest alerts...</p>
+          </div>
+        </div>
+        ${Skeletons.notifications()}
+      `;
+      return;
+    }
+
+    if (targetState === 'error') {
+      viewContainer.innerHTML = `
+        <div class="notif-error-container">
+          <div class="notif-error-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger)" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <h3>Unable to Load Notifications</h3>
+          <p>Something went wrong while loading your notification center. Please try again.</p>
+          <button id="notif-retry-btn" class="notif-btn notif-btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Retry Loading</span>
+          </button>
+        </div>
+      `;
+      const retryBtn = document.getElementById('notif-retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => renderNotificationsView('normal'));
+      }
+      return;
+    }
+
+    const allNotifs = AppState.notifications || [];
+    const filter = AppState.notificationFilter || 'all';
+    const query = (AppState.notificationSearchQuery || '').toLowerCase().trim();
+
+    let filtered = allNotifs.filter(n => {
+      if (filter === 'unread' && !n.unread) return false;
+      if (filter !== 'all' && filter !== 'unread' && n.category !== filter) return false;
+      
+      if (query) {
+        const inTitle = n.title.toLowerCase().includes(query);
+        const inDesc = n.desc.toLowerCase().includes(query);
+        const inCat = n.category.toLowerCase().includes(query);
+        const inSubType = (n.subType || '').toLowerCase().includes(query);
+        return inTitle || inDesc || inCat || inSubType;
+      }
+      return true;
+    });
+
+    const unreadCount = allNotifs.filter(n => n.unread).length;
+    const isAllSelected = filtered.length > 0 && filtered.every(n => AppState.selectedNotificationIds.has(n.id));
+
+    let contentHtml = `
+      <div class="notif-center-wrapper">
+        <!-- Page Header -->
+        <div class="notif-header">
+          <div class="notif-header-title-group">
+            <h2 class="notif-page-title">
+              Notification Center
+              <span class="notif-header-badge">${unreadCount} Unread</span>
+            </h2>
+            <p class="notif-page-subtitle">Manage your order updates, offers, wishlist alerts, and account activity</p>
+          </div>
+          <div class="notif-header-actions">
+            <button id="notif-simulate-btn" class="notif-btn notif-btn-outline" title="Simulate a new incoming alert">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              <span>Simulate Alert</span>
+            </button>
+            <button id="notif-mark-all-btn" class="notif-btn notif-btn-outline" ${unreadCount === 0 ? 'disabled' : ''}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Mark All Read</span>
+            </button>
+            <button id="notif-clear-all-btn" class="notif-btn notif-btn-danger-outline" ${allNotifs.length === 0 ? 'disabled' : ''}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              <span>Clear All</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="notif-controls-bar">
+          <!-- Search Box -->
+          <div class="notif-search-box">
+            <svg class="notif-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="notif-search-input" placeholder="Search notifications by title, category, keyword..." value="${AppState.notificationSearchQuery || ''}" aria-label="Search notifications">
+            ${query ? `<button id="notif-search-clear" class="notif-search-clear-btn" aria-label="Clear search">&times;</button>` : ''}
+          </div>
+
+          <!-- Category Tabs Bar -->
+          <div class="notif-tabs-scroll">
+            <div class="notif-tabs-bar">
+              <button class="notif-tab-pill ${filter === 'all' ? 'active' : ''}" data-filter="all">All (${allNotifs.length})</button>
+              <button class="notif-tab-pill ${filter === 'unread' ? 'active' : ''}" data-filter="unread">Unread (${unreadCount})</button>
+              <button class="notif-tab-pill ${filter === 'order' ? 'active' : ''}" data-filter="order">Orders</button>
+              <button class="notif-tab-pill ${filter === 'offer' ? 'active' : ''}" data-filter="offer">Offers</button>
+              <button class="notif-tab-pill ${filter === 'wishlist' ? 'active' : ''}" data-filter="wishlist">Wishlist</button>
+              <button class="notif-tab-pill ${filter === 'cart' ? 'active' : ''}" data-filter="cart">Cart</button>
+              <button class="notif-tab-pill ${filter === 'payment' ? 'active' : ''}" data-filter="payment">Payments</button>
+              <button class="notif-tab-pill ${filter === 'account' ? 'active' : ''}" data-filter="account">Account</button>
+              <button class="notif-tab-pill ${filter === 'system' ? 'active' : ''}" data-filter="system">System</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bulk Selection Toolbar -->
+        ${filtered.length > 0 ? `
+          <div class="notif-bulk-bar">
+            <label class="notif-select-all-label">
+              <input type="checkbox" id="notif-select-all-checkbox" ${isAllSelected ? 'checked' : ''}>
+              <span>Select All (${filtered.length})</span>
+            </label>
+            <div class="notif-bulk-actions">
+              ${AppState.selectedNotificationIds.size > 0 ? `
+                <span class="notif-selected-count">${AppState.selectedNotificationIds.size} Selected</span>
+                <button id="notif-delete-selected-btn" class="notif-btn notif-btn-sm notif-btn-danger">
+                  Delete Selected
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Main Content Area -->
+        <div class="notif-content-area">
+          ${filtered.length === 0 ? renderNotificationEmptyState(query, filter) : `
+            <div class="notif-card-list">
+              ${filtered.map(n => renderNotificationCard(n)).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+
+    viewContainer.innerHTML = contentHtml;
+    bindNotificationViewEvents();
+  }
+
+  function renderNotificationCard(n) {
+    const meta = getNotificationCategoryMeta(n.category, n.subType);
+    const isSelected = AppState.selectedNotificationIds.has(n.id);
+    return `
+      <div class="notif-card ${n.unread ? 'unread' : ''} ${isSelected ? 'selected' : ''}" data-id="${n.id}">
+        <div class="notif-card-checkbox-wrapper">
+          <input type="checkbox" class="notif-card-checkbox" data-id="${n.id}" ${isSelected ? 'checked' : ''}>
+        </div>
+
+        <div class="notif-card-icon-container ${meta.pillClass}">
+          ${meta.iconSvg}
+        </div>
+
+        <div class="notif-card-body">
+          <div class="notif-card-top-row">
+            <div class="notif-card-tags">
+              <span class="notif-category-tag ${meta.pillClass}">${meta.label}</span>
+              ${n.subType ? `<span class="notif-subtype-tag">${n.subType}</span>` : ''}
+              ${n.priority === 'high' ? `<span class="notif-priority-tag">HIGH</span>` : ''}
+            </div>
+            <span class="notif-card-time">${n.time}</span>
+          </div>
+
+          <h4 class="notif-card-title">${n.title}</h4>
+          <p class="notif-card-desc">${n.desc}</p>
+
+          <div class="notif-card-footer">
+            ${n.actionUrl ? `
+              <button class="notif-card-action-btn" data-url="${n.actionUrl}">
+                <span>${n.actionText || 'View Details'}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </button>
+            ` : '<div></div>'}
+
+            <div class="notif-card-quick-actions">
+              <button class="notif-icon-action-btn toggle-read-btn" data-id="${n.id}" title="${n.unread ? 'Mark as read' : 'Mark as unread'}">
+                ${n.unread ? `
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                ` : `
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/></svg>
+                `}
+              </button>
+              <button class="notif-icon-action-btn delete-card-btn" data-id="${n.id}" title="Delete notification">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderNotificationEmptyState(query, filter) {
+    const isFiltered = query.length > 0 || filter !== 'all';
+    return `
+      <div class="notif-empty-state">
+        <div class="notif-empty-illustration">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="80" fill="var(--bg-body)" stroke="var(--border-color)" stroke-width="2"/>
+            <path d="M100 45 C75 45, 60 65, 60 90 L60 120 L45 135 L155 135 L140 120 L140 90 C140 65, 125 45, 100 45 Z" fill="var(--bg-card)" stroke="var(--text-muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M85 145 C85 153, 91 160, 100 160 C109 160, 115 153, 115 145" fill="none" stroke="var(--color-accent)" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="100" cy="90" r="16" fill="var(--color-accent)" opacity="0.2"/>
+            <path d="M92 90 L98 96 L110 84" stroke="var(--color-accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="notif-empty-title">${isFiltered ? 'No Matching Notifications Found' : 'No Notifications Yet'}</h3>
+        <p class="notif-empty-desc">${isFiltered ? 'Try clearing your search query or switching category filters to see more notifications.' : 'We will notify you when there are order updates, flash sales, price drops, or account alerts.'}</p>
+        ${isFiltered ? `
+          <button id="notif-reset-filters-btn" class="notif-btn notif-btn-primary">Reset Filters</button>
+        ` : `
+          <button id="notif-explore-btn" class="notif-btn notif-btn-primary">Explore Products</button>
+        `}
+      </div>
+    `;
+  }
+
+  function bindNotificationViewEvents() {
+    const searchInput = document.getElementById('notif-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        AppState.notificationSearchQuery = e.target.value;
+        renderNotificationsView();
+      });
+    }
+
+    const searchClear = document.getElementById('notif-search-clear');
+    if (searchClear) {
+      searchClear.addEventListener('click', () => {
+        AppState.notificationSearchQuery = '';
+        renderNotificationsView();
+      });
+    }
+
+    document.querySelectorAll('.notif-tab-pill').forEach(tab => {
+      tab.addEventListener('click', () => {
+        AppState.notificationFilter = tab.getAttribute('data-filter');
+        renderNotificationsView();
+      });
+    });
+
+    const markAllBtn = document.getElementById('notif-mark-all-btn');
+    if (markAllBtn) {
+      markAllBtn.addEventListener('click', markAllNotificationsAsRead);
+    }
+
+    const clearAllBtn = document.getElementById('notif-clear-all-btn');
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener('click', openClearAllModal);
+    }
+
+    const simulateBtn = document.getElementById('notif-simulate-btn');
+    if (simulateBtn) {
+      simulateBtn.addEventListener('click', simulateRandomAlert);
+    }
+
+    const resetBtn = document.getElementById('notif-reset-filters-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        AppState.notificationSearchQuery = '';
+        AppState.notificationFilter = 'all';
+        renderNotificationsView();
+      });
+    }
+
+    const exploreBtn = document.getElementById('notif-explore-btn');
+    if (exploreBtn) {
+      exploreBtn.addEventListener('click', () => renderView('shop'));
+    }
+
+    const selectAllCb = document.getElementById('notif-select-all-checkbox');
+    if (selectAllCb) {
+      selectAllCb.addEventListener('change', (e) => {
+        const allNotifs = AppState.notifications || [];
+        const filter = AppState.notificationFilter || 'all';
+        const query = (AppState.notificationSearchQuery || '').toLowerCase().trim();
+        let filtered = allNotifs.filter(n => {
+          if (filter === 'unread' && !n.unread) return false;
+          if (filter !== 'all' && filter !== 'unread' && n.category !== filter) return false;
+          if (query) {
+            return n.title.toLowerCase().includes(query) || n.desc.toLowerCase().includes(query);
+          }
+          return true;
+        });
+
+        if (e.target.checked) {
+          filtered.forEach(n => AppState.selectedNotificationIds.add(n.id));
+        } else {
+          filtered.forEach(n => AppState.selectedNotificationIds.delete(n.id));
+        }
+        renderNotificationsView();
+      });
+    }
+
+    document.querySelectorAll('.notif-card-checkbox').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const id = cb.getAttribute('data-id');
+        if (e.target.checked) {
+          AppState.selectedNotificationIds.add(id);
+        } else {
+          AppState.selectedNotificationIds.delete(id);
+        }
+        renderNotificationsView();
+      });
+    });
+
+    const deleteSelectedBtn = document.getElementById('notif-delete-selected-btn');
+    if (deleteSelectedBtn) {
+      deleteSelectedBtn.addEventListener('click', deleteSelectedNotifications);
+    }
+
+    document.querySelectorAll('.notif-card-action-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.notif-card');
+        const id = card.getAttribute('data-id');
+        const targetNotif = AppState.notifications.find(n => n.id === id);
+        if (targetNotif) {
+          markNotificationAsRead(id);
+          renderView(btn.getAttribute('data-url'));
+        }
+      });
+    });
+
+    document.querySelectorAll('.toggle-read-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        const targetNotif = AppState.notifications.find(n => n.id === id);
+        if (targetNotif) {
+          if (targetNotif.unread) markNotificationAsRead(id);
+          else {
+            const notifs = AppState.notifications.map(n => n.id === id ? { ...n, unread: true } : n);
+            saveNotificationsToStorage(notifs);
+          }
+          renderNotificationsView();
+        }
+      });
+    });
+
+    document.querySelectorAll('.delete-card-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.notif-card');
+        const id = btn.getAttribute('data-id');
+        if (card) {
+          card.classList.add('removing');
+          setTimeout(() => {
+            deleteNotification(id);
+            renderNotificationsView();
+          }, 250);
+        } else {
+          deleteNotification(id);
+          renderNotificationsView();
+        }
+      });
+    });
+  }
+
+  // Initialize Notifications Module after all definitions
+  initNotificationModule();
 
 });
 
