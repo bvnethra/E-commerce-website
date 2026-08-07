@@ -2057,13 +2057,60 @@ document.addEventListener('DOMContentLoaded', () => {
           { user: 'Sarah Jenkins', rating: 4, comment: 'Great products, high durability. Highly recommended for daily use.', date: 'Jul 29, 2026' }
         ]
       };
-      // Initialize/sync products database in localStorage if not set
-      const storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
-      if (storedProducts.length > 0) {
-        mockDb.products = storedProducts;
-      } else {
-        localStorage.setItem('shopsphere_products', JSON.stringify(mockDb.products));
+      // Initialize/sync products database in localStorage if not set or outdated
+      let storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+      if (storedProducts.length < 108) {
+        const generatedProducts = [];
+        const categories = mockDb.categories;
+        let globalId = 1;
+        categories.forEach(cat => {
+          const baseNames = [
+            { suffix: 'Premium Pack', price: 2999, originalPrice: 4999, badge: 'Best Seller' },
+            { suffix: 'Elite Edition', price: 5999, originalPrice: 8999, badge: 'Featured' },
+            { suffix: 'Deluxe Suite', price: 8999, originalPrice: 12999, badge: 'Hot' },
+            { suffix: 'Standard Choice', price: 1499, originalPrice: 2499, badge: 'New' }
+          ];
+
+          baseNames.forEach((item, index) => {
+            generatedProducts.push({
+              id: globalId++,
+              name: `${cat.name} ${item.suffix}`,
+              cat: cat.name,
+              brand: 'HypeBrand',
+              price: `₹${item.price.toLocaleString('en-IN')}`,
+              originalPrice: `₹${item.originalPrice.toLocaleString('en-IN')}`,
+              numericPrice: item.price,
+              discount: Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100),
+              badge: item.badge,
+              rating: Number((4.0 + Math.random() * 1.0).toFixed(1)),
+              reviewCount: Math.floor(10 + Math.random() * 200),
+              inStock: true,
+              stockCount: Math.floor(5 + Math.random() * 50),
+              sku: `SKU-${cat.name.substring(0,3).toUpperCase()}-${globalId * 111}`,
+              deliveryBadge: 'Express Shipping in 2 Days',
+              warranty: '1 Year Brand Warranty',
+              returnPolicy: '30 Days Money Back Guarantee',
+              sellerInfo: 'Hype Official Store • Verified Retailer',
+              shortDesc: `Premium quality ${cat.name} ${item.suffix} designed for maximum satisfaction.`,
+              description: `Experience the finest selection of our ${cat.name} range. Handcrafted with top-grade materials and engineered to modern specifications.`,
+              img: cat.img || 'assets/images/cat_accessories.png',
+              images: [cat.img || 'assets/images/cat_accessories.png'],
+              variants: {
+                colors: ['Default Black', 'Titanium Silver', 'Ocean Blue'],
+                sizes: ['Standard Size']
+              },
+              specs: {
+                'Origin': 'Made with Care',
+                'Warranty': '1 Year Domestic Warranty',
+                'Quality': 'Tested and Verified'
+              }
+            });
+          });
+        });
+        localStorage.setItem('shopsphere_products', JSON.stringify(generatedProducts));
+        storedProducts = generatedProducts;
       }
+      mockDb.products = storedProducts;
 
       // Initialize/sync categories database in localStorage if not set or outdated
       const storedCategories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
@@ -2973,23 +3020,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nameMatch && !catMatch && !brandMatch && !descMatch) return false;
       }
 
-      // 2. Multi-Select Categories (with sub-category mapping support)
+      // 2. Multi-Select Categories
       if (f.categories && f.categories.length > 0) {
         const catName = p.cat.toLowerCase();
-        const categoryMapping = {
-          'men': ['smart watch', 'shoes', 'accessories'],
-          'women': ['smart watch', 'earbuds', 'backpack'],
-          'electronics': ['smart watch', 'earbuds', 'camera'],
-          'shoes': ['shoes'],
-          'accessories': ['accessories', 'backpack']
-        };
-
-        const matchesCategory = f.categories.some(c => {
-          const lowerC = c.toLowerCase();
-          const mappedCats = categoryMapping[lowerC] || [lowerC];
-          return mappedCats.includes(catName);
-        });
-
+        const matchesCategory = f.categories.some(c => c.toLowerCase() === catName);
         if (!matchesCategory) return false;
       }
 
@@ -3090,8 +3124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const startIndex = (AppState.currentPage - 1) * AppState.itemsPerPage;
     const paginatedProducts = filtered.slice(startIndex, startIndex + AppState.itemsPerPage);
 
-    const availableBrands = ['Noise', 'boAt', 'Canon', 'Hype', 'Apple', 'Nike', 'Adidas', 'Sony'];
-    const availableCategories = ['Smart Watch', 'Earbuds', 'Camera', 'Backpack', 'Shoes', 'Accessories', 'Men', 'Women'];
+    const availableBrands = ['Noise', 'boAt', 'Canon', 'Hype', 'Apple', 'Nike', 'Adidas', 'Sony', 'HypeMan', 'HypeWoman', 'HypeFit', 'HypeTech', 'HypeFoot', 'HypePack', 'HypeSound', 'HypeStore', 'HypeGlow'];
+    const availableCategories = ApiService.getMockData('categories').map(c => c.name);
     const availableColors = [
       { name: 'Black', hex: '#000000' },
       { name: 'Silver', hex: '#C0C0C0' },

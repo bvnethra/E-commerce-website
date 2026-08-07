@@ -196,33 +196,55 @@ function initializeAdminDatabases() {
   }
 
   // 7. Products Database initialization fallback
-  if (!localStorage.getItem('shopsphere_products')) {
-    const defaultProducts = [
-      {
-        id: 1,
-        name: 'Noise Ultra 2 Max',
-        cat: 'Smart Watch',
-        brand: 'Noise',
-        price: '₹4,999',
-        originalPrice: '₹6,999',
-        numericPrice: 4999,
-        discount: 28,
-        badge: '-28%',
-        rating: 4.8,
-        reviewCount: 342,
-        inStock: true,
-        stockCount: 14,
-        sku: 'SKU-NWT-9021',
-        deliveryBadge: 'Express Shipping in 2 Days',
-        warranty: '1 Year Brand Warranty',
-        returnPolicy: '30 Days Money Back Guarantee',
-        sellerInfo: 'Hype Direct Official Store • Verified Retailer',
-        shortDesc: 'Amoled display smartwatch with Bluetooth calling, 100+ sports modes, and 7-day battery backup.',
-        description: 'Experience next-gen smart wearable tech with Noise Ultra 2 Max. Features an ultra-bright AMOLED display, stainless steel dial frame, real-time SpO2 & heart rate monitoring, and seamless Bluetooth HD calling.',
-        img: 'assets/images/prod_watch.png',
-        images: ['assets/images/prod_watch.png']
-      }
-    ];
+  let storedProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+  if (storedProds.length < 108) {
+    const defaultProducts = [];
+    const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
+    let globalId = 1;
+    categories.forEach(cat => {
+      const baseNames = [
+        { suffix: 'Premium Pack', price: 2999, originalPrice: 4999, badge: 'Best Seller' },
+        { suffix: 'Elite Edition', price: 5999, originalPrice: 8999, badge: 'Featured' },
+        { suffix: 'Deluxe Suite', price: 8999, originalPrice: 12999, badge: 'Hot' },
+        { suffix: 'Standard Choice', price: 1499, originalPrice: 2499, badge: 'New' }
+      ];
+
+      baseNames.forEach((item, index) => {
+        defaultProducts.push({
+          id: globalId++,
+          name: `${cat.name} ${item.suffix}`,
+          cat: cat.name,
+          brand: 'HypeBrand',
+          price: `₹${item.price.toLocaleString('en-IN')}`,
+          originalPrice: `₹${item.originalPrice.toLocaleString('en-IN')}`,
+          numericPrice: item.price,
+          discount: Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100),
+          badge: item.badge,
+          rating: Number((4.0 + Math.random() * 1.0).toFixed(1)),
+          reviewCount: Math.floor(10 + Math.random() * 200),
+          inStock: true,
+          stockCount: Math.floor(5 + Math.random() * 50),
+          sku: `SKU-${cat.name.substring(0,3).toUpperCase()}-${globalId * 111}`,
+          deliveryBadge: 'Express Shipping in 2 Days',
+          warranty: '1 Year Brand Warranty',
+          returnPolicy: '30 Days Money Back Guarantee',
+          sellerInfo: 'Hype Official Store • Verified Retailer',
+          shortDesc: `Premium quality ${cat.name} ${item.suffix} designed for maximum satisfaction.`,
+          description: `Experience the finest selection of our ${cat.name} range. Handcrafted with top-grade materials and engineered to modern specifications.`,
+          img: cat.img || 'assets/images/cat_accessories.png',
+          images: [cat.img || 'assets/images/cat_accessories.png'],
+          variants: {
+            colors: ['Default Black', 'Titanium Silver', 'Ocean Blue'],
+            sizes: ['Standard Size']
+          },
+          specs: {
+            'Origin': 'Made with Care',
+            'Warranty': '1 Year Domestic Warranty',
+            'Quality': 'Tested and Verified'
+          }
+        });
+      });
+    });
     localStorage.setItem('shopsphere_products', JSON.stringify(defaultProducts));
   }
 }
