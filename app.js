@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      Application Global State & API Service
      ========================================================================== */
+  /* ==========================================================================
+     Application Global State & API Service
+     ========================================================================== */
   const AppState = {
     currentView: 'home',
     simulatedState: 'normal', // 'normal', 'loading', 'empty', 'error'
@@ -18,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedVariant: { color: null, size: null },
     lightboxIndex: 0,
     lightboxImages: [],
+    user: null,
+    pendingAction: null,
     listingFilters: {
       categories: [],
       brands: [],
@@ -32,6 +37,466 @@ document.addEventListener('DOMContentLoaded', () => {
       special: []
     }
   };
+
+  /* ==========================================================================
+     Flipkart-Inspired Authentication & Route/Action Protection Engine
+     ========================================================================== */
+  const AuthService = {
+    getUser() {
+      try {
+        const u = localStorage.getItem('aura_user');
+        return u ? JSON.parse(u) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+
+    getToken() {
+      return localStorage.getItem('aura_jwt_token') || null;
+    },
+
+    isAuthenticated() {
+      return !!(this.getToken() && this.getUser());
+    },
+
+    generateMockJwt(user) {
+      const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+      const payload = btoa(JSON.stringify({
+        sub: user.id || "usr_1001",
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "9876543210",
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (24 * 3600)
+      }));
+      const signature = btoa("aura_jwt_secret_" + Math.random().toString(36).substring(2, 9));
+      return `${header}.${payload}.${signature}`;
+    },
+
+    login(identifier, passwordOrOtp, isOtp = false) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (isOtp && passwordOrOtp !== '1234') {
+            return reject(new Error('Invalid OTP code. Please enter 1234 for demo.'));
+          }
+
+          let nameStr = identifier.includes('@') ? identifier.split('@')[0] : 'User';
+          nameStr = nameStr.charAt(0).toUpperCase() + nameStr.slice(1);
+
+          const user = {
+            id: 'usr_' + Math.floor(1000 + Math.random() * 9000),
+            name: nameStr,
+            email: identifier.includes('@') ? identifier : `${identifier}@example.com`,
+            phone: !identifier.includes('@') ? identifier : '9876543210'
+          };
+
+          const token = this.generateMockJwt(user);
+          localStorage.setItem('aura_jwt_token', token);
+          localStorage.setItem('aura_user', JSON.stringify(user));
+          AppState.user = user;
+
+          updateHeaderAuthState();
+          resolve(user);
+        }, 600);
+      });
+    },
+
+    signup(name, email, mobile, password) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (!name || !email || !mobile || !password) {
+            return reject(new Error('All fields are required.'));
+          }
+          if (password.length < 6) {
+            return reject(new Error('Password must be at least 6 characters.'));
+          }
+
+          const user = {
+            id: 'usr_' + Math.floor(1000 + Math.random() * 9000),
+            name: name.trim(),
+            email: email.trim(),
+            phone: mobile.trim()
+          };
+
+          const token = this.generateMockJwt(user);
+          localStorage.setItem('aura_jwt_token', token);
+          localStorage.setItem('aura_user', JSON.stringify(user));
+          AppState.user = user;
+
+          updateHeaderAuthState();
+          resolve(user);
+        }, 600);
+      });
+    },
+
+    googleLogin() {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const user = {
+            id: 'usr_goog_' + Math.floor(1000 + Math.random() * 9000),
+            name: 'Alex Hype',
+            email: 'alex.hype@gmail.com',
+            phone: '+91 98765 43210'
+          };
+
+          const token = this.generateMockJwt(user);
+          localStorage.setItem('aura_jwt_token', token);
+          localStorage.setItem('aura_user', JSON.stringify(user));
+          AppState.user = user;
+
+          updateHeaderAuthState();
+          resolve(user);
+        }, 600);
+      });
+    },
+
+    logout() {
+      localStorage.removeItem('aura_jwt_token');
+      localStorage.removeItem('aura_user');
+      AppState.user = null;
+      updateHeaderAuthState();
+      showToast('Logged out successfully', 'info');
+      if (['profile', 'orders', 'checkout'].includes(AppState.currentView)) {
+        renderView('home');
+      }
+    }
+  };
+
+  // Initialize Auth User
+  AppState.user = AuthService.getUser();
+
+  function requireAuth(actionType, payload, callback) {
+    if (AuthService.isAuthenticated()) {
+      callback();
+    } else {
+      AppState.pendingAction = { actionType, payload, callback };
+      openAuthModal(actionType);
+      showToast('Authentication required. Please log in.', 'error');
+    }
+  }
+
+  function resumePendingAction() {
+    if (AppState.pendingAction && typeof AppState.pendingAction.callback === 'function') {
+      const pending = AppState.pendingAction;
+      AppState.pendingAction = null;
+      setTimeout(() => {
+        pending.callback();
+        showToast(`Action completed: ${getActionLabel(pending.actionType)}`, 'success');
+      }, 300);
+    }
+  }
+
+  function getActionLabel(actionType) {
+    switch (actionType) {
+      case 'ADD_TO_CART': return 'Item added to your cart';
+      case 'BUY_NOW': return 'Proceeding to checkout';
+      case 'WISHLIST': return 'Wishlist updated';
+      case 'CHECKOUT': return 'Proceeding to checkout';
+      case 'ORDERS': return 'Opening Order History';
+      case 'PROFILE': return 'Opening User Profile';
+      case 'ADDRESSES': return 'Opening Addresses';
+      case 'SUBMIT_REVIEW': return 'Review submitted';
+      default: return 'Operation successful';
+    }
+  }
+
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast-message toast-${type}`;
+    const icon = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
+    toast.innerHTML = `<span style="font-size: 1.1rem; color: ${type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6')}">${icon}</span> <span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 3500);
+  }
+
+  /* Header Profile & Auth UI state sync */
+  function updateHeaderAuthState() {
+    const loginTrigger = document.getElementById('header-login-trigger');
+    const userTrigger = document.getElementById('header-user-trigger');
+    const userInitials = document.getElementById('header-user-initials');
+    const userName = document.getElementById('header-user-name');
+    const dropdownAvatarInitials = document.getElementById('dropdown-avatar-initials');
+    const dropdownUserName = document.getElementById('dropdown-user-name');
+    const dropdownUserEmail = document.getElementById('dropdown-user-email');
+
+    const user = AuthService.getUser();
+    if (user && AuthService.isAuthenticated()) {
+      if (loginTrigger) loginTrigger.style.display = 'none';
+      if (userTrigger) userTrigger.style.display = 'flex';
+
+      const initials = (user.name || 'User').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      if (userInitials) userInitials.textContent = initials;
+      if (userName) userName.textContent = user.name || 'User';
+
+      if (dropdownAvatarInitials) dropdownAvatarInitials.textContent = initials;
+      if (dropdownUserName) dropdownUserName.textContent = user.name || 'User';
+      if (dropdownUserEmail) dropdownUserEmail.textContent = user.email || 'user@example.com';
+    } else {
+      if (loginTrigger) loginTrigger.style.display = 'flex';
+      if (userTrigger) userTrigger.style.display = 'none';
+    }
+  }
+
+  /* Flipkart Auth Modal UI Controls */
+  let otpTimerInterval = null;
+
+  function openAuthModal(actionType = 'LOGIN') {
+    const overlay = document.getElementById('auth-modal-overlay');
+    if (!overlay) return;
+
+    resetAuthForms();
+    showAuthView('login');
+
+    const bannerHeading = document.getElementById('fk-banner-title');
+    const bannerSubtext = document.getElementById('fk-banner-subtext');
+
+    if (bannerHeading && bannerSubtext) {
+      if (actionType === 'ADD_TO_CART') {
+        bannerHeading.textContent = 'Unlock Your Cart';
+        bannerSubtext.textContent = 'Sign in to add items to your cart & access instant checkout.';
+      } else if (actionType === 'WISHLIST') {
+        bannerHeading.textContent = 'Save to Wishlist';
+        bannerSubtext.textContent = 'Keep track of your favorite styles across all devices.';
+      } else if (actionType === 'CHECKOUT') {
+        bannerHeading.textContent = 'Secure Checkout';
+        bannerSubtext.textContent = 'Sign in to access saved addresses and 1-click payment options.';
+      } else {
+        bannerHeading.textContent = 'Welcome Back';
+        bannerSubtext.textContent = 'Log in to manage orders, saved wishlist items, and personal recommendations.';
+      }
+    }
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAuthModal() {
+    const overlay = document.getElementById('auth-modal-overlay');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = 'auto';
+    stopOtpTimer();
+  }
+
+  function showAuthView(viewName) {
+    const loginForm = document.getElementById('fk-login-form');
+    const otpForm = document.getElementById('fk-otp-form');
+    const signupForm = document.getElementById('fk-signup-form');
+    const bannerTitle = document.getElementById('fk-banner-title');
+    const bannerSubtext = document.getElementById('fk-banner-subtext');
+    hideAuthError();
+
+    if (loginForm) loginForm.style.display = viewName === 'login' ? 'flex' : 'none';
+    if (otpForm) otpForm.style.display = viewName === 'otp' ? 'flex' : 'none';
+    if (signupForm) signupForm.style.display = viewName === 'signup' ? 'flex' : 'none';
+
+    if (viewName === 'signup' && bannerTitle && bannerSubtext) {
+      bannerTitle.textContent = "Join Hype. Today";
+      bannerSubtext.textContent = "Create an account to receive 10% OFF your first purchase & member perks.";
+    } else if (viewName === 'otp' && bannerTitle && bannerSubtext) {
+      bannerTitle.textContent = "Verify Security OTP";
+      bannerSubtext.textContent = "Enter the 4-digit code sent to your mobile or email address.";
+    }
+  }
+
+  function showAuthError(msg) {
+    const errAlert = document.getElementById('fk-auth-error');
+    const errText = document.getElementById('fk-error-text');
+    if (errAlert && errText) {
+      errText.textContent = msg;
+      errAlert.style.display = 'flex';
+    }
+  }
+
+  function hideAuthError() {
+    const errAlert = document.getElementById('fk-auth-error');
+    if (errAlert) errAlert.style.display = 'none';
+  }
+
+  function resetAuthForms() {
+    hideAuthError();
+    document.querySelectorAll('.fk-auth-form').forEach(f => f.reset());
+    document.querySelectorAll('.fk-field-error').forEach(e => e.textContent = '');
+  }
+
+  function setBtnLoading(btnElement, loading) {
+    if (!btnElement) return;
+    const textSpan = btnElement.querySelector('.btn-text');
+    const spinnerSpan = btnElement.querySelector('.btn-spinner');
+    btnElement.disabled = loading;
+    if (textSpan) textSpan.style.display = loading ? 'none' : 'inline';
+    if (spinnerSpan) spinnerSpan.style.display = loading ? 'inline-block' : 'none';
+  }
+
+  function startOtpTimer() {
+    stopOtpTimer();
+    let secondsLeft = 30;
+    const countdownEl = document.getElementById('fk-otp-countdown');
+    const timerTextEl = document.getElementById('fk-otp-timer-text');
+    const resendBtn = document.getElementById('fk-otp-resend-btn');
+
+    if (timerTextEl) timerTextEl.style.display = 'inline';
+    if (resendBtn) resendBtn.style.display = 'none';
+
+    otpTimerInterval = setInterval(() => {
+      secondsLeft--;
+      if (countdownEl) countdownEl.textContent = secondsLeft;
+      if (secondsLeft <= 0) {
+        stopOtpTimer();
+        if (timerTextEl) timerTextEl.style.display = 'none';
+        if (resendBtn) resendBtn.style.display = 'inline';
+      }
+    }, 1000);
+  }
+
+  function stopOtpTimer() {
+    if (otpTimerInterval) {
+      clearInterval(otpTimerInterval);
+      otpTimerInterval = null;
+    }
+  }
+
+  /* Bind Modal & Header Authentication Event Listeners */
+  function bindAuthEventListeners() {
+    updateHeaderAuthState();
+
+    const closeBtn = document.getElementById('fk-auth-close');
+    const overlay = document.getElementById('auth-modal-overlay');
+    if (closeBtn) closeBtn.addEventListener('click', closeAuthModal);
+    if (overlay) overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeAuthModal();
+    });
+
+    const headerLoginBtn = document.getElementById('header-login-trigger');
+    if (headerLoginBtn) {
+      headerLoginBtn.addEventListener('click', () => openAuthModal('LOGIN'));
+    }
+
+    const userTrigger = document.getElementById('header-user-trigger');
+    const userMenu = document.getElementById('user-dropdown-menu');
+
+    if (userTrigger && userMenu) {
+      userTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('show');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!userTrigger.contains(e.target)) {
+          userMenu.classList.remove('show');
+        }
+      });
+    }
+
+    // Dropdown Items
+    const menuProfile = document.getElementById('menu-item-profile');
+    const menuOrders = document.getElementById('menu-item-orders');
+    const menuWishlist = document.getElementById('menu-item-wishlist');
+    const menuAddresses = document.getElementById('menu-item-addresses');
+    const menuLogout = document.getElementById('menu-item-logout');
+
+    if (menuProfile) menuProfile.addEventListener('click', () => { userMenu.classList.remove('show'); renderView('profile'); });
+    if (menuOrders) menuOrders.addEventListener('click', () => { userMenu.classList.remove('show'); renderView('orders'); });
+    if (menuWishlist) menuWishlist.addEventListener('click', () => { userMenu.classList.remove('show'); renderView('wishlist'); });
+    if (menuAddresses) menuAddresses.addEventListener('click', () => { userMenu.classList.remove('show'); requireAuth('ADDRESSES', {}, () => showToast('Managing delivery addresses', 'info')); });
+    if (menuLogout) menuLogout.addEventListener('click', () => { userMenu.classList.remove('show'); AuthService.logout(); });
+
+    // Mode View Switchers & Social Login
+    const toSignup = document.getElementById('fk-link-to-signup');
+    const toLogin = document.getElementById('fk-link-to-login');
+    const googleBtn = document.getElementById('google-signin-btn');
+
+    if (toSignup) toSignup.addEventListener('click', () => showAuthView('signup'));
+    if (toLogin) toLogin.addEventListener('click', () => showAuthView('login'));
+
+    if (googleBtn) {
+      googleBtn.addEventListener('click', () => {
+        hideAuthError();
+        googleBtn.style.opacity = '0.7';
+        googleBtn.style.pointerEvents = 'none';
+
+        AuthService.googleLogin()
+          .then(() => {
+            googleBtn.style.opacity = '1';
+            googleBtn.style.pointerEvents = 'auto';
+            closeAuthModal();
+            showToast(`Signed in with Google! Welcome, ${AppState.user.name}!`, 'success');
+            resumePendingAction();
+          })
+          .catch((err) => {
+            googleBtn.style.opacity = '1';
+            googleBtn.style.pointerEvents = 'auto';
+            showAuthError(err.message);
+          });
+      });
+    }
+
+    // Login Form Submit
+    const loginForm = document.getElementById('fk-login-form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const identifier = document.getElementById('fk-login-identifier').value.trim();
+        const password = document.getElementById('fk-login-password').value;
+
+        if (!identifier || !password) {
+          showAuthError('Please enter both identifier and password.');
+          return;
+        }
+
+        const submitBtn = document.getElementById('fk-login-submit');
+        setBtnLoading(submitBtn, true);
+        hideAuthError();
+
+        AuthService.login(identifier, password, false)
+          .then(() => {
+            setBtnLoading(submitBtn, false);
+            closeAuthModal();
+            showToast(`Welcome back, ${AppState.user.name}!`, 'success');
+            resumePendingAction();
+          })
+          .catch((err) => {
+            setBtnLoading(submitBtn, false);
+            showAuthError(err.message);
+          });
+      });
+    }
+
+
+    // Signup Form Submit
+    const signupForm = document.getElementById('fk-signup-form');
+    if (signupForm) {
+      signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('fk-signup-name').value;
+        const email = document.getElementById('fk-signup-email').value;
+        const mobile = document.getElementById('fk-signup-mobile').value;
+        const password = document.getElementById('fk-signup-password').value;
+
+        const submitBtn = document.getElementById('fk-signup-submit');
+        setBtnLoading(submitBtn, true);
+        hideAuthError();
+
+        AuthService.signup(name, email, mobile, password)
+          .then(() => {
+            setBtnLoading(submitBtn, false);
+            closeAuthModal();
+            showToast(`Account created! Welcome to Hype, ${AppState.user.name}!`, 'success');
+            resumePendingAction();
+          })
+          .catch((err) => {
+            setBtnLoading(submitBtn, false);
+            showAuthError(err.message);
+          });
+      });
+    }
+  }
 
   // Simulated Async API Service with Instant Resolution
   const ApiService = {
@@ -259,11 +724,33 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         ],
         categories: [
-          { name: 'Men', subtitle: 'Collection', bg: '#f1f3e7', img: 'assets/images/cat_men.png' },
-          { name: 'Women', subtitle: 'Collection', bg: '#f9ebdf', img: 'assets/images/cat_women.png' },
-          { name: 'Electronics', subtitle: 'Gadgets', bg: '#e4edf7', img: 'assets/images/cat_electronics.png' },
+          { name: 'Men', subtitle: 'Collection', bg: '#dcfce7', img: 'assets/images/cat_men.png' },
+          { name: 'Women', subtitle: 'Collection', bg: '#ffedd5', img: 'assets/images/cat_women.png' },
+          { name: 'Electronics', subtitle: 'Gadgets', bg: '#e0f2fe', img: 'assets/images/cat_electronics.png' },
           { name: 'Shoes', subtitle: 'Collection', bg: '#f5ece4', img: 'assets/images/cat_shoes.png' },
-          { name: 'Accessories', subtitle: 'Collection', bg: '#ecdff9', img: 'assets/images/cat_accessories.png' }
+          { name: 'Accessories', subtitle: 'Collection', bg: '#f3e8ff', img: 'assets/images/cat_accessories.png' },
+          { name: 'Kids & Baby', subtitle: 'Apparel & Essentials', bg: '#fef9c3', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M20 40h60v40H20z" fill="#fde047" opacity="0.8"/><path d="M25 30h50v20H25z" fill="#fef08a"/><circle cx="50" cy="20" r="12" fill="#fef9c3" stroke="#eab308" stroke-width="3"/></svg>' },
+          { name: 'Activewear', subtitle: 'Sportswear & Gym', bg: '#ccfbf1', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M20 30 L40 20 L60 20 L80 30 L70 80 L30 80 Z" fill="#14b8a6" opacity="0.7"/><path d="M35 35 L65 35" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/></svg>' },
+          { name: 'Bags & Luggage', subtitle: 'Travel & Daily', bg: '#e2e8f0', img: 'assets/images/prod_backpack.png' },
+          { name: 'Jewelry', subtitle: 'Fine & Fashion', bg: '#ffe4e6', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M50 20 C30 20, 20 40, 20 60 C20 75, 80 75, 80 60 C80 40, 70 20, 50 20 Z" stroke="#fb7185" stroke-width="4"/><circle cx="50" cy="70" r="8" fill="#fda4af" stroke="#f43f5e" stroke-width="2"/></svg>' },
+          { name: 'Sleepwear', subtitle: 'Lounge & Comfort', bg: '#fae8ff', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M25 30 L50 20 L75 30 L65 85 L35 85 Z" fill="#e879f9" opacity="0.6"/><path d="M40 30 L60 30" stroke="#ffffff" stroke-width="3"/></svg>' },
+          { name: 'Home Decor', subtitle: 'Living & Style', bg: '#f7fee7', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M35 40 Q20 60 35 85 L65 85 Q80 60 65 40 Z" fill="#bef264"/><path d="M50 20 C45 30 55 35 50 40" stroke="#65a30d" stroke-width="4" stroke-linecap="round"/></svg>' },
+          { name: 'Kitchen & Dining', subtitle: 'Cookware & Dining', bg: '#ffedd5', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="20" y="45" width="45" height="35" rx="8" fill="#fb923c"/><path d="M65 55 L90 55" stroke="#ea580c" stroke-width="6" stroke-linecap="round"/></svg>' },
+          { name: 'Furniture', subtitle: 'Indoor & Outdoor', bg: '#ecfccb', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M25 40 C25 30 75 30 75 40 L70 70 L30 70 Z" fill="#a3e635"/><path d="M30 70 L25 90 M70 70 L75 90" stroke="#4d7c0f" stroke-width="4" stroke-linecap="round"/></svg>' },
+          { name: 'Bedding & Bath', subtitle: 'Comfort Essentials', bg: '#e0f2fe', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="25" y="30" width="50" height="15" rx="5" fill="#38bdf8"/><rect x="20" y="48" width="60" height="15" rx="5" fill="#0284c7"/><rect x="15" y="66" width="70" height="18" rx="6" fill="#0369a1"/></svg>' },
+          { name: 'Lighting', subtitle: 'Lamps & Ambiance', bg: '#fef9c3', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M50 10 L50 40 M30 65 L70 65 L60 40 L40 40 Z" stroke="#ca8a04" stroke-width="4" fill="#fde047"/><circle cx="50" cy="72" r="6" fill="#facc15"/></svg>' },
+          { name: 'Beauty & Skincare', subtitle: 'Self-Care & Glow', bg: '#ffe4e6', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="35" y="40" width="30" height="45" rx="8" fill="#fb7185"/><rect x="42" y="25" width="16" height="15" fill="#f43f5e"/><circle cx="50" cy="18" r="7" fill="#fda4af"/></svg>' },
+          { name: 'Fragrances', subtitle: 'Perfumes & Scents', bg: '#fae8ff', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M30 45 L70 45 L65 85 L35 85 Z" fill="#c084fc"/><rect x="40" y="25" width="20" height="20" rx="4" fill="#a855f7"/></svg>' },
+          { name: 'Grooming', subtitle: 'Personal Care', bg: '#fed7aa', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="30" y="30" width="40" height="12" rx="3" fill="#f97316"/><path d="M50 42 L50 85" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/></svg>' },
+          { name: 'Health & Wellness', subtitle: 'Vitamins & Care', bg: '#d1fae5', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="30" y="35" width="40" height="50" rx="10" fill="#34d399"/><path d="M50 48 L50 72 M38 60 L62 60" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/></svg>' },
+          { name: 'Gaming', subtitle: 'Consoles & Gear', bg: '#e2e8f0', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="20" y="35" width="60" height="35" rx="12" fill="#64748b"/><circle cx="35" cy="52.5" r="4" fill="#ffffff"/><circle cx="65" cy="48" r="3" fill="#ef4444"/><circle cx="72" cy="55" r="3" fill="#3b82f6"/></svg>' },
+          { name: 'Audio', subtitle: 'Speakers & Sound', bg: '#dbeafe', img: 'assets/images/prod_earbuds.png' },
+          { name: 'Smart Home', subtitle: 'Automation & Security', bg: '#f1f5f9', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="30" fill="#475569"/><circle cx="50" cy="50" r="22" fill="#0f172a"/><text x="50" y="56" font-size="16" fill="#38bdf8" text-anchor="middle" font-weight="bold">78°</text></svg>' },
+          { name: 'Office & Stationery', subtitle: 'Desks & Supplies', bg: '#ffedd5', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="25" y="25" width="45" height="55" rx="6" fill="#d97706"/><line x1="60" y1="20" x2="80" y2="70" stroke="#92400e" stroke-width="4" stroke-linecap="round"/></svg>' },
+          { name: 'Sports & Fitness', subtitle: 'Training Equipment', bg: '#ffe4e6', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="20" y="45" width="10" height="25" rx="3" fill="#f43f5e"/><rect x="70" y="45" width="10" height="25" rx="3" fill="#f43f5e"/><rect x="28" y="53" width="44" height="9" fill="#e11d48"/></svg>' },
+          { name: 'Outdoor & Camping', subtitle: 'Adventure Gear', bg: '#ffedd5', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><path d="M50 20 L80 75 L20 75 Z" fill="#f97316"/><path d="M50 20 L50 75 L35 75 Z" fill="#ea580c"/></svg>' },
+          { name: 'Toys & Games', subtitle: 'Play & Collectibles', bg: '#fef9c3', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><rect x="25" y="55" width="22" height="22" rx="3" fill="#ef4444"/><rect x="52" y="55" width="22" height="22" rx="3" fill="#3b82f6"/><rect x="38" y="30" width="22" height="22" rx="3" fill="#eab308"/></svg>' },
+          { name: 'Pet Supplies', subtitle: 'Food & Accessories', bg: '#f5ebe0', svg: '<svg class="category-img-svg" viewBox="0 0 100 100" fill="none"><ellipse cx="50" cy="65" rx="30" ry="15" fill="#d97706"/><circle cx="35" cy="40" r="8" fill="#b45309"/><circle cx="65" cy="40" r="8" fill="#b45309"/><circle cx="50" cy="35" r="10" fill="#b45309"/></svg>' }
         ],
         orders: [
           { id: '#ORD-9824', date: 'August 4, 2026', items: 3, total: '₹9,297', status: 'Delivered', statusClass: 'success' },
@@ -463,29 +950,31 @@ document.addEventListener('DOMContentLoaded', () => {
      Cart Management & Toast Notification System
      ========================================================================== */
   function addToCart(productId, qty = 1, color = null, size = null) {
-    const allProducts = ApiService.getMockData('products');
-    const product = allProducts.find(p => p.id == productId);
-    if (!product) return;
+    requireAuth('ADD_TO_CART', { productId, qty, color, size }, () => {
+      const allProducts = ApiService.getMockData('products');
+      const product = allProducts.find(p => p.id == productId);
+      if (!product) return;
 
-    if (!AppState.cart) AppState.cart = [];
+      if (!AppState.cart) AppState.cart = [];
 
-    const targetColor = color || AppState.selectedVariant?.color || product.variants?.colors?.[0] || 'Default';
-    const targetSize = size || AppState.selectedVariant?.size || product.variants?.sizes?.[0] || 'Standard';
+      const targetColor = color || AppState.selectedVariant?.color || product.variants?.colors?.[0] || 'Default';
+      const targetSize = size || AppState.selectedVariant?.size || product.variants?.sizes?.[0] || 'Standard';
 
-    const existingItem = AppState.cart.find(item => item.product.id == productId && item.color === targetColor && item.size === targetSize);
-    if (existingItem) {
-      existingItem.qty += qty;
-    } else {
-      AppState.cart.push({
-        product: product,
-        qty: qty,
-        color: targetColor,
-        size: targetSize
-      });
-    }
+      const existingItem = AppState.cart.find(item => item.product.id == productId && item.color === targetColor && item.size === targetSize);
+      if (existingItem) {
+        existingItem.qty += qty;
+      } else {
+        AppState.cart.push({
+          product: product,
+          qty: qty,
+          color: targetColor,
+          size: targetSize
+        });
+      }
 
-    updateCartBadge();
-    showToastNotification(`Added "${product.name}" to your Cart!`);
+      updateCartBadge();
+      showToast(`Added "${product.name}" to your Cart!`, 'success');
+    });
   }
 
   function updateCartBadge() {
@@ -692,10 +1181,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutBtn = document.getElementById('checkout-btn');
     if (checkoutBtn) {
       checkoutBtn.addEventListener('click', () => {
-        showToastNotification('Order placed successfully! Thank you for shopping with Hype.');
-        AppState.cart = [];
-        updateCartBadge();
-        renderCartView();
+        requireAuth('CHECKOUT', {}, () => {
+          showToast('Order placed successfully! Thank you for shopping with Hype.', 'success');
+          AppState.cart = [];
+          updateCartBadge();
+          renderCartView();
+        });
       });
     }
 
@@ -1790,16 +2281,35 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     } else {
       return `
-        <div class="notifications-list">
-          ${ApiService.getMockData('reviews').map(r => `
-            <div class="notification-card">
-              <div>
-                <h4 style="margin-bottom: 4px; font-weight: 700;">${r.user} <span style="color: #ffc107;">★ ${r.rating}</span></h4>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">${r.comment}</p>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">${r.date}</span>
-              </div>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Review Submission Form -->
+          <form id="product-review-form" style="background: var(--bg-body); padding: 18px; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">Write a Customer Review</h4>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Rating:</label>
+              <select id="review-rating-select" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-weight: 700;">
+                <option value="5">★★★★★ (5/5)</option>
+                <option value="4">★★★★☆ (4/5)</option>
+                <option value="3">★★★☆☆ (3/5)</option>
+                <option value="2">★★☆☆☆ (2/5)</option>
+                <option value="1">★☆☆☆☆ (1/5)</option>
+              </select>
             </div>
-          `).join('')}
+            <textarea id="review-comment-input" rows="2" placeholder="Share details of your experience with this product..." style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.88rem; outline: none; resize: vertical;" required></textarea>
+            <button type="submit" class="btn-primary-action" style="align-self: flex-start; padding: 8px 18px; font-size: 0.85rem;">Submit Review</button>
+          </form>
+
+          <div class="notifications-list">
+            ${ApiService.getMockData('reviews').map(r => `
+              <div class="notification-card">
+                <div>
+                  <h4 style="margin-bottom: 4px; font-weight: 700;">${r.user} <span style="color: #ffc107;">★ ${r.rating}</span></h4>
+                  <p style="color: var(--text-secondary); font-size: 0.9rem;">${r.comment}</p>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">${r.date}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       `;
     }
@@ -1845,31 +2355,40 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Add to Cart
+    // Add to Cart in Product Details
     const addCartBtn = document.getElementById('details-add-to-cart-btn');
     if (addCartBtn) {
       addCartBtn.addEventListener('click', () => {
         const qty = parseInt(document.getElementById('qty-input')?.value || '1', 10);
-        AppState.cartCount += qty;
-        const cartBadge = document.getElementById('cart-badge');
-        if (cartBadge) cartBadge.textContent = AppState.cartCount;
-
-        addCartBtn.innerHTML = `<span>Added ${qty} to Cart</span>`;
-        setTimeout(() => {
-          addCartBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span>Add to Cart</span>
-          `;
-        }, 1500);
+        addToCart(product.id, qty);
       });
     }
 
-    // Buy Now
+    // Buy Now in Product Details
     const buyNowBtn = document.getElementById('details-buy-now-btn');
     if (buyNowBtn) {
       buyNowBtn.addEventListener('click', () => {
-        AppState.cartCount++;
-        renderView('cart');
+        requireAuth('BUY_NOW', { pid: product.id }, () => {
+          addToCart(product.id, 1);
+          document.querySelectorAll('.product-details-modal-overlay').forEach(m => m.remove());
+          document.body.style.overflow = 'auto';
+          renderView('cart');
+        });
+      });
+    }
+
+    // Review Form submission binding
+    const reviewForm = document.getElementById('product-review-form');
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const rating = document.getElementById('review-rating-select')?.value || '5';
+        const comment = document.getElementById('review-comment-input')?.value.trim();
+
+        requireAuth('SUBMIT_REVIEW', { pid: product.id, rating, comment }, () => {
+          showToast('Review submitted successfully! Thank you.', 'success');
+          reviewForm.reset();
+        });
       });
     }
 
@@ -1880,7 +2399,21 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('active');
         const tab = btn.getAttribute('data-tab');
         const pane = document.getElementById('tab-content-pane');
-        if (pane) pane.innerHTML = renderTabContent(tab, product);
+        if (pane) {
+          pane.innerHTML = renderTabContent(tab, product);
+          if (tab === 'reviews') {
+            const rf = document.getElementById('product-review-form');
+            if (rf) {
+              rf.addEventListener('submit', (e) => {
+                e.preventDefault();
+                requireAuth('SUBMIT_REVIEW', { pid: product.id }, () => {
+                  showToast('Review submitted successfully!', 'success');
+                  rf.reset();
+                });
+              });
+            }
+          }
+        }
       });
     });
   }
@@ -2089,9 +2622,17 @@ document.addEventListener('DOMContentLoaded', () => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const catTitle = card.querySelector('.category-title')?.textContent?.trim();
+        const catTarget = card.getAttribute('data-nav-target');
+        if (catTarget) {
+          renderView(catTarget);
+          return;
+        }
+        const catTitle = card.getAttribute('data-category') || card.querySelector('.category-title')?.textContent?.trim();
         if (catTitle) {
-          renderView('category/' + catTitle);
+          AppState.selectedCategory = catTitle;
+          AppState.searchQuery = '';
+          renderView('shop');
+          showToast(`Filtered by ${catTitle}`, 'info');
         } else {
           renderView('categories');
         }
@@ -2244,6 +2785,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const VALID_ROUTES = ['home', 'shop', 'categories', 'wishlist', 'orders', 'profile', 'cart', 'checkout', 'search', 'product-not-found', 'category-not-found', '404'];
 
   function renderView(viewName, overrideState) {
+    if (['profile', 'orders', 'wishlist'].includes(viewName) && !AuthService.isAuthenticated()) {
+      requireAuth(viewName.toUpperCase(), { viewName }, () => {
+        renderView(viewName, overrideState);
+      });
+      return;
+    }
+
     AppState.currentView = viewName;
     const targetState = overrideState || AppState.simulatedState;
 
@@ -2464,20 +3012,20 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     } else if (viewName === 'categories') {
       contentHtml = `
-        <div class="view-section-header">
+        <div class="view-section-header" style="margin-bottom: 24px;">
           <div>
-            <h2 class="view-title">Product Categories</h2>
-            <p class="view-subtitle">Explore by department</p>
+            <h2 class="view-title" style="font-size: 1.8rem; font-weight: 800;">Product Categories</h2>
+            <p class="view-subtitle" style="color: var(--text-secondary); margin-top: 4px; font-size: 0.95rem; font-weight: 500;">Explore all 27 departments</p>
           </div>
         </div>
         <div class="category-grid">
           ${data.map(c => `
-            <a href="#" class="category-card" style="--card-bg: ${c.bg};">
+            <a href="#" class="category-card" style="--card-bg: ${c.bg};" data-category="${c.name}">
               <div class="category-info">
                 <span class="category-title">${c.name}</span>
                 <span class="category-subtitle">${c.subtitle}</span>
               </div>
-              <img src="${c.img}" alt="${c.name}" class="category-img">
+              ${c.img ? `<img src="${c.img}" alt="${c.name}" class="category-img">` : (c.svg || '')}
             </a>
           `).join('')}
         </div>
@@ -2558,20 +3106,41 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
     } else if (viewName === 'profile') {
+      const u = AuthService.getUser() || { name: 'User', email: 'user@example.com', phone: '+91 98765 43210' };
+      const initials = (u.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
       contentHtml = `
         <div class="view-section-header">
           <div>
             <h2 class="view-title">User Profile</h2>
-            <p class="view-subtitle">Manage personal information & preferences</p>
+            <p class="view-subtitle">Manage personal information & delivery addresses</p>
           </div>
         </div>
-        <div style="background: var(--bg-card); padding: 30px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px;">
-          <div style="display: flex; align-items: center; gap: 20px;">
-            <img src="assets/images/cat_men.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+        <div style="background: var(--bg-card); padding: 30px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 24px;">
+          <div style="display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #047857); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800;">
+              ${initials}
+            </div>
             <div>
-              <h3 style="font-size: 1.25rem; font-weight: 700;">Alex Hype</h3>
-              <p style="color: var(--text-secondary); font-size: 0.9rem;">alex.hype@example.com</p>
-              <span class="status-pill success" style="margin-top: 6px;">PRO VIP Member</span>
+              <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin: 0;">${u.name}</h3>
+              <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 4px 0;">${u.email} • ${u.phone}</p>
+              <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <span class="status-pill success">Verified Account</span>
+                <span class="status-pill success" style="background: rgba(40,116,240,0.15); color: #2874f0;">JWT Authenticated</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+            <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Saved Address</h4>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">Flat 402, Skyline Residency, MG Road, Bengaluru, Karnataka - 560001</p>
+              <button id="profile-manage-address-btn" class="btn-secondary-action" style="padding: 8px 16px; font-size: 0.85rem;">Manage Addresses</button>
+            </div>
+            <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Account Security</h4>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">Session is protected with 256-bit encryption JWT tokens.</p>
+              <button id="profile-logout-action-btn" class="btn-secondary-action" style="padding: 8px 16px; font-size: 0.85rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Logout Session</button>
             </div>
           </div>
         </div>
@@ -2589,6 +3158,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     viewContainer.innerHTML = contentHtml;
+
+    if (viewName === 'profile') {
+      const addressBtn = document.getElementById('profile-manage-address-btn');
+      const logoutBtn = document.getElementById('profile-logout-action-btn');
+
+      if (addressBtn) {
+        addressBtn.addEventListener('click', () => {
+          requireAuth('ADDRESSES', {}, () => showToast('Address management opened', 'info'));
+        });
+      }
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          AuthService.logout();
+        });
+      }
+    }
+
     bindProductCardListeners();
     bindGlobalNavigationEvents();
   }
@@ -2754,14 +3340,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       button.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isActive = button.classList.toggle('active');
-        button.style.transform = 'scale(0.8)';
-        setTimeout(() => {
-          button.style.transform = isActive ? 'scale(1.1)' : 'scale(1)';
-        }, 100);
-        setTimeout(() => {
-          button.style.transform = 'none';
-        }, 250);
+        const card = button.closest('.product-card');
+        const pid = card?.getAttribute('data-product-id');
+
+        requireAuth('WISHLIST', { pid }, () => {
+          const isActive = button.classList.toggle('active');
+          button.style.transform = 'scale(0.8)';
+          setTimeout(() => {
+            button.style.transform = isActive ? 'scale(1.1)' : 'scale(1)';
+          }, 100);
+          setTimeout(() => {
+            button.style.transform = 'none';
+          }, 250);
+          showToast(isActive ? 'Item added to Wishlist' : 'Item removed from Wishlist', isActive ? 'success' : 'info');
+        });
       });
     });
   }
@@ -2835,10 +3427,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  /* Category Card Filter Router */
+  document.querySelectorAll('.category-card[data-category]').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      const catName = card.getAttribute('data-category');
+      if (catName) {
+        AppState.selectedCategory = catName;
+        AppState.searchQuery = '';
+        renderView('shop');
+        showToast(`Filtered by ${catName}`, 'info');
+      }
+    });
+  });
+
   // Initial bindings for static elements on initial DOM load
   loadFiltersFromURL();
   bindProductCardListeners();
   bindGlobalNavigationEvents();
+  bindAuthEventListeners();
+
+  // Automatically prompt login modal on site entry if unauthenticated
+  if (!AuthService.isAuthenticated()) {
+    setTimeout(() => {
+      openAuthModal('LOGIN');
+    }, 400);
+  }
 
 });
 
