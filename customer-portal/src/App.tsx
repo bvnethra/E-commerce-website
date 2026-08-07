@@ -1034,55 +1034,53 @@ export default function App() {
                       </div>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                      <div style={{ maxWidth: '450px', width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '40px' }}>
-                        <h3 style={{ marginBottom: '24px', textAlign: 'center' }}>Sign in to Hype.</h3>
-                        {authError && (
-                          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(231,29,54,0.1)', color: 'var(--color-danger)', fontSize: '0.9rem', marginBottom: '16px' }}>
-                            {authError}
-                          </div>
-                        )}
-                        <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', fontWeight: 600 }}>Username</label>
-                            <input 
-                              type="text" 
-                              value={usernameInput}
-                              onChange={(e) => setUsernameInput(e.target.value)}
-                              style={{ width: '100%', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--input-bg)', color: 'var(--text-primary)' }}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', fontWeight: 600 }}>Password</label>
-                            <input 
-                              type="password" 
-                              value={passwordInput}
-                              onChange={(e) => setPasswordInput(e.target.value)}
-                              style={{ width: '100%', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--input-bg)', color: 'var(--text-primary)' }}
-                              required
-                            />
-                          </div>
-                          <button 
-                            type="submit" 
-                            className="btn-primary-action"
-                            style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}
-                            disabled={isAuthLoading}
-                          >
-                            {isAuthLoading ? 'Authenticating...' : 'Sign In'}
-                          </button>
-                        </form>
-
-                        <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '20px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Want to login quickly as John Doe?</span>
-                          <button 
-                            onClick={() => { setUsernameInput('john_doe'); setPasswordInput('CustomerPass123!'); handleSignIn(undefined, 'john_doe', 'CustomerPass123!'); }}
-                            className="btn-secondary-action"
-                            style={{ display: 'block', width: '100%', marginTop: '8px' }}
-                          >
-                            Auto Login as Guest
-                          </button>
+                    <div style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '40px', boxSizing: 'border-box' }}>
+                      <h3 style={{ marginBottom: '24px', textAlign: 'center' }}>Sign in to Hype.</h3>
+                      {authError && (
+                        <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(231,29,54,0.1)', color: 'var(--color-danger)', fontSize: '0.9rem', marginBottom: '16px', maxWidth: '400px', margin: '0 auto 16px' }}>
+                          {authError}
                         </div>
+                      )}
+                      <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px', margin: '0 auto' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', fontWeight: 600 }}>Username</label>
+                          <input 
+                            type="text" 
+                            value={usernameInput}
+                            onChange={(e) => setUsernameInput(e.target.value)}
+                            style={{ width: '100%', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--input-bg)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', fontWeight: 600 }}>Password</label>
+                          <input 
+                            type="password" 
+                            value={passwordInput}
+                            onChange={(e) => setPasswordInput(e.target.value)}
+                            style={{ width: '100%', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--input-bg)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
+                            required
+                          />
+                        </div>
+                        <button 
+                          type="submit" 
+                          className="btn-primary-action"
+                          style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}
+                          disabled={isAuthLoading}
+                        >
+                          {isAuthLoading ? 'Authenticating...' : 'Sign In'}
+                        </button>
+                      </form>
+
+                      <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '20px', textAlign: 'center', maxWidth: '400px', margin: '24px auto 0' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Want to login quickly as John Doe?</span>
+                        <button 
+                          onClick={() => { setUsernameInput('john_doe'); setPasswordInput('CustomerPass123!'); handleSignIn(undefined, 'john_doe', 'CustomerPass123!'); }}
+                          className="btn-secondary-action"
+                          style={{ display: 'block', width: '100%', marginTop: '8px' }}
+                        >
+                          Auto Login as Guest
+                        </button>
                       </div>
                     </div>
                   )}

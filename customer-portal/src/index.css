@@ -1892,6 +1892,9 @@ input {
   margin: 20px 0;
   box-shadow: var(--shadow-sm);
   animation: fadeIn 0.4s ease;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
 }
 
 .empty-state-illustration {
