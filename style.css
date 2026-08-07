@@ -1100,9 +1100,11 @@ input {
   position: absolute;
   bottom: -5px;
   right: -5px;
-  height: 80%;
-  object-fit: contain;
-  transition: transform var(--transition-normal);
+  height: 85%;
+  object-fit: cover;
+  border-radius: 14px;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.16)) contrast(1.06) brightness(1.02);
+  transition: transform var(--transition-normal), filter var(--transition-normal);
   z-index: 1;
 }
 
@@ -1112,7 +1114,8 @@ input {
 }
 
 .category-card:hover .category-img {
-  transform: scale(1.1) rotate(-3deg);
+  transform: scale(1.08) rotate(-2deg);
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.22)) contrast(1.08) brightness(1.04);
 }
 
 /* All Categories Dark Card Special styling */
