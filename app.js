@@ -2265,6 +2265,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const product = allProducts.find(p => p.id == productId);
       if (!product) return;
 
+      if (product.inStock === false || (product.stockCount !== undefined && product.stockCount <= 0)) {
+        showToast(`Sorry, "${product.name}" is currently out of stock.`, 'error');
+        return;
+      }
+
       if (!AppState.cart) AppState.cart = [];
 
       const targetColor = color || AppState.selectedVariant?.color || product.variants?.colors?.[0] || 'Default';
@@ -3382,14 +3387,16 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           ` : `
             <div class="products-grid ${AppState.viewMode === 'list' ? 'list-view' : ''}">
-              ${paginatedProducts.map(p => `
-                <div class="product-card" data-product-id="${p.id}">
+              ${paginatedProducts.map(p => {
+                const isOutOfStock = p.inStock === false || (p.stockCount !== undefined && p.stockCount <= 0);
+                return `
+                <div class="product-card ${isOutOfStock ? 'out-of-stock-card' : ''}" data-product-id="${p.id}">
                   <div class="product-card-top">
-                    <span class="discount-badge">${p.badge}</span>
+                    ${isOutOfStock ? `<span class="discount-badge" style="background-color: var(--color-danger); color: white;">Out of Stock</span>` : `<span class="discount-badge">${p.badge}</span>`}
                     <button class="wishlist-btn" aria-label="Add to wishlist" data-product-id="${p.id}">
                       <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     </button>
-                    <div class="product-img-wrapper">
+                    <div class="product-img-wrapper" style="${isOutOfStock ? 'opacity: 0.55;' : ''}">
                       <img src="${p.img}" alt="${p.name}" class="product-img">
                     </div>
                   </div>
@@ -3408,13 +3415,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div style="display: flex; gap: 8px;">
                       <button class="btn-secondary-action quick-view-btn" data-quick-view-id="${p.id}" style="padding: 6px 12px; font-size: 0.8rem;">Quick View</button>
-                      <button class="add-to-cart-btn" title="Add to Cart">
+                      <button class="add-to-cart-btn" title="${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}" ${isOutOfStock ? 'disabled style="opacity: 0.4; cursor: not-allowed; pointer-events: none;"' : ''}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                       </button>
                     </div>
                   </div>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
 
             <!-- Pagination Bar -->
@@ -3844,18 +3851,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <!-- Quantity & Actions -->
             <div class="purchase-actions-row">
-              <div class="quantity-control">
-                <button class="qty-btn" id="qty-minus-btn">-</button>
-                <input type="text" id="qty-input" class="qty-input" value="1" readonly>
-                <button class="qty-btn" id="qty-plus-btn">+</button>
-              </div>
+              ${product.inStock !== false && (product.stockCount === undefined || product.stockCount > 0) ? `
+                <div class="quantity-control">
+                  <button class="qty-btn" id="qty-minus-btn">-</button>
+                  <input type="text" id="qty-input" class="qty-input" value="1" readonly>
+                  <button class="qty-btn" id="qty-plus-btn">+</button>
+                </div>
 
-              <button class="btn-primary-action" id="details-add-to-cart-btn" style="padding: 14px 28px; font-size: 0.95rem;">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span>Add to Cart</span>
-              </button>
+                <button class="btn-primary-action" id="details-add-to-cart-btn" style="padding: 14px 28px; font-size: 0.95rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  <span>Add to Cart</span>
+                </button>
 
-              <button class="btn-buy-now" id="details-buy-now-btn">Buy Now</button>
+                <button class="btn-buy-now" id="details-buy-now-btn">Buy Now</button>
+              ` : `
+                <button class="btn-primary-action" disabled style="opacity: 0.55; padding: 14px 28px; font-size: 0.95rem; cursor: not-allowed; background-color: var(--color-danger); border-color: var(--color-danger); color: white;">
+                  <span>Currently Out of Stock</span>
+                </button>
+              `}
             </div>
 
             <!-- Trust Badges -->
