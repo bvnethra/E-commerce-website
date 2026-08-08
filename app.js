@@ -6439,12 +6439,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
 
-    viewContainer.classList.add('view-entering');
     viewContainer.innerHTML = contentHtml;
-    requestAnimationFrame(() => {
-      viewContainer.classList.remove('view-entering');
-      viewContainer.classList.add('view-entered');
-    });
 
     if (viewName === 'profile') {
       const u = AuthService.getUser() || {};
@@ -8396,13 +8391,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Run Home Page animations on initial DOM load
   initHomePageAnimations();
-});
-
-
-window.initHomePageAnimations = initHomePageAnimations;
-
-// Run Home Page animations on initial DOM load
-initHomePageAnimations();
 });
 
 
