@@ -61,14 +61,14 @@ interface Order {
 export default function App() {
   // Navigation & Views
   const [currentView, setCurrentView] = useState<string>('home')
-  
+
   // Data State
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hasError, setHasError] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  
+
   // Interaction State
   const [cart, setCart] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem('cart')
@@ -78,12 +78,12 @@ export default function App() {
     const saved = localStorage.getItem('wishlist')
     return saved ? JSON.parse(saved) : []
   })
-  
+
   // Search & Filtering State
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [priceRange, setPriceRange] = useState<number>(10000)
-  
+
   // Auth State
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'))
   const [user, setUser] = useState<any>(() => {
@@ -94,11 +94,11 @@ export default function App() {
   const [passwordInput, setPasswordInput] = useState<string>('CustomerPass123!')
   const [authError, setAuthError] = useState<string | null>(null)
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(false)
-  
+
   // Orders State
   const [orders, setOrders] = useState<Order[]>([])
   const [isOrdersLoading, setIsOrdersLoading] = useState<boolean>(false)
-  
+
   // Theme State
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('theme') || 'light')
 
@@ -355,8 +355,8 @@ export default function App() {
 
   // Filters calculation
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
     const matchesCategory = selectedCategory === null || product.category.id === selectedCategory
     const matchesPrice = product.price <= priceRange
     return matchesSearch && matchesCategory && matchesPrice
@@ -375,56 +375,56 @@ export default function App() {
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <button 
+              <button
                 className={`nav-item ${currentView === 'home' ? 'active' : ''}`}
                 onClick={() => { setCurrentView('home'); setSelectedCategory(null); }}
               >
-                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                 <span>Home</span>
               </button>
             </li>
             <li>
-              <button 
+              <button
                 className={`nav-item ${currentView === 'shop' ? 'active' : ''}`}
                 onClick={() => setCurrentView('shop')}
               >
-                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
                 <span>Shop</span>
               </button>
             </li>
             <li>
-              <button 
+              <button
                 className={`nav-item ${currentView === 'categories' ? 'active' : ''}`}
                 onClick={() => setCurrentView('categories')}
               >
-                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>
                 <span>Categories</span>
               </button>
             </li>
             <li>
-              <button 
+              <button
                 className={`nav-item ${currentView === 'wishlist' ? 'active' : ''}`}
                 onClick={() => setCurrentView('wishlist')}
               >
-                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                 <span>Wishlist</span>
               </button>
             </li>
             <li>
-              <button 
+              <button
                 className={`nav-item ${currentView === 'orders' ? 'active' : ''}`}
                 onClick={() => setCurrentView('orders')}
               >
-                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
                 <span>Orders</span>
               </button>
             </li>
             <li>
-              <button 
+              <button
                 className={`nav-item ${currentView === 'profile' ? 'active' : ''}`}
                 onClick={() => setCurrentView('profile')}
               >
-                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg className="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                 <span>Profile</span>
               </button>
             </li>
@@ -433,20 +433,20 @@ export default function App() {
 
         <div className="sidebar-bottom">
           <div className="sidebar-utilities">
-            <button 
-              className="utility-btn" 
+            <button
+              className="utility-btn"
               onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
               title="Toggle theme"
             >
               {theme === 'light' ? (
-                <svg className="theme-icon-light" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg className="theme-icon-light" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
               ) : (
-                <svg className="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg className="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
               )}
             </button>
             {token && (
               <button className="utility-btn" onClick={handleLogOut} title="Log Out">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
               </button>
             )}
           </div>
@@ -457,7 +457,7 @@ export default function App() {
             <button className="promo-signup-btn" onClick={() => setCurrentView('profile')}>SIGN UP</button>
             <div className="promo-decorative-line">
               <svg viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5 25 C 20 5, 40 5, 60 20 C 75 30, 85 15, 95 10" stroke="var(--color-accent, #c2db3a)" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                <path d="M5 25 C 20 5, 40 5, 60 20 C 75 30, 85 15, 95 10" stroke="var(--color-accent, #c2db3a)" strokeWidth="2" strokeLinecap="round" fill="none" />
               </svg>
             </div>
           </div>
@@ -466,15 +466,15 @@ export default function App() {
 
       {/* Main Content Wrapper */}
       <main className="main-content" style={{ flexGrow: 1 }}>
-        
+
         {/* Top Header */}
         <header className="top-header">
           {/* Search Bar */}
           <div className="search-container">
-            <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input 
-              type="text" 
-              placeholder="Search for products, brands and more..." 
+            <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <input
+              type="text"
+              placeholder="Search for products, brands and more..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value)
@@ -486,23 +486,23 @@ export default function App() {
           <div className="header-right">
             {/* Location Selector */}
             <div className="location-selector" style={{ position: 'relative' }}>
-              <svg className="location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <svg className="location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
               <div className="location-info">
                 <span className="location-label" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Deliver to</span>
-                <button 
-                  className="location-value-btn" 
+                <button
+                  className="location-value-btn"
                   onClick={() => setShowLocationDropdown(prev => !prev)}
                   style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, color: 'var(--text-primary)' }}
                 >
                   <span>{location}</span>
-                  <svg className="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '12px', height: '12px' }}><polyline points="6 9 12 15 18 9"/></svg>
+                  <svg className="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '12px', height: '12px' }}><polyline points="6 9 12 15 18 9" /></svg>
                 </button>
               </div>
               {showLocationDropdown && (
                 <ul className="location-dropdown" style={{ display: 'block', position: 'absolute', top: '100%', left: 0, zIndex: 10, background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px 0', minWidth: '120px', boxShadow: 'var(--shadow-md)' }}>
                   {['India', 'USA', 'UK', 'Germany', 'Japan'].map(loc => (
-                    <li 
-                      key={loc} 
+                    <li
+                      key={loc}
                       onClick={() => { setLocation(loc); setShowLocationDropdown(false); }}
                       style={{ padding: '8px 16px', cursor: 'pointer', fontWeight: location === loc ? 600 : 400 }}
                     >
@@ -515,7 +515,7 @@ export default function App() {
 
             {/* Cart Icon */}
             <button className="cart-btn" onClick={() => setCurrentView('cart')} title="Shopping Cart">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
               {totalCartCount > 0 && <span className="cart-badge">{totalCartCount}</span>}
             </button>
 
@@ -536,7 +536,7 @@ export default function App() {
           ) : hasError ? (
             <div className="empty-state-card" style={{ padding: '40px' }}>
               <div className="empty-state-illustration" style={{ color: 'var(--color-danger)' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
               </div>
               <h3 className="empty-state-title">Server Connection Failed</h3>
               <p className="empty-state-desc">{errorMessage}</p>
@@ -551,12 +551,12 @@ export default function App() {
                       <span className="hero-tagline">NEW COLLECTION</span>
                       <h2 className="hero-headline">STYLE THAT<br />MOVES <span className="highlight-text">YOU</span></h2>
                       <p className="hero-description">Discover curated, high-end design assets and ambient items for your workspace.</p>
-                      
+
                       <div className="hero-actions">
                         <button className="shop-now-btn" onClick={() => setCurrentView('shop')}>
                           <span>SHOP NOW</span>
                           <span className="arrow-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                           </span>
                         </button>
                       </div>
@@ -577,9 +577,9 @@ export default function App() {
                   <section className="categories-section">
                     <div className="category-grid">
                       {categories.slice(0, 5).map(cat => (
-                        <button 
-                          key={cat.id} 
-                          className="category-card" 
+                        <button
+                          key={cat.id}
+                          className="category-card"
                           onClick={() => { setSelectedCategory(cat.id); setCurrentView('shop'); }}
                           style={{ border: 'none', width: '100%', textAlign: 'left', background: getCategoryBgColor(cat.id) }}
                         >
@@ -590,14 +590,14 @@ export default function App() {
                           <img src={getCategoryImage(cat.slug)} alt={cat.name} className="category-img" />
                         </button>
                       ))}
-                      <button 
+                      <button
                         className="category-card all-categories-card"
                         onClick={() => setCurrentView('categories')}
                         style={{ border: 'none' }}
                       >
                         <div className="all-categories-content">
                           <div className="all-categories-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                           </div>
                           <span className="all-categories-text">All Departments</span>
                         </div>
@@ -612,7 +612,7 @@ export default function App() {
                       <button className="view-all-link" onClick={() => setCurrentView('shop')} style={{ border: 'none', background: 'none' }}>
                         <span>View All Products</span>
                         <span className="arrow-circle-small">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                         </span>
                       </button>
                     </div>
@@ -623,17 +623,17 @@ export default function App() {
                           <div key={product.id} className="product-card">
                             <div className="product-card-top" onClick={() => viewProductDetails(product)} style={{ cursor: 'pointer' }}>
                               <span className="discount-badge">-20%</span>
-                              <button 
+                              <button
                                 className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
                                 onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
                               >
-                                <svg className="heart-icon" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                <svg className="heart-icon" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                               </button>
                               <div className="product-img-wrapper">
                                 <img src={getProductImage(product.imageUrl, product.slug)} alt={product.name} className="product-img" />
                               </div>
                               <div className="quick-view-overlay">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '18px', height: '18px' }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '18px', height: '18px' }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                               </div>
                             </div>
                             <div className="product-card-bottom">
@@ -645,12 +645,12 @@ export default function App() {
                                   <span className="price-original" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginLeft: '6px' }}>{formatPrice(product.price * 1.25)}</span>
                                 </div>
                               </div>
-                              <button 
-                                className="add-to-cart-btn" 
+                              <button
+                                className="add-to-cart-btn"
                                 onClick={() => addToCart(product)}
                                 title="Add to Cart"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
                               </button>
                             </div>
                           </div>
@@ -663,7 +663,7 @@ export default function App() {
                           <h3 className="deals-title">Stoneware &<br /><span className="deals-highlight">Travertine</span></h3>
                           <p className="deals-description">Imported Italian travertine stone accessories curated by AURA studios.</p>
                           <button className="deals-action-btn" onClick={() => { setSelectedCategory(2); setCurrentView('shop'); }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                           </button>
                         </div>
                         <div className="deals-visual">
@@ -681,17 +681,17 @@ export default function App() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                     <h2>Catalog Products ({filteredProducts.length})</h2>
                     <div style={{ display: 'flex', gap: '12px' }}>
-                      <button 
-                        onClick={() => setSelectedCategory(null)} 
+                      <button
+                        onClick={() => setSelectedCategory(null)}
                         className={`filter-tab ${selectedCategory === null ? 'active' : ''}`}
                         style={{ padding: '8px 16px', borderRadius: '20px', border: '1px solid var(--border-color)', background: selectedCategory === null ? 'var(--text-primary)' : 'var(--bg-card)', color: selectedCategory === null ? 'var(--bg-card)' : 'var(--text-primary)', cursor: 'pointer' }}
                       >
                         All
                       </button>
                       {categories.map(cat => (
-                        <button 
+                        <button
                           key={cat.id}
-                          onClick={() => setSelectedCategory(cat.id)} 
+                          onClick={() => setSelectedCategory(cat.id)}
                           className={`filter-tab ${selectedCategory === cat.id ? 'active' : ''}`}
                           style={{ padding: '8px 16px', borderRadius: '20px', border: '1px solid var(--border-color)', background: selectedCategory === cat.id ? 'var(--text-primary)' : 'var(--bg-card)', color: selectedCategory === cat.id ? 'var(--bg-card)' : 'var(--text-primary)', cursor: 'pointer' }}
                         >
@@ -705,19 +705,19 @@ export default function App() {
                     {/* Filters Sidebar */}
                     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '24px', height: 'fit-content' }}>
                       <h4 style={{ marginBottom: '16px' }}>Max Price: {formatPrice(priceRange)}</h4>
-                      <input 
-                        type="range" 
-                        min="10" 
-                        max="10000" 
-                        value={priceRange} 
+                      <input
+                        type="range"
+                        min="10"
+                        max="10000"
+                        value={priceRange}
                         onChange={(e) => setPriceRange(Number(e.target.value))}
                         style={{ width: '100%', accentColor: 'var(--color-accent)', marginBottom: '24px' }}
                       />
 
                       <h4 style={{ marginBottom: '12px' }}>Filter by Keywords</h4>
-                      <input 
-                        type="text" 
-                        placeholder="Search products..." 
+                      <input
+                        type="text"
+                        placeholder="Search products..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--input-bg)', color: 'var(--text-primary)' }}
@@ -739,17 +739,17 @@ export default function App() {
                             <div key={product.id} className="product-card">
                               <div className="product-card-top" onClick={() => viewProductDetails(product)} style={{ cursor: 'pointer' }}>
                                 <span className="discount-badge">-20%</span>
-                                <button 
+                                <button
                                   className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
                                   onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
                                 >
-                                  <svg className="heart-icon" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                  <svg className="heart-icon" viewBox="0 0 24 24" fill={wishlist.includes(product.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                                 </button>
                                 <div className="product-img-wrapper">
                                   <img src={getProductImage(product.imageUrl, product.slug)} alt={product.name} className="product-img" />
                                 </div>
                                 <div className="quick-view-overlay">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '18px', height: '18px' }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '18px', height: '18px' }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                                 </div>
                               </div>
                               <div className="product-card-bottom">
@@ -761,12 +761,12 @@ export default function App() {
                                     <span className="price-original" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginLeft: '6px' }}>{formatPrice(product.price * 1.25)}</span>
                                   </div>
                                 </div>
-                                <button 
-                                  className="add-to-cart-btn" 
+                                <button
+                                  className="add-to-cart-btn"
                                   onClick={() => addToCart(product)}
                                   title="Add to Cart"
                                 >
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
                                 </button>
                               </div>
                             </div>
@@ -784,9 +784,9 @@ export default function App() {
                   <h2 style={{ marginBottom: '24px' }}>Product Departments</h2>
                   <div className="category-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                     {categories.map(cat => (
-                      <button 
-                        key={cat.id} 
-                        className="category-card" 
+                      <button
+                        key={cat.id}
+                        className="category-card"
                         onClick={() => { setSelectedCategory(cat.id); setCurrentView('shop'); }}
                         style={{ border: 'none', height: '180px', width: '100%', textAlign: 'left', background: getCategoryBgColor(cat.id) }}
                       >
@@ -808,11 +808,11 @@ export default function App() {
                   {wishlist.length === 0 ? (
                     <div className="empty-state-card" style={{ padding: '60px 40px', background: 'var(--bg-card)', width: '100%' }}>
                       <div className="empty-state-illustration" style={{ width: '64px', height: '64px', background: 'rgba(194, 219, 58, 0.1)', color: 'var(--text-primary)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                       </div>
                       <h3 className="empty-state-title" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>Your Wishlist is Empty</h3>
                       <p className="empty-state-desc" style={{ maxWidth: '400px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>Save your favorite items here so you can find them quickly whenever you return.</p>
-                      <button 
+                      <button
                         onClick={() => setCurrentView('shop')}
                         style={{
                           background: 'var(--color-accent, #c2db3a)',
@@ -834,17 +834,17 @@ export default function App() {
                         <div key={product.id} className="product-card">
                           <div className="product-card-top" onClick={() => viewProductDetails(product)} style={{ cursor: 'pointer' }}>
                             <span className="discount-badge">-20%</span>
-                            <button 
+                            <button
                               className="wishlist-btn active"
                               onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
                             >
-                              <svg className="heart-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                              <svg className="heart-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                             </button>
                             <div className="product-img-wrapper">
                               <img src={getProductImage(product.imageUrl, product.slug)} alt={product.name} className="product-img" />
                             </div>
                             <div className="quick-view-overlay">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '18px', height: '18px' }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '18px', height: '18px' }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                             </div>
                           </div>
                           <div className="product-card-bottom">
@@ -856,12 +856,12 @@ export default function App() {
                                 <span className="price-original" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through', marginLeft: '6px' }}>{formatPrice(product.price * 1.25)}</span>
                               </div>
                             </div>
-                            <button 
-                              className="add-to-cart-btn" 
+                            <button
+                              className="add-to-cart-btn"
                               onClick={() => { addToCart(product); toggleWishlist(product.id); }}
                               title="Move to Cart"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
                             </button>
                           </div>
                         </div>
@@ -900,7 +900,7 @@ export default function App() {
                               <button onClick={() => updateCartQuantity(item.product.id, item.quantity + 1)} style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--border-color)', fontWeight: 'bold' }}>+</button>
                             </div>
                             <button onClick={() => removeFromCart(item.product.id)} style={{ color: 'var(--color-danger)', marginLeft: '12px' }}>
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
                             </button>
                           </div>
                         ))}
@@ -922,8 +922,8 @@ export default function App() {
                           <span>Total</span>
                           <span>{formatPrice(cartSubtotal)}</span>
                         </div>
-                        <button 
-                          className="btn-primary-action" 
+                        <button
+                          className="btn-primary-action"
                           onClick={handleCheckout}
                           style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
                         >
@@ -951,11 +951,11 @@ export default function App() {
                   ) : orders.length === 0 ? (
                     <div className="empty-state-card" style={{ padding: '60px 40px', background: 'var(--bg-card)', width: '100%' }}>
                       <div className="empty-state-illustration" style={{ width: '64px', height: '64px', background: 'rgba(194, 219, 58, 0.1)', color: 'var(--text-primary)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px' }}><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>
                       </div>
                       <h3 className="empty-state-title" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>No Orders Yet</h3>
                       <p className="empty-state-desc" style={{ maxWidth: '400px', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>Looks like you haven't placed any orders yet. Start shopping to fill your history!</p>
-                      <button 
+                      <button
                         onClick={() => setCurrentView('shop')}
                         style={{
                           background: 'var(--color-accent, #c2db3a)',
@@ -1044,8 +1044,8 @@ export default function App() {
                       <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px', margin: '0 auto' }}>
                         <div>
                           <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', fontWeight: 600 }}>Username</label>
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={usernameInput}
                             onChange={(e) => setUsernameInput(e.target.value)}
                             style={{ width: '100%', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--input-bg)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
@@ -1054,16 +1054,16 @@ export default function App() {
                         </div>
                         <div>
                           <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', fontWeight: 600 }}>Password</label>
-                          <input 
-                            type="password" 
+                          <input
+                            type="password"
                             value={passwordInput}
                             onChange={(e) => setPasswordInput(e.target.value)}
                             style={{ width: '100%', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--input-bg)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
                             required
                           />
                         </div>
-                        <button 
-                          type="submit" 
+                        <button
+                          type="submit"
                           className="btn-primary-action"
                           style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}
                           disabled={isAuthLoading}
@@ -1074,7 +1074,7 @@ export default function App() {
 
                       <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '20px', textAlign: 'center', maxWidth: '400px', margin: '24px auto 0' }}>
                         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Want to login quickly as John Doe?</span>
-                        <button 
+                        <button
                           onClick={() => { setUsernameInput('john_doe'); setPasswordInput('CustomerPass123!'); handleSignIn(undefined, 'john_doe', 'CustomerPass123!'); }}
                           className="btn-secondary-action"
                           style={{ display: 'block', width: '100%', marginTop: '8px' }}
@@ -1097,17 +1097,17 @@ export default function App() {
 
                   {/* Two-Column Layout Grid */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px', background: 'var(--bg-card)', padding: '40px', borderRadius: '24px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-                    
+
                     {/* Left Column: Images */}
                     <div>
                       <div style={{ position: 'relative', background: 'var(--bg-body)', borderRadius: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px', minHeight: '380px' }}>
-                        <img 
-                          src={activeThumbnail || getProductImage(selectedProduct.imageUrl, selectedProduct.slug)} 
-                          alt={selectedProduct.name} 
-                          style={{ width: '100%', maxHeight: '350px', objectFit: 'contain' }} 
+                        <img
+                          src={activeThumbnail || getProductImage(selectedProduct.imageUrl, selectedProduct.slug)}
+                          alt={selectedProduct.name}
+                          style={{ width: '100%', maxHeight: '350px', objectFit: 'contain' }}
                         />
                         <button style={{ position: 'absolute', top: '20px', right: '20px', background: '#fff', border: '1px solid var(--border-color)', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#000', boxShadow: 'var(--shadow-sm)', cursor: 'pointer' }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '18px', height: '18px' }}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '18px', height: '18px' }}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg>
                         </button>
                       </div>
 
@@ -1118,7 +1118,7 @@ export default function App() {
                           '/assets/images/prod_earbuds.png',
                           '/assets/images/prod_backpack.png'
                         ].map((thumbUrl, idx) => (
-                          <div 
+                          <div
                             key={idx}
                             onClick={() => setActiveThumbnail(thumbUrl)}
                             style={{
@@ -1132,7 +1132,7 @@ export default function App() {
                               justifyContent: 'center',
                               alignItems: 'center',
                               border: (activeThumbnail === thumbUrl || (!activeThumbnail && idx === 0))
-                                ? '2px solid var(--color-accent, #c2db3a)' 
+                                ? '2px solid var(--color-accent, #c2db3a)'
                                 : '1px solid var(--border-color)'
                             }}
                           >
@@ -1148,7 +1148,7 @@ export default function App() {
                         {selectedProduct.brand ? selectedProduct.brand.name : selectedProduct.category.name}
                       </span>
                       <h2 style={{ fontSize: '2.2rem', fontWeight: 800, margin: '0 0 12px', color: 'var(--text-primary)', lineHeight: 1.2 }}>{selectedProduct.name}</h2>
-                      
+
                       {/* Rating and Reviews */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
                         <span style={{ background: '#2ec4b6', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1176,7 +1176,7 @@ export default function App() {
                         <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '10px' }}>Color: {selectedColor}</h4>
                         <div style={{ display: 'flex', gap: '10px' }}>
                           {['Jet Black', 'Silver Gray', 'Olive Green'].map(color => (
-                            <button 
+                            <button
                               key={color}
                               onClick={() => setSelectedColor(color)}
                               style={{
@@ -1200,7 +1200,7 @@ export default function App() {
                         <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '10px' }}>Size:</h4>
                         <div style={{ display: 'flex', gap: '10px' }}>
                           {['44mm', '48mm'].map(size => (
-                            <button 
+                            <button
                               key={size}
                               onClick={() => setSelectedSize(size)}
                               style={{
@@ -1233,7 +1233,7 @@ export default function App() {
 
                       {/* Action Buttons */}
                       <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                        <button 
+                        <button
                           onClick={() => { addToCart(selectedProduct, quantityInput); setCurrentView('cart'); }}
                           style={{
                             background: 'var(--color-accent, #c2db3a)',
@@ -1256,8 +1256,8 @@ export default function App() {
                         >
                           BUY NOW
                         </button>
-                        
-                        <button 
+
+                        <button
                           onClick={() => addToCart(selectedProduct, quantityInput)}
                           style={{
                             background: 'var(--bg-card)',
@@ -1274,11 +1274,11 @@ export default function App() {
                             gap: '10px'
                           }}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '20px', height: '20px' }}><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '20px', height: '20px' }}><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
                           <span>ADD TO CART</span>
                         </button>
 
-                        <button 
+                        <button
                           onClick={() => toggleWishlist(selectedProduct.id)}
                           style={{
                             background: 'var(--bg-card)',
@@ -1293,7 +1293,7 @@ export default function App() {
                             cursor: 'pointer'
                           }}
                         >
-                          <svg viewBox="0 0 24 24" fill={wishlist.includes(selectedProduct.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                          <svg viewBox="0 0 24 24" fill={wishlist.includes(selectedProduct.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                         </button>
                       </div>
                     </div>

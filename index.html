@@ -16,6 +16,9 @@
 
 <body>
 
+  <!-- Top Scroll Progress Bar -->
+  <div id="scroll-progress-bar" class="scroll-progress-bar"></div>
+
   <!-- Sidebar Navigation -->
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header" style="align-items: center; gap: 10px; padding: 25px 25px 20px 25px;">
@@ -178,15 +181,18 @@
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <input type="text" id="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search for products, brands and more..."
-          aria-label="Search products" style="padding-right: 42px;">
-        <button id="voice-search-btn" title="Search by voice" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; outline: none; z-index: 5;">
-          <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; transition: transform 0.2s;">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="23"/>
-            <line x1="8" y1="23" x2="16" y2="23"/>
+        <input type="text" id="search-input" data-i18n-placeholder="search_placeholder"
+          placeholder="Search for products, brands and more..." aria-label="Search products"
+          style="padding-right: 42px;">
+        <button id="voice-search-btn" title="Search by voice"
+          style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; outline: none; z-index: 5;">
+          <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="width: 18px; height: 18px; transition: transform 0.2s;">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
           </svg>
         </button>
       </div>
@@ -202,7 +208,8 @@
           </svg>
           <div class="location-info">
             <span class="location-label" data-i18n="deliver_to">Deliver to</span>
-            <span id="current-location" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">India</span>
+            <span id="current-location"
+              style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">India</span>
           </div>
         </div>
 
@@ -219,17 +226,19 @@
 
         <!-- Notification Bell & Dropdown Wrapper -->
         <div class="notification-bell-wrapper" id="notif-wrapper">
-          <button class="notification-bell-btn" id="header-notif-btn" aria-label="Notifications" title="Notifications" aria-expanded="false">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
+          <button class="notification-bell-btn" id="header-notif-btn" aria-label="Notifications" title="Notifications"
+            aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             <span id="notification-badge" class="notification-badge hidden">0</span>
           </button>
-          
+
           <!-- Dropdown Container -->
-          <div id="notification-dropdown" class="notification-dropdown hidden" role="region" aria-label="Notifications Dropdown">
+          <div id="notification-dropdown" class="notification-dropdown hidden" role="region"
+            aria-label="Notifications Dropdown">
             <div class="notif-dropdown-header">
               <div class="notif-dropdown-title-row">
                 <h3>Notifications</h3>
@@ -237,15 +246,16 @@
               </div>
               <button id="notif-dropdown-mark-all-read" class="notif-text-btn">Mark all read</button>
             </div>
-            
+
             <div id="notif-dropdown-list" class="notif-dropdown-list">
               <!-- Dynamically rendered notification cards -->
             </div>
-            
+
             <div class="notif-dropdown-footer">
               <button id="notif-dropdown-view-all" class="notif-view-all-btn">
                 <span>View Notification Center</span>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" style="width: 14px; height: 14px;">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </button>
@@ -256,7 +266,11 @@
         <!-- User Profile / Login Action & Dropdown -->
         <div class="header-auth-container" id="header-auth-wrapper">
           <button class="header-login-btn" id="header-login-trigger" style="display: flex;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
             <span data-i18n="login">Login</span>
           </button>
 
@@ -265,7 +279,10 @@
               <span id="header-user-initials" class="avatar-initials">U</span>
             </div>
             <span id="header-user-name" class="header-username">User</span>
-            <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
 
             <!-- User Menu Dropdown -->
             <div class="user-menu-dropdown" id="user-dropdown-menu">
@@ -278,24 +295,46 @@
               </div>
               <ul class="user-menu-list">
                 <li id="menu-item-profile">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
                   <span>My Profile</span>
                 </li>
                 <li id="menu-item-orders">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <polyline points="21 8 21 21 3 21 3 8" />
+                    <rect x="1" y="3" width="22" height="5" />
+                    <line x1="10" y1="12" x2="14" y2="12" />
+                  </svg>
                   <span>Orders</span>
                 </li>
                 <li id="menu-item-wishlist">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
                   <span>Wishlist</span>
                 </li>
                 <li id="menu-item-addresses">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
                   <span>Addresses</span>
                 </li>
                 <li class="menu-divider"></li>
                 <li id="menu-item-logout" class="menu-logout">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
                   <span data-i18n="logout">Logout</span>
                 </li>
               </ul>
@@ -308,69 +347,214 @@
     <!-- Main View Container -->
     <div id="view-container">
 
-      <!-- Hero Section -->
-      <section class="hero-section">
-        <div class="hero-content">
-          <span class="hero-tagline" data-i18n="new_collection">NEW COLLECTION</span>
-          <h2 class="hero-headline" data-i18n="style_moves_you_html">STYLE THAT<br>MOVES <span class="highlight-text">YOU</span></h2>
-          <p class="hero-description" data-i18n="hero_description">Discover everything you need to elevate your everyday.</p>
+      <!-- Interactive Hero Carousel Section -->
+      <section class="hero-carousel-container reveal-element reveal-scale" id="hero-carousel"
+        aria-label="Featured Collections Carousel">
 
-          <div class="hero-actions">
-            <button class="shop-now-btn">
-              <span data-i18n="shop_now">SHOP NOW</span>
-              <span class="arrow-circle">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </span>
-            </button>
+        <!-- Carousel Slides Wrapper -->
+        <div class="hero-carousel-track" id="hero-carousel-track">
 
-            <!-- Social Proof -->
-            <div class="social-proof">
-              <div class="customer-avatars">
-                <img src="assets/images/cat_men.png" alt="Customer 1" class="avatar">
-                <img src="assets/images/cat_women.png" alt="Customer 2" class="avatar">
-                <img src="assets/images/cat_accessories.png" alt="Customer 3" class="avatar">
+          <!-- Slide 1: Main Hype Collection -->
+          <div class="hero-slide active" data-slide-index="0">
+            <div class="hero-section">
+              <div class="hero-content">
+                <span class="hero-tagline" data-i18n="new_collection">NEW COLLECTION 2026</span>
+                <h2 class="hero-headline" data-i18n="style_moves_you_html">STYLE THAT<br>MOVES <span
+                    class="highlight-text">YOU</span></h2>
+                <p class="hero-description" data-i18n="hero_description">Discover premium hype fashion, smart wearables,
+                  and audio curated to elevate your everyday outfit.</p>
+
+                <div class="hero-actions">
+                  <button class="shop-now-btn ripple-button" data-nav="shop">
+                    <span data-i18n="shop_now">SHOP NOW</span>
+                    <span class="arrow-circle">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <div class="social-proof">
+                    <div class="customer-avatars">
+                      <img src="assets/images/cat_men.png" alt="Customer 1" class="avatar">
+                      <img src="assets/images/cat_women.png" alt="Customer 2" class="avatar">
+                      <img src="assets/images/cat_accessories.png" alt="Customer 3" class="avatar">
+                    </div>
+                    <div class="social-text">
+                      <span class="social-count" data-counter="200000">200K+</span>
+                      <span class="social-label" data-i18n="happy_customers">Happy Customers</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="social-text">
-                <span class="social-count">200K+</span>
-                <span class="social-label" data-i18n="happy_customers">Happy Customers</span>
+
+              <div class="hero-visual">
+                <div class="hero-bg-circle"></div>
+                <img src="assets/images/hero_composite.png" alt="Featured Hype products" class="hero-main-img">
+                <div class="hero-promo-card">
+                  <span class="promo-title">Summer Sale</span>
+                  <span class="promo-desc">UP TO</span>
+                  <span class="promo-pct">50%</span>
+                  <span class="promo-off">OFF</span>
+                  <button class="promo-arrow-btn ripple-button" aria-label="View sale items">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="deco-dots"></div>
               </div>
             </div>
           </div>
 
-        </div>
+          <!-- Slide 2: Next-Gen Tech & Audio -->
+          <div class="hero-slide" data-slide-index="1">
+            <div class="hero-section hero-slide-tech">
+              <div class="hero-content">
+                <span class="hero-tagline">NEXT-GEN TECH & AUDIO</span>
+                <h2 class="hero-headline">PURE SOUND.<br>ZERO <span class="highlight-text">LIMITS</span></h2>
+                <p class="hero-description">Experience high-fidelity wireless audio, noise cancellation, and smart
+                  wearable gear engineered for immersion.</p>
 
-        <!-- Hero Visuals -->
-        <div class="hero-visual">
-          <div class="hero-bg-circle"></div>
-          <img src="assets/images/hero_composite.png" alt="Featured Hype products: backpack, headphones and white sneakers on rock base" class="hero-main-img">
-          
-          <!-- Floating Promo Badge -->
-          <div class="hero-promo-card">
-            <span class="promo-title">Summer Sale</span>
-            <span class="promo-desc">UP TO</span>
-            <span class="promo-pct">50%</span>
-            <span class="promo-off">OFF</span>
-            <button class="promo-arrow-btn" aria-label="View sale items">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
+                <div class="hero-actions">
+                  <button class="shop-now-btn ripple-button" data-nav="shop">
+                    <span>EXPLORE AUDIO</span>
+                    <span class="arrow-circle">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <div class="social-proof">
+                    <div class="customer-avatars">
+                      <img src="assets/images/cat_electronics.png" alt="Gadget Customer 1" class="avatar">
+                      <img src="assets/images/prod_watch.png" alt="Gadget Customer 2" class="avatar">
+                      <img src="assets/images/prod_earbuds.png" alt="Gadget Customer 3" class="avatar">
+                    </div>
+                    <div class="social-text">
+                      <span class="social-count" data-counter="95000">95K+</span>
+                      <span class="social-label">Audio Enthusiasts</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hero-visual">
+                <div class="hero-bg-circle" style="background-color: var(--bg-cat-electronics);"></div>
+                <img src="assets/images/prod_earbuds.png" alt="Boat Airdopes Earbuds" class="hero-main-img"
+                  style="max-height: 380px; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));">
+                <div class="hero-promo-card" style="background-color: #1e201b;">
+                  <span class="promo-title">Audio Blitz</span>
+                  <span class="promo-desc">FLAT</span>
+                  <span class="promo-pct">30%</span>
+                  <span class="promo-off">CASHBACK</span>
+                  <button class="promo-arrow-btn ripple-button" aria-label="View audio deals">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="deco-dots"></div>
+              </div>
+            </div>
           </div>
 
-          <!-- Decorative Pattern Dots -->
-          <div class="deco-dots"></div>
+          <!-- Slide 3: Urban Apparel & Sneaker Hype -->
+          <div class="hero-slide" data-slide-index="2">
+            <div class="hero-section hero-slide-apparel">
+              <div class="hero-content">
+                <span class="hero-tagline">URBAN FASHION & FOOTWEAR</span>
+                <h2 class="hero-headline">ELEVATE YOUR<br>EVERYDAY <span class="highlight-text">LOOK</span></h2>
+                <p class="hero-description">Contemporary streetwear, premium footwear, and everyday bags designed for
+                  comfort, utility, and sleek aesthetic.</p>
+
+                <div class="hero-actions">
+                  <button class="shop-now-btn ripple-button" data-nav="shop">
+                    <span>SHOP FASHION</span>
+                    <span class="arrow-circle">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <div class="social-proof">
+                    <div class="customer-avatars">
+                      <img src="assets/images/cat_shoes.png" alt="Shoes Customer 1" class="avatar">
+                      <img src="assets/images/prod_backpack.png" alt="Shoes Customer 2" class="avatar">
+                      <img src="assets/images/cat_women.png" alt="Shoes Customer 3" class="avatar">
+                    </div>
+                    <div class="social-text">
+                      <span class="social-count" data-counter="150000">150K+</span>
+                      <span class="social-label">Style Trendsetters</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hero-visual">
+                <div class="hero-bg-circle" style="background-color: var(--bg-cat-shoes);"></div>
+                <img src="assets/images/cat_shoes.png" alt="Sneakers collection" class="hero-main-img"
+                  style="max-height: 380px; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));">
+                <div class="hero-promo-card">
+                  <span class="promo-title">New Arrivals</span>
+                  <span class="promo-desc">FRESH</span>
+                  <span class="promo-pct">2026</span>
+                  <span class="promo-off">DROP</span>
+                  <button class="promo-arrow-btn ripple-button" aria-label="View new arrivals">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="deco-dots"></div>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- End .hero-carousel-track -->
+
+        <!-- Navigation Buttons -->
+        <button class="hero-nav-btn prev" id="hero-prev-btn" aria-label="Previous Slide">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <button class="hero-nav-btn next" id="hero-next-btn" aria-label="Next Slide">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+
+        <!-- Indicators / Dots -->
+        <div class="hero-indicators" id="hero-indicators">
+          <button class="indicator-dot active" data-slide-to="0" aria-label="Slide 1"></button>
+          <button class="indicator-dot" data-slide-to="1" aria-label="Slide 2"></button>
+          <button class="indicator-dot" data-slide-to="2" aria-label="Slide 3"></button>
         </div>
+
       </section>
 
-
-
       <!-- Category Tiles -->
-      <section class="categories-section" style="margin-top: 50px; margin-bottom: 50px;">
-        <div class="category-grid">
+      <section class="categories-section reveal-element" style="margin-top: 50px; margin-bottom: 50px;">
+        <div class="category-grid stagger-container">
           <!-- Men Category -->
-          <a href="#" class="category-card" data-category="Men" style="--card-bg: #f1f3e7;">
+          <a href="#" class="category-card stagger-item" data-category="Men" style="--card-bg: #f1f3e7;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_men">Men</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -379,7 +563,7 @@
           </a>
 
           <!-- Women Category -->
-          <a href="#" class="category-card" data-category="Women" style="--card-bg: #f9ebdf;">
+          <a href="#" class="category-card stagger-item" data-category="Women" style="--card-bg: #f9ebdf;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_women">Women</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -388,7 +572,7 @@
           </a>
 
           <!-- Electronics Category -->
-          <a href="#" class="category-card" data-category="Electronics" style="--card-bg: #e4edf7;">
+          <a href="#" class="category-card stagger-item" data-category="Electronics" style="--card-bg: #e4edf7;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_electronics">Electronics</span>
               <span class="category-subtitle" data-i18n="subtitle_gadgets">Gadgets</span>
@@ -397,7 +581,7 @@
           </a>
 
           <!-- Shoes Category -->
-          <a href="#" class="category-card" data-category="Shoes" style="--card-bg: #f5ece4;">
+          <a href="#" class="category-card stagger-item" data-category="Shoes" style="--card-bg: #f5ece4;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_shoes">Shoes</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -406,7 +590,7 @@
           </a>
 
           <!-- Accessories Category -->
-          <a href="#" class="category-card" data-category="Accessories" style="--card-bg: #ecdff9;">
+          <a href="#" class="category-card stagger-item" data-category="Accessories" style="--card-bg: #ecdff9;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_accessories">Accessories</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -415,7 +599,7 @@
           </a>
 
           <!-- All Categories Button Card -->
-          <a href="#" class="category-card all-categories-card">
+          <a href="#" class="category-card all-categories-card stagger-item">
             <div class="all-categories-content">
               <div class="all-categories-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -433,8 +617,8 @@
       </section>
 
       <!-- Featured Products & Deals Container -->
-      <section class="featured-section">
-        <div class="section-header">
+      <section class="featured-section reveal-element">
+        <div class="section-header reveal-element reveal-left">
           <h2 class="section-title" data-i18n="featured_products">Featured Products</h2>
           <a href="#" class="view-all-link">
             <span data-i18n="view_all_products">View All Products</span>
@@ -450,155 +634,176 @@
 
         <div class="products-and-deals-grid">
           <!-- Products Sub-Grid (4 columns layout within this flex/grid container) -->
-          <div class="products-grid">
+          <div class="products-grid stagger-container">
 
             <!-- Product Card 1 -->
-            <div class="product-card" data-product-id="1">
+            <div class="product-card stagger-item" data-product-id="1">
               <div class="product-card-top">
                 <span class="discount-badge">-20%</span>
-                <button class="wishlist-btn" aria-label="Add Smart Watch to wishlist">
-                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                <button class="wishlist-btn" aria-label="Add Smart Watch to wishlist" data-product-id="1">
+                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
                 <div class="product-img-wrapper">
                   <img src="assets/images/prod_watch.png" alt="Noise Ultra 2 Max Smart Watch" class="product-img">
+                  <button class="quickview-overlay-btn ripple-button" data-quick-view-id="1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Quick View</span>
+                  </button>
                 </div>
               </div>
               <div class="product-card-bottom">
                 <div class="product-details">
-                  <span class="product-cat">Smart Watch</span>
-                  <h3 class="product-name">Noise Ultra 2 Max</h3>
+                  <span class="product-cat">Noise • Smart Watch</span>
+                  <h3 class="product-name" title="Noise Ultra 2 Max">Noise Ultra 2 Max</h3>
+                  <div class="details-rating-row">
+                    <span class="rating-stars">★★★★★</span>
+                    <span class="rating-text">4.8 <span class="review-count">(342)</span></span>
+                  </div>
                   <div class="product-price-row">
                     <span class="price-current">₹4,999</span>
                     <span class="price-original">₹6,999</span>
+                    <span class="price-discount-tag">20% OFF</span>
                   </div>
                 </div>
-                <button class="add-to-cart-btn" aria-label="Add Noise Ultra 2 Max to cart" title="Add to Cart">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
-                  </svg>
-                </button>
+                <div class="card-action-btns">
+                  <button class="btn-secondary-action quick-view-btn" data-quick-view-id="1">Quick View</button>
+                  <button class="add-to-cart-btn ripple-button" data-product-id="1" aria-label="Add Noise Ultra 2 Max to cart" title="Add to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
 
             <!-- Product Card 2 -->
-            <div class="product-card" data-product-id="2">
+            <div class="product-card stagger-item" data-product-id="2">
               <div class="product-card-top">
-                <span class="discount-badge" style="background-color: var(--accent); color: #000;">HOT</span>
-                <button class="wishlist-btn" aria-label="Add Boat Airdopes 181 to wishlist">
-                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                <span class="discount-badge">HOT</span>
+                <button class="wishlist-btn" aria-label="Add Boat Airdopes 181 to wishlist" data-product-id="2">
+                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
                 <div class="product-img-wrapper">
                   <img src="assets/images/prod_earbuds.png" alt="Boat Airdopes 181 Earbuds" class="product-img">
+                  <button class="quickview-overlay-btn ripple-button" data-quick-view-id="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Quick View</span>
+                  </button>
                 </div>
               </div>
               <div class="product-card-bottom">
                 <div class="product-details">
-                  <span class="product-cat">Earbuds</span>
-                  <h3 class="product-name">Boat Airdopes 181</h3>
+                  <span class="product-cat">boAt • Earbuds</span>
+                  <h3 class="product-name" title="Boat Airdopes 181">Boat Airdopes 181</h3>
+                  <div class="details-rating-row">
+                    <span class="rating-stars">★★★★★</span>
+                    <span class="rating-text">4.6 <span class="review-count">(210)</span></span>
+                  </div>
                   <div class="product-price-row">
                     <span class="price-current">₹1,299</span>
                     <span class="price-original">₹1,999</span>
+                    <span class="price-discount-tag">35% OFF</span>
                   </div>
                 </div>
-                <button class="add-to-cart-btn" aria-label="Add Boat Airdopes 181 to cart" title="Add to Cart">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
-                  </svg>
-                </button>
+                <div class="card-action-btns">
+                  <button class="btn-secondary-action quick-view-btn" data-quick-view-id="2">Quick View</button>
+                  <button class="add-to-cart-btn ripple-button" data-product-id="2" aria-label="Add Boat Airdopes 181 to cart" title="Add to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
 
             <!-- Product Card 3 -->
-            <div class="product-card" data-product-id="3">
+            <div class="product-card stagger-item" data-product-id="3">
               <div class="product-card-top">
                 <span class="discount-badge">-8%</span>
-                <button class="wishlist-btn" aria-label="Add Canon Camera to wishlist">
-                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                <button class="wishlist-btn" aria-label="Add Canon Camera to wishlist" data-product-id="3">
+                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
                 <div class="product-img-wrapper">
                   <img src="assets/images/prod_camera.png" alt="Canon EOS M50 Mark II Camera" class="product-img">
+                  <button class="quickview-overlay-btn ripple-button" data-quick-view-id="3">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Quick View</span>
+                  </button>
                 </div>
               </div>
               <div class="product-card-bottom">
                 <div class="product-details">
-                  <span class="product-cat">Camera</span>
-                  <h3 class="product-name">Canon EOS M50 Mark II</h3>
+                  <span class="product-cat">Canon • Camera</span>
+                  <h3 class="product-name" title="Canon EOS M50 Mark II">Canon EOS M50 Mark II</h3>
+                  <div class="details-rating-row">
+                    <span class="rating-stars">★★★★★</span>
+                    <span class="rating-text">4.9 <span class="review-count">(185)</span></span>
+                  </div>
                   <div class="product-price-row">
                     <span class="price-current">₹54,990</span>
                     <span class="price-original">₹59,999</span>
+                    <span class="price-discount-tag">8% OFF</span>
                   </div>
                 </div>
-                <button class="add-to-cart-btn" aria-label="Add Canon EOS M50 Mark II to cart" title="Add to Cart">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
-                  </svg>
-                </button>
+                <div class="card-action-btns">
+                  <button class="btn-secondary-action quick-view-btn" data-quick-view-id="3">Quick View</button>
+                  <button class="add-to-cart-btn ripple-button" data-product-id="3" aria-label="Add Canon EOS M50 Mark II to cart" title="Add to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
 
             <!-- Product Card 4 -->
-            <div class="product-card" data-product-id="4">
+            <div class="product-card stagger-item" data-product-id="4">
               <div class="product-card-top">
                 <span class="discount-badge">-25%</span>
-                <button class="wishlist-btn" aria-label="Add Backpack to wishlist">
-                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                <button class="wishlist-btn" aria-label="Add Backpack to wishlist" data-product-id="4">
+                  <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
                 <div class="product-img-wrapper">
                   <img src="assets/images/prod_backpack.png" alt="Urban Explorer Pro Backpack" class="product-img">
+                  <button class="quickview-overlay-btn ripple-button" data-quick-view-id="4">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Quick View</span>
+                  </button>
                 </div>
               </div>
               <div class="product-card-bottom">
                 <div class="product-details">
-                  <span class="product-cat">Backpack</span>
-                  <h3 class="product-name">Urban Explorer Pro</h3>
+                  <span class="product-cat">Hype • Backpack</span>
+                  <h3 class="product-name" title="Urban Explorer Pro">Urban Explorer Pro</h3>
+                  <div class="details-rating-row">
+                    <span class="rating-stars">★★★★★</span>
+                    <span class="rating-text">4.7 <span class="review-count">(94)</span></span>
+                  </div>
                   <div class="product-price-row">
                     <span class="price-current">₹2,999</span>
                     <span class="price-original">₹3,999</span>
+                    <span class="price-discount-tag">25% OFF</span>
                   </div>
                 </div>
-                <button class="add-to-cart-btn" aria-label="Add Urban Explorer Pro to cart" title="Add to Cart">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
-                  </svg>
-                </button>
+                <div class="card-action-btns">
+                  <button class="btn-secondary-action quick-view-btn" data-quick-view-id="4">Quick View</button>
+                  <button class="add-to-cart-btn ripple-button" data-product-id="4" aria-label="Add Urban Explorer Pro to cart" title="Add to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
 
           </div>
 
           <!-- Exclusive Deals Block -->
-          <div class="deals-block">
+          <div class="deals-block reveal-element reveal-right">
             <div class="deals-content">
               <span class="deals-badge" data-i18n="exclusive">Exclusive</span>
-              <h3 class="deals-title" data-i18n="deals_only_for_you_html">Deals Only<br><span class="deals-highlight">For You</span></h3>
+              <h3 class="deals-title" data-i18n="deals_only_for_you_html">Deals Only<br><span
+                  class="deals-highlight">For You</span></h3>
 
               <div class="deals-line">
                 <svg viewBox="0 0 100 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -609,7 +814,25 @@
 
               <p class="deals-description" data-i18n="grab_best_offers">Grab the best offers before they're gone!</p>
 
-              <button class="deals-action-btn" aria-label="View exclusive deals">
+              <!-- Live Deals Countdown Timer -->
+              <div class="deals-countdown" id="deals-countdown-timer" aria-label="Limited time offer countdown">
+                <div class="countdown-unit">
+                  <span id="cd-hours">08</span>
+                  <label>HRS</label>
+                </div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-unit">
+                  <span id="cd-mins">42</span>
+                  <label>MIN</label>
+                </div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-unit">
+                  <span id="cd-secs">19</span>
+                  <label>SEC</label>
+                </div>
+              </div>
+
+              <button class="deals-action-btn ripple-button" aria-label="View exclusive deals">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -628,9 +851,9 @@
       </section>
 
       <!-- Service Bar / Footer -->
-      <footer class="service-bar">
+      <footer class="service-bar reveal-element reveal-scale stagger-container">
         <!-- Item 1: Free Shipping -->
-        <div class="service-item">
+        <div class="service-item stagger-item">
           <div class="service-icon-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -647,7 +870,7 @@
         </div>
 
         <!-- Item 2: Easy Returns -->
-        <div class="service-item">
+        <div class="service-item stagger-item">
           <div class="service-icon-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -662,7 +885,7 @@
         </div>
 
         <!-- Item 3: Secure Payment -->
-        <div class="service-item">
+        <div class="service-item stagger-item">
           <div class="service-icon-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -676,7 +899,7 @@
         </div>
 
         <!-- Item 4: 24/7 Support -->
-        <div class="service-item">
+        <div class="service-item stagger-item">
           <div class="service-icon-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -695,17 +918,19 @@
   </main>
 
   <!-- Clear All Notifications Confirmation Modal -->
-  <div id="notif-modal-overlay" class="notif-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="notif-modal-title">
+  <div id="notif-modal-overlay" class="notif-modal-overlay hidden" role="dialog" aria-modal="true"
+    aria-labelledby="notif-modal-title">
     <div class="notif-modal-card">
       <div class="notif-modal-icon warning">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </div>
       <h3 id="notif-modal-title" class="notif-modal-title">Clear All Notifications?</h3>
-      <p class="notif-modal-desc">This action will remove all notifications permanently. You will not be able to recover them.</p>
+      <p class="notif-modal-desc">This action will remove all notifications permanently. You will not be able to recover
+        them.</p>
       <div class="notif-modal-actions">
         <button id="notif-modal-cancel-btn" class="notif-btn notif-btn-secondary">Cancel</button>
         <button id="notif-modal-confirm-btn" class="notif-btn notif-btn-danger">Clear All</button>
@@ -719,58 +944,81 @@
       <div class="address-modal-header">
         <h3 data-i18n="manage_delivery_addresses">Manage Delivery Addresses</h3>
         <button id="address-modal-close" class="address-modal-close-btn" aria-label="Close modal">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
-      
+
       <div class="address-modal-body">
         <!-- Button to Add New Address -->
-        <button id="add-new-address-trigger" class="btn-primary-action" style="width: 100%; justify-content: center; margin-bottom: 20px; padding: 12px; border-radius: var(--radius-md); font-weight: 700;">
+        <button id="add-new-address-trigger" class="btn-primary-action"
+          style="width: 100%; justify-content: center; margin-bottom: 20px; padding: 12px; border-radius: var(--radius-md); font-weight: 700;">
           <span data-i18n="add_new_address">+ Add New Address</span>
         </button>
 
         <!-- Address Form (Hidden by default) -->
-        <form id="address-form" style="display: none; flex-direction: column; gap: 14px; margin-bottom: 20px; padding: 18px; background: var(--bg-hover); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
-          <h4 id="address-form-title" data-i18n="add_new_address" style="margin-top: 0; font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">Add New Address</h4>
+        <form id="address-form"
+          style="display: none; flex-direction: column; gap: 14px; margin-bottom: 20px; padding: 18px; background: var(--bg-hover); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+          <h4 id="address-form-title" data-i18n="add_new_address"
+            style="margin-top: 0; font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">Add New Address
+          </h4>
           <input type="hidden" id="address-edit-id">
-          
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input type="text" id="address-name" class="address-input" data-i18n-placeholder="placeholder_fullname" placeholder="Full Name" required>
-            <input type="tel" id="address-phone" class="address-input" data-i18n-placeholder="placeholder_mobile" placeholder="Mobile Number (10 digits)" pattern="[0-9]{10}" required>
+            <input type="text" id="address-name" class="address-input" data-i18n-placeholder="placeholder_fullname"
+              placeholder="Full Name" required>
+            <input type="tel" id="address-phone" class="address-input" data-i18n-placeholder="placeholder_mobile"
+              placeholder="Mobile Number (10 digits)" pattern="[0-9]{10}" required>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
-            <input type="text" id="address-pincode" class="address-input" data-i18n-placeholder="placeholder_pincode" placeholder="Pincode" required>
-            <input type="text" id="address-line" class="address-input" data-i18n-placeholder="placeholder_address" placeholder="Flat, House no., Building, MG Road" required>
+            <input type="text" id="address-pincode" class="address-input" data-i18n-placeholder="placeholder_pincode"
+              placeholder="Pincode" required>
+            <input type="text" id="address-line" class="address-input" data-i18n-placeholder="placeholder_address"
+              placeholder="Flat, House no., Building, MG Road" required>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input type="text" id="address-city" class="address-input" data-i18n-placeholder="placeholder_city" placeholder="Town/City" required>
-            <input type="text" id="address-state" class="address-input" data-i18n-placeholder="placeholder_state" placeholder="State" required>
+            <input type="text" id="address-city" class="address-input" data-i18n-placeholder="placeholder_city"
+              placeholder="Town/City" required>
+            <input type="text" id="address-state" class="address-input" data-i18n-placeholder="placeholder_state"
+              placeholder="State" required>
           </div>
 
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px;">
             <div style="display: flex; gap: 10px;">
-              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
-                <input type="radio" name="address-type" value="Home" checked> <span data-i18n="address_type_home">Home</span>
+              <label
+                style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                <input type="radio" name="address-type" value="Home" checked> <span
+                  data-i18n="address_type_home">Home</span>
               </label>
-              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+              <label
+                style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
                 <input type="radio" name="address-type" value="Work"> <span data-i18n="address_type_work">Work</span>
               </label>
             </div>
-            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
-              <input type="checkbox" id="address-default"> <span data-i18n="set_default_address">Set as Default Address</span>
+            <label
+              style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+              <input type="checkbox" id="address-default"> <span data-i18n="set_default_address">Set as Default
+                Address</span>
             </label>
           </div>
 
           <div style="display: flex; gap: 10px; margin-top: 4px;">
-            <button type="button" id="address-form-cancel" class="btn-secondary-action" data-i18n="cancel" style="flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-md);">Cancel</button>
-            <button type="submit" class="btn-primary-action" data-i18n="save_address" style="flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; justify-content: center; border-radius: var(--radius-md);">Save Address</button>
+            <button type="button" id="address-form-cancel" class="btn-secondary-action" data-i18n="cancel"
+              style="flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-md);">Cancel</button>
+            <button type="submit" class="btn-primary-action" data-i18n="save_address"
+              style="flex: 1; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; justify-content: center; border-radius: var(--radius-md);">Save
+              Address</button>
           </div>
         </form>
 
         <!-- Saved Addresses List Container -->
-        <div id="address-list-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 4px;">
+        <div id="address-list-container"
+          style="display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 4px;">
           <!-- Dynamically rendered address cards -->
         </div>
       </div>
@@ -780,19 +1028,26 @@
   <!-- Delete Address Confirmation Modal -->
   <div id="addr-delete-modal-overlay" class="address-modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="address-modal-card" style="max-width: 400px; text-align: center; align-items: center;">
-      <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px;">
+      <div
+        style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="width: 28px; height: 28px;">
           <polyline points="3 6 5 6 21 6"></polyline>
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           <line x1="10" y1="11" x2="10" y2="17"></line>
           <line x1="14" y1="11" x2="14" y2="17"></line>
         </svg>
       </div>
-      <h3 data-i18n="delete_address_title" style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin: 0 0 8px 0;">Delete Address?</h3>
-      <p data-i18n="delete_address_desc" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 24px 0;">Are you sure you want to delete this address? This action cannot be undone.</p>
+      <h3 data-i18n="delete_address_title"
+        style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin: 0 0 8px 0;">Delete Address?</h3>
+      <p data-i18n="delete_address_desc"
+        style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 24px 0;">Are you sure
+        you want to delete this address? This action cannot be undone.</p>
       <div style="display: flex; gap: 12px; width: 100%;">
-        <button id="addr-delete-cancel-btn" class="btn-secondary-action" data-i18n="cancel" style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Cancel</button>
-        <button id="addr-delete-confirm-btn" class="btn-primary-action" data-i18n="delete" style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 700; justify-content: center; background-color: #ef4444; border-color: #ef4444; color: #ffffff; border-radius: var(--radius-md);">Delete</button>
+        <button id="addr-delete-cancel-btn" class="btn-secondary-action" data-i18n="cancel"
+          style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Cancel</button>
+        <button id="addr-delete-confirm-btn" class="btn-primary-action" data-i18n="delete"
+          style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 700; justify-content: center; background-color: #ef4444; border-color: #ef4444; color: #ffffff; border-radius: var(--radius-md);">Delete</button>
       </div>
     </div>
   </div>
@@ -803,46 +1058,75 @@
       <div class="settings-drawer-header">
         <h3 data-i18n="display_language">Display & Language</h3>
         <button id="settings-drawer-close" class="settings-drawer-close-btn" aria-label="Close drawer">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
-      
+
       <div class="settings-drawer-body" style="display: flex; flex-direction: column; gap: 24px; padding: 20px 0;">
         <!-- Theme Mode Selection (Light / Dark) -->
         <div>
-          <h4 data-i18n="theme_mode" style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Theme Mode</h4>
+          <h4 data-i18n="theme_mode"
+            style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Theme Mode
+          </h4>
           <div style="display: flex; gap: 10px;">
-            <button id="settings-mode-light" class="btn-secondary-action" data-i18n="light_mode" style="flex: 1; padding: 10px; font-size: 0.85rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Light Mode</button>
-            <button id="settings-mode-dark" class="btn-secondary-action" data-i18n="dark_mode" style="flex: 1; padding: 10px; font-size: 0.85rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Dark Mode</button>
+            <button id="settings-mode-light" class="btn-secondary-action" data-i18n="light_mode"
+              style="flex: 1; padding: 10px; font-size: 0.85rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Light
+              Mode</button>
+            <button id="settings-mode-dark" class="btn-secondary-action" data-i18n="dark_mode"
+              style="flex: 1; padding: 10px; font-size: 0.85rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Dark
+              Mode</button>
           </div>
         </div>
 
         <!-- Color Theme Palette Picker -->
         <div>
-          <h4 data-i18n="color_palette" style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Color Palette</h4>
+          <h4 data-i18n="color_palette"
+            style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Color Palette
+          </h4>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;" id="theme-color-palette">
-            <button class="color-palette-btn" data-theme-name="lime" style="background: #c2db3a; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;" title="Lime Active"></button>
-            <button class="color-palette-btn" data-theme-name="blue" style="background: #2563eb; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;" title="Royal Blue"></button>
-            <button class="color-palette-btn" data-theme-name="green" style="background: #10b981; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;" title="Emerald Green"></button>
-            <button class="color-palette-btn" data-theme-name="orange" style="background: #ff5a36; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;" title="Sunset Orange"></button>
-            <button class="color-palette-btn" data-theme-name="purple" style="background: #8b5cf6; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;" title="Velvet Purple"></button>
-            <button class="color-palette-btn" data-theme-name="pink" style="background: #ec4899; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;" title="Hot Pink"></button>
+            <button class="color-palette-btn" data-theme-name="lime"
+              style="background: #c2db3a; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;"
+              title="Lime Active"></button>
+            <button class="color-palette-btn" data-theme-name="blue"
+              style="background: #2563eb; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;"
+              title="Royal Blue"></button>
+            <button class="color-palette-btn" data-theme-name="green"
+              style="background: #10b981; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;"
+              title="Emerald Green"></button>
+            <button class="color-palette-btn" data-theme-name="orange"
+              style="background: #ff5a36; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;"
+              title="Sunset Orange"></button>
+            <button class="color-palette-btn" data-theme-name="purple"
+              style="background: #8b5cf6; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;"
+              title="Velvet Purple"></button>
+            <button class="color-palette-btn" data-theme-name="pink"
+              style="background: #ec4899; border: 2px solid transparent; height: 40px; border-radius: var(--radius-md); cursor: pointer;"
+              title="Hot Pink"></button>
           </div>
         </div>
 
         <!-- Language Selector -->
         <div>
-          <h4 data-i18n="language_select" style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Language / மொழி / भाषा</h4>
+          <h4 data-i18n="language_select"
+            style="margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Language /
+            மொழி / भाषा</h4>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="lang-selector-btn" data-lang="en" style="width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+            <button class="lang-selector-btn" data-lang="en"
+              style="width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
               <span>English (Default)</span>
               <span class="active-check">✓</span>
             </button>
-            <button class="lang-selector-btn" data-lang="ta" style="width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+            <button class="lang-selector-btn" data-lang="ta"
+              style="width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
               <span>தமிழ் (Tamil)</span>
               <span class="active-check" style="display: none;">✓</span>
             </button>
-            <button class="lang-selector-btn" data-lang="hi" style="width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+            <button class="lang-selector-btn" data-lang="hi"
+              style="width: 100%; text-align: left; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-md); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
               <span>हिन्दी (Hindi)</span>
               <span class="active-check" style="display: none;">✓</span>
             </button>
@@ -856,14 +1140,22 @@
   <div id="auth-modal-overlay" class="fk-modal-overlay">
     <div class="fk-auth-modal" role="dialog" aria-modal="true" aria-labelledby="fk-banner-title">
       <button id="fk-auth-close" class="fk-modal-close-btn" aria-label="Close dialog">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </button>
 
       <!-- Left Hype Brand Hero Banner -->
       <div class="fk-auth-banner hype-auth-banner">
-        <div class="hype-brand-header" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 24px;">
-          <img src="assets/images/shopsphere_logo.png" alt="ShopSphere Logo" style="height: 80px; object-fit: contain; filter: brightness(0) invert(1);">
-          <p data-i18n="style_moves_you" style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0; font-weight: 500;">Style That Moves You</p>
+        <div class="hype-brand-header"
+          style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 24px;">
+          <img src="assets/images/shopsphere_logo.png" alt="ShopSphere Logo"
+            style="height: 80px; object-fit: contain; filter: brightness(0) invert(1);">
+          <p data-i18n="style_moves_you"
+            style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0; font-weight: 500;">Style That Moves You
+          </p>
         </div>
 
         <!-- Essential VIP Welcome Offer Card -->
@@ -871,7 +1163,7 @@
           <span class="offer-tag" data-i18n="welcome_perk">WELCOME PERK</span>
           <h3 class="offer-heading" data-i18n="get_10_off">GET 10% OFF</h3>
           <p class="offer-subtext">On your first purchase after signing in</p>
-          
+
           <div class="offer-code-pill">
             <span>PROMO: <strong>FIRST10</strong></span>
           </div>
@@ -904,26 +1196,36 @@
       <div class="fk-auth-form-panel">
         <!-- Error Alert Banner -->
         <div id="fk-auth-error" class="fk-auth-alert" style="display: none;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
           <span id="fk-error-text">Invalid login credentials.</span>
         </div>
 
         <!-- 1. LOGIN VIEW -->
         <form id="fk-login-form" class="fk-auth-form">
           <div class="fk-field-group">
-            <input type="text" id="fk-login-identifier" class="fk-input-field" placeholder=" " required autocomplete="username">
-            <label for="fk-login-identifier" class="fk-floating-label" data-i18n="enter_mobile_email">Enter Email / Mobile Number</label>
+            <input type="text" id="fk-login-identifier" class="fk-input-field" placeholder=" " required
+              autocomplete="username">
+            <label for="fk-login-identifier" class="fk-floating-label" data-i18n="enter_mobile_email">Enter Email /
+              Mobile Number</label>
             <span class="fk-field-error" id="err-login-identifier"></span>
           </div>
 
           <div class="fk-field-group" id="fk-pwd-group">
-            <input type="password" id="fk-login-password" class="fk-input-field" placeholder=" " required autocomplete="current-password">
+            <input type="password" id="fk-login-password" class="fk-input-field" placeholder=" " required
+              autocomplete="current-password">
             <label for="fk-login-password" class="fk-floating-label" data-i18n="enter_password">Enter Password</label>
             <span class="fk-field-error" id="err-login-password"></span>
           </div>
 
           <div class="fk-disclaimer-text">
-            <span data-i18n="agree_terms">By continuing, you agree to ShopSphere's</span> <a href="#" data-i18n="terms_of_use">Terms of Use</a> <span data-i18n="and">and</span> <a href="#" data-i18n="privacy_policy">Privacy Policy</a>.
+            <span data-i18n="agree_terms">By continuing, you agree to ShopSphere's</span> <a href="#"
+              data-i18n="terms_of_use">Terms of Use</a> <span data-i18n="and">and</span> <a href="#"
+              data-i18n="privacy_policy">Privacy Policy</a>.
           </div>
 
           <button type="submit" id="fk-login-submit" class="fk-btn-primary">
@@ -935,17 +1237,22 @@
 
           <button type="button" id="google-signin-btn" class="google-signin-btn">
             <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              <path fill="#EA4335"
+                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+              <path fill="#4285F4"
+                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+              <path fill="#FBBC05"
+                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z" />
+              <path fill="#34A853"
+                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
             </svg>
             <span>Sign in with Google</span>
           </button>
 
           <div class="fk-switch-footer">
             <span data-i18n="new_to_shopsphere">New to ShopSphere?</span>
-            <button type="button" id="fk-link-to-signup" class="fk-link-btn" data-i18n="create_account">Create an account</button>
+            <button type="button" id="fk-link-to-signup" class="fk-link-btn" data-i18n="create_account">Create an
+              account</button>
           </div>
         </form>
 
@@ -958,20 +1265,24 @@
           </div>
 
           <div class="fk-field-group">
-            <input type="email" id="fk-signup-email" class="fk-input-field" placeholder=" " required autocomplete="email">
+            <input type="email" id="fk-signup-email" class="fk-input-field" placeholder=" " required
+              autocomplete="email">
             <label for="fk-signup-email" class="fk-floating-label" data-i18n="placeholder_email">Email Address</label>
             <span class="fk-field-error" id="err-signup-email"></span>
           </div>
 
           <div class="fk-field-group">
             <input type="tel" id="fk-signup-mobile" class="fk-input-field" placeholder=" " required autocomplete="tel">
-            <label for="fk-signup-mobile" class="fk-floating-label" data-i18n="placeholder_mobile">Mobile Number (10 digits)</label>
+            <label for="fk-signup-mobile" class="fk-floating-label" data-i18n="placeholder_mobile">Mobile Number (10
+              digits)</label>
             <span class="fk-field-error" id="err-signup-mobile"></span>
           </div>
 
           <div class="fk-field-group">
-            <input type="password" id="fk-signup-password" class="fk-input-field" placeholder=" " required autocomplete="new-password">
-            <label for="fk-signup-password" class="fk-floating-label" data-i18n="create_password">Set Password (Min 6 chars)</label>
+            <input type="password" id="fk-signup-password" class="fk-input-field" placeholder=" " required
+              autocomplete="new-password">
+            <label for="fk-signup-password" class="fk-floating-label" data-i18n="create_password">Set Password (Min 6
+              chars)</label>
             <span class="fk-field-error" id="err-signup-password"></span>
           </div>
 
@@ -985,6 +1296,64 @@
             <button type="button" id="fk-link-to-login" class="fk-link-btn" data-i18n="login">Log in</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick View Product Modal -->
+  <div id="quickview-modal" class="quickview-modal-overlay hidden" role="dialog" aria-modal="true"
+    aria-labelledby="qv-title">
+    <div class="quickview-modal-card">
+      <button id="quickview-close-btn" class="quickview-close-btn" aria-label="Close modal">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="quickview-body">
+        <div class="quickview-visual">
+          <div class="qv-main-img-wrap">
+            <img id="qv-main-img" src="" alt="Product view" class="qv-main-img">
+          </div>
+        </div>
+
+        <div class="quickview-details">
+          <span id="qv-category" class="qv-category">Category</span>
+          <h2 id="qv-title" class="qv-title">Product Name</h2>
+
+          <div class="qv-rating-row">
+            <span class="qv-stars">★★★★★</span>
+            <span id="qv-reviews" class="qv-reviews">(4.8 / 120 reviews)</span>
+          </div>
+
+          <div class="qv-price-row">
+            <span id="qv-price-current" class="qv-price-current">₹0</span>
+            <span id="qv-price-original" class="qv-price-original">₹0</span>
+            <span id="qv-discount-badge" class="qv-discount-badge">OFF</span>
+          </div>
+
+          <p id="qv-description" class="qv-description">Elevate your daily routine with high quality materials and
+            modern aesthetics.</p>
+
+          <div class="qv-actions">
+            <button id="qv-add-cart-btn" class="qv-add-cart-btn ripple-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              <span>Add to Cart</span>
+            </button>
+            <button id="qv-wishlist-btn" class="qv-wishlist-btn wishlist-btn" aria-label="Add to wishlist">
+              <svg class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
