@@ -690,6 +690,139 @@ document.addEventListener('DOMContentLoaded', () => {
   initAddressModal();
 
   /* ==========================================================================
+     Header Delivery Location Selector Controller
+     ========================================================================== */
+  function initHeaderLocationSelector() {
+    const locationTrigger = document.getElementById('location-select');
+    const modalOverlay = document.getElementById('header-location-modal-overlay');
+    const closeBtn = document.getElementById('header-location-modal-close');
+    const addressesContainer = document.getElementById('header-location-addresses-list');
+    const addBtn = document.getElementById('header-location-add-btn');
+    const manageBtn = document.getElementById('header-location-manage-btn');
+
+    if (!locationTrigger || !modalOverlay || !addressesContainer) return;
+
+    function renderHeaderLocationModalList() {
+      const addrs = typeof AddressService !== 'undefined' ? AddressService.getAll() : [];
+      addressesContainer.innerHTML = '';
+
+      if (addrs.length === 0) {
+        addressesContainer.innerHTML = `
+          <div style="text-align: center; padding: 24px 16px; background: var(--bg-body); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+            <div style="font-size: 2rem; margin-bottom: 8px;">📍</div>
+            <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">No Saved Addresses Found</div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0 16px 0;">Add an address to choose your preferred delivery location.</p>
+            <button id="header-empty-add-btn" class="btn-primary-action btn-sm" style="margin: 0 auto; padding: 8px 18px;">+ Add Address</button>
+          </div>
+        `;
+        const emptyAddBtn = document.getElementById('header-empty-add-btn');
+        if (emptyAddBtn) {
+          emptyAddBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('hidden');
+            if (window.openAddressModal) window.openAddressModal();
+          });
+        }
+        return;
+      }
+
+      const currentUser = typeof AuthService !== 'undefined' ? (AuthService.getUser() || {}) : {};
+
+      addressesContainer.innerHTML = addrs.map(addr => `
+        <div class="header-location-item ${addr.isDefault ? 'selected' : ''}" data-id="${addr.id}" style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid ${addr.isDefault ? 'var(--color-accent, #2874f0)' : 'var(--border-color)'}; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s;">
+          <div style="display: flex; align-items: flex-start; gap: 12px; width: 100%;">
+            <input type="radio" name="header-selected-addr" value="${addr.id}" ${addr.isDefault ? 'checked' : ''} style="margin-top: 3px; accent-color: var(--color-accent, #2874f0); cursor: pointer;" aria-label="Select ${addr.type || 'Address'}">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-weight: 700; color: var(--text-primary); font-size: 0.92rem;">${addr.name || currentUser.name || 'User'}</span>
+                <span class="status-pill" style="font-size: 0.72rem; padding: 2px 6px; background: var(--bg-hover); color: var(--text-primary); font-weight: 700;">${addr.type || 'Home'}</span>
+                ${addr.isDefault ? `<span class="status-pill success" style="font-size: 0.72rem; padding: 2px 6px;">Default / Selected</span>` : ''}
+              </div>
+              <div style="font-size: 0.84rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                ${addr.addressLine}, ${addr.city}, ${addr.state} - <strong>${addr.pincode}</strong>
+              </div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Phone: ${addr.phone || currentUser.phone || ''}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      addressesContainer.querySelectorAll('.header-location-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const id = item.getAttribute('data-id');
+          if (typeof AddressService !== 'undefined') {
+            AddressService.setDefault(id);
+            const def = AddressService.getDefault();
+            if (def) {
+              showToast(`Delivery location set to ${def.city} - ${def.pincode}`, 'success');
+            }
+          }
+          modalOverlay.classList.add('hidden');
+          locationTrigger.setAttribute('aria-expanded', 'false');
+
+          if (AppState.currentView === 'profile') {
+            const profileTab = document.querySelector('.profile-nav-btn.active');
+            if (profileTab && profileTab.getAttribute('data-tab') === 'addresses') {
+              renderView('profile');
+            }
+          }
+        });
+      });
+    }
+
+    function openHeaderLocationModal() {
+      renderHeaderLocationModalList();
+      modalOverlay.classList.remove('hidden');
+      locationTrigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeHeaderLocationModal() {
+      modalOverlay.classList.add('hidden');
+      locationTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    locationTrigger.addEventListener('click', openHeaderLocationModal);
+    locationTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openHeaderLocationModal();
+      }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeHeaderLocationModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeHeaderLocationModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
+        closeHeaderLocationModal();
+      }
+    });
+
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        closeHeaderLocationModal();
+        if (window.openAddressModal) window.openAddressModal();
+      });
+    }
+
+    if (manageBtn) {
+      manageBtn.addEventListener('click', () => {
+        closeHeaderLocationModal();
+        requireAuth('PROFILE', {}, () => {
+          renderView('profile');
+          setTimeout(() => {
+            const addrTabBtn = document.querySelector('.profile-nav-btn[data-tab="addresses"]');
+            if (addrTabBtn) addrTabBtn.click();
+          }, 50);
+        });
+      });
+    }
+  }
+
+  initHeaderLocationSelector();
+
+  /* ==========================================================================
      Translation & Localization Engine (i18n)
      ========================================================================== */
   const TRANSLATIONS = {

@@ -209,7 +209,7 @@
       <!-- Header Right Utilities -->
       <div class="header-right">
         <!-- Location Selector -->
-        <div class="location-selector" id="location-select" style="cursor: default;">
+        <div class="location-selector" id="location-select" style="cursor: pointer;" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Choose delivery location" title="Click to change delivery location">
           <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -218,8 +218,9 @@
           <div class="location-info">
             <span class="location-label" data-i18n="deliver_to">Deliver to</span>
             <span id="current-location"
-              style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">India</span>
+              style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">Bengaluru - 560001</span>
           </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left: 2px; color: var(--text-secondary);"><path d="M6 9l6 6 6-6"/></svg>
         </div>
 
         <!-- Cart Icon -->
@@ -1080,6 +1081,35 @@
       <div style="display: flex; gap: 12px; width: 100%;">
         <button id="acct-delete-cancel-btn" class="btn-secondary-action" style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Cancel</button>
         <button id="acct-delete-confirm-btn" class="btn-primary-action" style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 700; justify-content: center; background-color: #ef4444; border-color: #ef4444; color: #ffffff; border-radius: var(--radius-md);">Delete Permanently</button>
+      </div>
+    </div>
+  <!-- Header Delivery Location Selector Modal -->
+  <div id="header-location-modal-overlay" class="address-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="header-location-modal-title">
+    <div class="address-modal-card" style="max-width: 480px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 16px;">
+        <div>
+          <h3 id="header-location-modal-title" style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin: 0;">Choose Delivery Location</h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 4px 0 0 0;">Select a saved address for real-time delivery estimates</p>
+        </div>
+        <button id="header-location-modal-close" class="address-modal-close-btn" aria-label="Close modal" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:4px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Address List Container -->
+      <div id="header-location-addresses-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 2px;">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-color); gap: 12px;">
+        <button id="header-location-add-btn" class="btn-primary-action btn-sm" style="display: flex; align-items: center; gap: 6px; padding: 8px 16px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Add New Address</span>
+        </button>
+        <button id="header-location-manage-btn" class="btn-secondary-action btn-sm" style="padding: 8px 16px; font-size: 0.85rem;">
+          <span>Manage Addresses</span>
+        </button>
       </div>
     </div>
   </div>
