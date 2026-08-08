@@ -1,5 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Force purge legacy cached products in localStorage to guarantee 100% synchronized images
+  if (localStorage.getItem('shopsphere_db_version') !== 'v30') {
+    localStorage.removeItem('shopsphere_products');
+    localStorage.removeItem('shopsphere_categories');
+    localStorage.setItem('shopsphere_db_version', 'v30');
+  }
+
   /* ==========================================================================
      Helper Star Rating Persistence Functions
      ========================================================================== */
@@ -1940,6 +1947,45 @@ document.addEventListener('DOMContentLoaded', () => {
       return { state: 'success', data: ApiService.getMockData(viewName) };
     },
 
+    async submitSupportTicket(ticketData) {
+      if (this.isLive) {
+        try {
+          const res = await fetch(`${this.baseUrl}/api/v1/admin/support/tickets`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ticketData)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return data;
+          }
+        } catch (err) {
+          console.warn('Backend ticket submission failed, generating fallback response:', err);
+        }
+      }
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const randomNum = Math.floor(10000 + Math.random() * 90000);
+          const refId = `#SUP-${randomNum}`;
+
+          const existingTickets = JSON.parse(localStorage.getItem('shopsphere_support_tickets') || '[]');
+          existingTickets.unshift({
+            refId,
+            ...ticketData,
+            createdAt: new Date().toISOString(),
+            status: 'OPEN'
+          });
+          localStorage.setItem('shopsphere_support_tickets', JSON.stringify(existingTickets));
+
+          resolve({
+            status: 'success',
+            message: 'Support ticket submitted successfully',
+            data: { ticketId: refId }
+          });
+        }, 800);
+      });
+    },
+
     getMockData(viewName) {
       const mockDb = {
         products: [
@@ -2140,8 +2186,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sellerInfo: 'Hype Accessories Official • Verified Retailer',
             shortDesc: 'Slim top-grain genuine leather bi-fold wallet with RFID blocking layer and 8 card slots.',
             description: 'Handcrafted from 100% genuine top-grain leather. Sleek slim profile fits comfortably in front or back pockets while protecting cards against electronic theft.',
-            img: 'assets/images/cat_accessories.png',
-            images: ['assets/images/cat_accessories.png'],
+            img: 'assets/images/prod_wallet.png',
+            images: ['assets/images/prod_wallet.png'],
             variants: {
               colors: ['Mahogany', 'Obsidian Black', 'Tan Brown'],
               sizes: ['Slim Bifold']
@@ -2163,7 +2209,7 @@ document.addEventListener('DOMContentLoaded', () => {
           { name: 'Shoes', subtitle: 'Sneakers, Boots & Sandals', bg: '#fef9c3', img: 'assets/images/cat_shoes.png' },
           { name: 'Bags & Luggage', subtitle: 'Backpacks & Suitcases', bg: '#e2e8f0', img: 'assets/images/prod_backpack.png' },
           { name: 'Jewelry', subtitle: 'Necklaces, Rings & Earrings', bg: '#ffe4e6', img: 'assets/images/cat_jewelry.svg' },
-          { name: 'Accessories', subtitle: 'Smartwatches, Sunglasses & Wallets', bg: '#fef9c3', img: 'assets/images/cat_accessories.png' },
+          { name: 'Accessories', subtitle: 'Smartwatches, Sunglasses & Wallets', bg: '#fef9c3', img: 'assets/images/prod_wallet.png' },
           { name: 'Kids & Baby', subtitle: 'Baby Onesies & Kids Apparel', bg: '#fae8ff', img: 'assets/images/cat_kids.png' },
           { name: 'Electronics', subtitle: 'Smartphones, Laptops & Accessories', bg: '#dcfce7', img: 'assets/images/cat_electronics.png' },
           { name: 'Audio', subtitle: 'Earbuds, Headphones & Speakers', bg: '#dbeafe', img: 'assets/images/prod_earbuds.png' },
@@ -2193,7 +2239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
       };
       // Initialize/sync products database in localStorage if not set or outdated
-      const CURRENT_DB_VERSION = 'v8';
+      const CURRENT_DB_VERSION = 'v25';
       let storedProducts = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
       const currentDbVersion = localStorage.getItem('shopsphere_db_version');
       if (storedProducts.length < 108 || currentDbVersion !== CURRENT_DB_VERSION || !storedProducts[0]?.name.includes('Shirt')) {
@@ -2231,13 +2277,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const categoryProductImages = {
-          'Men Shirt': 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=300&q=80',
+          'Men Shirt': 'assets/images/prod_shirt.png',
           'Men T-Shirt': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=300&q=80',
           'Men Pants': 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=300&q=80',
           'Men Jacket': 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=300&q=80',
           'Women Dress': 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80',
           'Women Top': 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=300&q=80',
-          'Women Skirt': 'https://images.unsplash.com/photo-1583496661160-fb488b2c1a82?auto=format&fit=crop&w=300&q=80',
+          'Women Skirt': 'assets/images/prod_skirt.png',
           'Women Jeans': 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=300&q=80',
           'Activewear Gym Shorts': 'https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=300&q=80',
           'Activewear Sports Bra': 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=300&q=80',
@@ -2246,12 +2292,12 @@ document.addEventListener('DOMContentLoaded', () => {
           'Sleepwear Pajama Set': 'https://images.unsplash.com/photo-1608748010899-18f300247112?auto=format&fit=crop&w=300&q=80',
           'Sleepwear Nightgown': 'https://images.unsplash.com/photo-1562572159-4ebcd318f4dd?auto=format&fit=crop&w=300&q=80',
           'Sleepwear Robe': 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=300&q=80',
-          'Sleepwear Sweatpants': 'https://images.unsplash.com/photo-1551854838-212c50b4c184?auto=format&fit=crop&w=300&q=80',
+          'Sleepwear Sweatpants': 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=300&q=80',
           'Shoes Sneakers': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80',
           'Shoes Boots': 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=300&q=80',
           'Shoes Sandals': 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=300&q=80',
           'Shoes Formal Shoes': 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=300&q=80',
-          'Bags & Luggage Backpack': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80',
+          'Bags & Luggage Backpack': 'assets/images/prod_backpack.png',
           'Bags & Luggage Suitcase': 'https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=300&q=80',
           'Bags & Luggage Handbag': 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80',
           'Bags & Luggage Laptop Bag': 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&w=300&q=80',
@@ -2259,25 +2305,25 @@ document.addEventListener('DOMContentLoaded', () => {
           'Jewelry Ring': 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=300&q=80',
           'Jewelry Earrings': 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=300&q=80',
           'Jewelry Bracelet': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=300&q=80',
-          'Accessories Sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=300&q=80',
-          'Accessories Wallet': 'https://images.unsplash.com/photo-1627124118303-622c97be5e31?auto=format&fit=crop&w=300&q=80',
-          'Accessories Belt': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80',
-          'Accessories Smartwatch': 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=300&q=80',
+          'Accessories Sunglasses': 'assets/images/prod_sunglasses.png',
+          'Accessories Wallet': 'assets/images/prod_wallet.png',
+          'Accessories Belt': 'assets/images/prod_belt.png',
+          'Accessories Smartwatch': 'assets/images/prod_watch.png',
           'Kids & Baby Onesie': 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=300&q=80',
           'Kids & Baby Kids T-Shirt': 'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=300&q=80',
           'Kids & Baby Kids Shorts': 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=300&q=80',
           'Kids & Baby Baby Blanket': 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=300&q=80',
           'Electronics Smartphone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80',
-          'Electronics Laptop': 'https://images.unsplash.com/photo-1496181130204-7552cc14ac1a?auto=format&fit=crop&w=300&q=80',
+          'Electronics Laptop': 'assets/images/prod_laptop.png',
           'Electronics Power Bank': 'https://images.unsplash.com/photo-1609592424109-dd2556b68b8e?auto=format&fit=crop&w=300&q=80',
           'Electronics Tablet': 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80',
-          'Audio Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80',
-          'Audio Earbuds': 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=300&q=80',
+          'Audio Headphones': 'assets/images/prod_headphones.png',
+          'Audio Earbuds': 'assets/images/prod_earbuds.png',
           'Audio Bluetooth Speaker': 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=300&q=80',
           'Audio Soundbar': 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=300&q=80',
           'Gaming Gaming Console': 'https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=300&q=80',
           'Gaming Game Controller': 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=300&q=80',
-          'Gaming Gaming Headset': 'https://images.unsplash.com/photo-1574744577884-64260b433a78?auto=format&fit=crop&w=300&q=80',
+          'Gaming Gaming Headset': 'assets/images/prod_gaming_headset.png',
           'Gaming Video Game': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80',
           'Smart Home Smart Bulb': 'https://images.unsplash.com/photo-1550985543-f47f38aeee65?auto=format&fit=crop&w=300&q=80',
           'Smart Home Security Camera': 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=300&q=80',
@@ -2291,8 +2337,8 @@ document.addEventListener('DOMContentLoaded', () => {
           'Home Decor Vase': 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=300&q=80',
           'Home Decor Scented Candle': 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=300&q=80',
           'Home Decor Curtain': 'https://images.unsplash.com/photo-1514894780887-121968d00567?auto=format&fit=crop&w=300&q=80',
-          'Bedding & Bath Bed Sheet': 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=300&q=80',
-          'Bedding & Bath Comforter': 'https://images.unsplash.com/photo-150569339888-ac5ce068fe85?auto=format&fit=crop&w=300&q=80',
+          'Bedding & Bath Bed Sheet': 'assets/images/prod_bedsheet.png',
+          'Bedding & Bath Comforter': 'assets/images/prod_comforter.png',
           'Bedding & Bath Bath Towel': 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&q=80',
           'Bedding & Bath Pillow': 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=300&q=80',
           'Kitchen & Dining Frying Pan': 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&w=300&q=80',
@@ -2301,7 +2347,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Kitchen & Dining Dinnerware Set': 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=300&q=80',
           'Lighting Desk Lamp': 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&q=80',
           'Lighting Ceiling Light': 'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=300&q=80',
-          'Lighting Floor Lamp': 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&q=80',
+          'Lighting Floor Lamp': 'assets/images/prod_floorlamp.png',
           'Lighting Solar Light': 'https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?auto=format&fit=crop&w=300&q=80',
           'Beauty & Skincare Face Wash': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=300&q=80',
           'Beauty & Skincare Moisturizer': 'https://images.unsplash.com/photo-1608248597481-496100c8c836?auto=format&fit=crop&w=300&q=80',
@@ -2321,11 +2367,11 @@ document.addEventListener('DOMContentLoaded', () => {
           'Health & Wellness First Aid Kit': 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&w=300&q=80',
           'Sports & Fitness Dumbbell': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=300&q=80',
           'Sports & Fitness Yoga Mat': 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2?auto=format&fit=crop&w=300&q=80',
-          'Sports & Fitness Resistance Band': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=300&q=80',
+          'Sports & Fitness Resistance Band': 'assets/images/prod_resistanceband.png',
           'Sports & Fitness Basketball': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=300&q=80',
           'Outdoor & Camping Camping Tent': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=300&q=80',
           'Outdoor & Camping Sleeping Bag': 'https://images.unsplash.com/photo-1517824806704-9040b037703b?auto=format&fit=crop&w=300&q=80',
-          'Outdoor & Camping Hiking Backpack': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80',
+          'Outdoor & Camping Hiking Backpack': 'assets/images/prod_backpack.png',
           'Outdoor & Camping Headlamp': 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=300&q=80',
           'Office & Stationery Notebook': 'https://images.unsplash.com/photo-1531346878377-a5c20888254f?auto=format&fit=crop&w=300&q=80',
           'Office & Stationery Pen Set': 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=300&q=80',
@@ -2335,7 +2381,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Toys & Games Board Game': 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=300&q=80',
           'Toys & Games Building Blocks': 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=300&q=80',
           'Toys & Games Puzzle': 'https://images.unsplash.com/photo-1585250000033-03333e577078?auto=format&fit=crop&w=300&q=80',
-          'Pet Supplies Dog Food': 'https://images.unsplash.com/photo-1589721062801-44026de174e5?auto=format&fit=crop&w=300&q=80',
+          'Pet Supplies Dog Food': 'assets/images/prod_dog_food.png',
           'Pet Supplies Pet Bed': 'https://images.unsplash.com/photo-1541599540903-216a46ca1ad0?auto=format&fit=crop&w=300&q=80',
           'Pet Supplies Dog Leash': 'https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&w=300&q=80',
           'Pet Supplies Pet Toy': 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=300&q=80'
@@ -4970,13 +5016,481 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /* ==========================================================================
+     Customer Support & Contact Us View
+     ========================================================================== */
+  function renderSupportView() {
+    if (!viewContainer) return;
+
+    const user = AuthService.getUser() || {};
+    const defaultName = user.name || (user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '');
+    const defaultEmail = user.email || '';
+    const defaultPhone = user.phone || '';
+
+    viewContainer.innerHTML = `
+      <div class="support-container" role="region" aria-label="Customer Support and Contact Us">
+        
+        <!-- Hero Header -->
+        <div class="support-hero">
+          <div class="support-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>24/7 Dedicated Support</span>
+          </div>
+          <h1>How Can We Help You?</h1>
+          <p>Have a question about an order, delivery, payment, or website feature? Submit your query below or contact our support team directly.</p>
+        </div>
+
+        <!-- 2-Column Main Layout -->
+        <div class="support-grid">
+          
+          <!-- Column 1: Query Form Card -->
+          <div class="support-card" id="support-form-card">
+            <h2 class="support-card-title">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: var(--color-accent);"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Submit a Query</span>
+            </h2>
+            <p class="support-card-subtitle">Fill in the details below and our customer support team will investigate and respond within 24 hours.</p>
+
+            <div id="support-form-alert" class="hidden" style="padding: 12px 16px; border-radius: var(--radius-md); background: rgba(231, 29, 54, 0.1); border: 1px solid var(--color-danger); color: var(--color-danger); margin-bottom: 20px; font-size: 0.88rem; font-weight: 500;"></div>
+
+            <form id="support-query-form" novalidate aria-label="Customer support query form">
+              
+              <!-- Full Name & Email -->
+              <div class="support-form-row">
+                <div class="support-form-group">
+                  <label for="support-name" class="support-label">
+                    <span>Full Name <span class="required-star">*</span></span>
+                  </label>
+                  <input type="text" id="support-name" class="support-input" placeholder="e.g. Rahul Sharma" value="${defaultName}" required aria-required="true" aria-describedby="err-support-name">
+                  <span class="support-field-error" id="err-support-name"></span>
+                </div>
+
+                <div class="support-form-group">
+                  <label for="support-email" class="support-label">
+                    <span>Email Address <span class="required-star">*</span></span>
+                  </label>
+                  <input type="email" id="support-email" class="support-input" placeholder="e.g. rahul@example.com" value="${defaultEmail}" required aria-required="true" aria-describedby="err-support-email">
+                  <span class="support-field-error" id="err-support-email"></span>
+                </div>
+              </div>
+
+              <!-- Phone Number & Order ID -->
+              <div class="support-form-row">
+                <div class="support-form-group">
+                  <label for="support-phone" class="support-label">
+                    <span>Phone Number <span class="required-star">*</span></span>
+                  </label>
+                  <input type="tel" id="support-phone" class="support-input" placeholder="e.g. 9876543210" value="${defaultPhone}" required aria-required="true" aria-describedby="err-support-phone">
+                  <span class="support-field-error" id="err-support-phone"></span>
+                </div>
+
+                <div class="support-form-group">
+                  <label for="support-order-id" class="support-label">
+                    <span>Order ID <span class="optional-tag">(Optional)</span></span>
+                  </label>
+                  <input type="text" id="support-order-id" class="support-input" placeholder="e.g. ORD-98214" aria-describedby="err-support-order-id">
+                  <span class="support-field-error" id="err-support-order-id"></span>
+                </div>
+              </div>
+
+              <!-- Query Type Dropdown -->
+              <div class="support-form-group">
+                <label for="support-query-type" class="support-label">
+                  <span>Query Type <span class="required-star">*</span></span>
+                </label>
+                <select id="support-query-type" class="support-select" required aria-required="true" aria-describedby="err-support-query-type">
+                  <option value="" disabled selected>-- Select Issue / Category --</option>
+                  <option value="Order Issue">Order Issue</option>
+                  <option value="Product Issue">Product Issue</option>
+                  <option value="Payment Issue">Payment Issue</option>
+                  <option value="Delivery / Shipping Issue">Delivery / Shipping Issue</option>
+                  <option value="Return / Refund Issue">Return / Refund Issue</option>
+                  <option value="Account Issue">Account Issue</option>
+                  <option value="Website Technical Issue">Website Technical Issue</option>
+                  <option value="Product Quality Issue">Product Quality Issue</option>
+                  <option value="General Query">General Query</option>
+                  <option value="Feedback">Feedback</option>
+                  <option value="Other">Other</option>
+                </select>
+                <span class="support-field-error" id="err-support-query-type"></span>
+              </div>
+
+              <!-- Subject -->
+              <div class="support-form-group">
+                <label for="support-subject" class="support-label">
+                  <span>Subject <span class="required-star">*</span></span>
+                </label>
+                <input type="text" id="support-subject" class="support-input" placeholder="Brief summary of your query or issue" required aria-required="true" aria-describedby="err-support-subject" maxlength="150">
+                <span class="support-field-error" id="err-support-subject"></span>
+              </div>
+
+              <!-- Description / Message -->
+              <div class="support-form-group">
+                <label for="support-message" class="support-label">
+                  <span>Message / Description <span class="required-star">*</span></span>
+                </label>
+                <textarea id="support-message" class="support-textarea" placeholder="Please provide complete details regarding your issue, question, or feedback..." required aria-required="true" aria-describedby="err-support-message" maxlength="2000"></textarea>
+                <span class="support-field-error" id="err-support-message"></span>
+              </div>
+
+              <!-- Optional Attachment Upload -->
+              <div class="support-form-group">
+                <label class="support-label">
+                  <span>Attachment <span class="optional-tag">(Optional - Images/PDF up to 5MB)</span></span>
+                </label>
+                <div class="support-file-zone" id="file-drop-zone">
+                  <input type="file" id="support-attachment" accept="image/png, image/jpeg, image/webp, application/pdf" aria-label="Upload optional file attachment">
+                  <div class="support-file-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; color: var(--text-muted);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Click or drag & drop to attach a file</span>
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">Supported: PNG, JPG, WEBP, PDF (Max 5MB)</span>
+                  </div>
+                  <div id="file-selected-name" class="support-file-name"></div>
+                </div>
+                <span class="support-field-error" id="err-support-attachment"></span>
+              </div>
+
+              <!-- Submit Button -->
+              <div style="margin-top: 10px;">
+                <button type="submit" id="support-submit-btn" class="btn-primary-action" style="width: 100%; justify-content: center; padding: 14px 28px; font-size: 1rem;">Submit Query</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Column 2: Support Contact Info & FAQs -->
+          <div style="display: flex; flex-direction: column; gap: 28px;">
+            
+            <!-- Support Information Card -->
+            <div class="support-card">
+              <h3 class="support-card-title" style="font-size: 1.25rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 22px; height: 22px; color: var(--color-accent);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>Customer Support Details</span>
+              </h3>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 16px;">Reach out directly to our support team during working hours.</p>
+
+              <div class="support-contact-list">
+                <div class="support-contact-item">
+                  <div class="support-icon-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div class="support-contact-details">
+                    <h5>Email Support</h5>
+                    <p><a href="mailto:support@shopsphere.com" style="color: inherit; text-decoration: none;">support@shopsphere.com</a></p>
+                    <span>Average response time: 2 hours</span>
+                  </div>
+                </div>
+
+                <div class="support-contact-item">
+                  <div class="support-icon-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </div>
+                  <div class="support-contact-details">
+                    <h5>Phone Support</h5>
+                    <p><a href="tel:+918045678900" style="color: inherit; text-decoration: none;">+91 80 4567 8900</a></p>
+                    <span>Toll-free customer hotline</span>
+                  </div>
+                </div>
+
+                <div class="support-contact-item">
+                  <div class="support-icon-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div class="support-contact-details">
+                    <h5>Support Hours</h5>
+                    <p>Monday – Saturday</p>
+                    <span>9:00 AM – 6:00 PM IST</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Action Links -->
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 24px; margin-bottom: 12px;">Quick Support Links</h4>
+              <div class="support-quick-nav">
+                <button class="support-quick-card" data-nav-target="orders">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                  <span>Track Orders</span>
+                </button>
+                <button class="support-quick-card" data-nav-target="orders">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                  <span>Return & Refund</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Frequently Asked Questions Accordion -->
+            <div class="support-card">
+              <h3 class="support-card-title" style="font-size: 1.25rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 22px; height: 22px; color: var(--color-accent);"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Frequently Asked Questions</span>
+              </h3>
+
+              <div class="support-faq-accordion">
+                <div class="support-faq-item">
+                  <button class="support-faq-question">
+                    <span>How do I track my order shipment?</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="support-faq-answer">
+                    You can track your order status in real time by navigating to your <strong>Orders</strong> page in your account dashboard. Detailed tracking numbers and delivery estimates are provided once dispatched.
+                  </div>
+                </div>
+
+                <div class="support-faq-item">
+                  <button class="support-faq-question">
+                    <span>What is your 30-day return policy?</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="support-faq-answer">
+                    We offer a hassle-free 30-day return policy for unused items in original packaging. You can initiate a return directly from the item details under your Orders section.
+                  </div>
+                </div>
+
+                <div class="support-faq-item">
+                  <button class="support-faq-question">
+                    <span>How quickly will my support query be answered?</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="support-faq-answer">
+                    Our customer support team processes queries within 2 to 24 hours during working hours (Monday to Saturday, 9 AM to 6 PM IST). Urgent order issues receive priority handling.
+                  </div>
+                </div>
+
+                <div class="support-faq-item">
+                  <button class="support-faq-question">
+                    <span>What payment methods are supported?</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="support-faq-answer">
+                    We support UPI, Credit/Debit Cards, NetBanking, Razorpay, and Cash on Delivery (COD) for eligible pin codes.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    `;
+
+    // File Attachment display update
+    const fileInput = document.getElementById('support-attachment');
+    const fileNameDisplay = document.getElementById('file-selected-name');
+
+    if (fileInput && fileNameDisplay) {
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) {
+          const file = fileInput.files[0];
+          if (file.size > 5 * 1024 * 1024) {
+            document.getElementById('err-support-attachment').textContent = 'File size exceeds 5MB limit.';
+            fileInput.value = '';
+            fileNameDisplay.textContent = '';
+            return;
+          }
+          document.getElementById('err-support-attachment').textContent = '';
+          fileNameDisplay.innerHTML = `✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        } else {
+          fileNameDisplay.textContent = '';
+        }
+      });
+    }
+
+    // FAQ Accordion Interactivity
+    document.querySelectorAll('.support-faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.support-faq-item');
+        if (item) {
+          item.classList.toggle('active');
+        }
+      });
+    });
+
+    // Real-time Field Error Clearing
+    const fieldsToClear = ['support-name', 'support-email', 'support-phone', 'support-query-type', 'support-subject', 'support-message'];
+    fieldsToClear.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => {
+          el.classList.remove('is-invalid');
+          const errEl = document.getElementById(`err-${id}`);
+          if (errEl) errEl.textContent = '';
+        });
+        el.addEventListener('change', () => {
+          el.classList.remove('is-invalid');
+          const errEl = document.getElementById(`err-${id}`);
+          if (errEl) errEl.textContent = '';
+        });
+      }
+    });
+
+    // Form Submission Logic
+    const form = document.getElementById('support-query-form');
+    const submitBtn = document.getElementById('support-submit-btn');
+    const formAlert = document.getElementById('support-form-alert');
+
+    if (form && submitBtn) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (formAlert) {
+          formAlert.classList.add('hidden');
+          formAlert.textContent = '';
+        }
+
+        const nameVal = document.getElementById('support-name')?.value.trim() || '';
+        const emailVal = document.getElementById('support-email')?.value.trim() || '';
+        const phoneVal = document.getElementById('support-phone')?.value.trim() || '';
+        const typeVal = document.getElementById('support-query-type')?.value || '';
+        const subjectVal = document.getElementById('support-subject')?.value.trim() || '';
+        const messageVal = document.getElementById('support-message')?.value.trim() || '';
+        const orderIdVal = document.getElementById('support-order-id')?.value.trim() || '';
+
+        let isValid = true;
+
+        if (!nameVal) {
+          showFieldError('support-name', 'Full name is required.');
+          isValid = false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailVal) {
+          showFieldError('support-email', 'Email address is required.');
+          isValid = false;
+        } else if (!emailRegex.test(emailVal)) {
+          showFieldError('support-email', 'Please enter a valid email address.');
+          isValid = false;
+        }
+
+        const phoneDigits = phoneVal.replace(/\D/g, '');
+        if (!phoneVal) {
+          showFieldError('support-phone', 'Phone number is required.');
+          isValid = false;
+        } else if (phoneDigits.length < 10) {
+          showFieldError('support-phone', 'Please enter a valid 10-digit phone number.');
+          isValid = false;
+        }
+
+        if (!typeVal) {
+          showFieldError('support-query-type', 'Please select a query type.');
+          isValid = false;
+        }
+
+        if (!subjectVal) {
+          showFieldError('support-subject', 'Subject is required.');
+          isValid = false;
+        } else if (subjectVal.length < 5) {
+          showFieldError('support-subject', 'Subject must be at least 5 characters long.');
+          isValid = false;
+        }
+
+        if (!messageVal) {
+          showFieldError('support-message', 'Message description is required.');
+          isValid = false;
+        } else if (messageVal.length < 10) {
+          showFieldError('support-message', 'Message must be at least 10 characters long.');
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        submitBtn.disabled = true;
+
+        try {
+          const payload = {
+            name: nameVal,
+            email: emailVal,
+            phone: phoneVal,
+            queryType: typeVal,
+            subject: subjectVal,
+            description: messageVal,
+            orderId: orderIdVal || null
+          };
+
+          const response = await ApiService.submitSupportTicket(payload);
+
+          submitBtn.disabled = false;
+
+          if (response && (response.status === 'success' || response.data)) {
+            const ticketRef = response.data?.ticketId || '#SUP-' + Math.floor(10000 + Math.random() * 90000);
+
+            showToast('Your query has been submitted successfully.', 'success');
+
+            const formCard = document.getElementById('support-form-card');
+            if (formCard) {
+              formCard.innerHTML = `
+                <div class="support-success-card">
+                  <div class="support-success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Query Submitted Successfully!</h2>
+                  <p style="font-size: 0.95rem; color: var(--text-secondary); max-width: 480px; margin: 0 auto; line-height: 1.6;">
+                    Thank you for reaching out to ShopSphere Customer Support. Our team has received your ticket and will respond to <strong>${emailVal}</strong> within 24 hours.
+                  </p>
+
+                  <div>
+                    <span class="support-ref-badge">Reference ID: ${ticketRef}</span>
+                  </div>
+
+                  <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn-primary-action" id="submit-another-query-btn">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      <span>Submit Another Query</span>
+                    </button>
+                    <button class="btn-secondary-action" data-nav-target="home" id="query-success-home-btn">Go to Home</button>
+                  </div>
+                </div>
+              `;
+
+              const resetBtn = document.getElementById('submit-another-query-btn');
+              if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                  renderSupportView();
+                });
+              }
+
+              const homeBtn = document.getElementById('query-success-home-btn');
+              if (homeBtn) {
+                homeBtn.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  const homeNavItem = document.querySelector('.nav-item[data-nav="home"]');
+                  if (homeNavItem) {
+                    homeNavItem.click();
+                  } else {
+                    renderView('home');
+                  }
+                });
+              }
+            }
+          } else {
+            throw new Error(response?.message || 'Server response invalid');
+          }
+
+        } catch (error) {
+          console.error('Support query submission error:', error);
+          submitBtn.disabled = false;
+
+          if (formAlert) {
+            formAlert.textContent = 'Failed to submit support query. Please check your network connection and try again.';
+            formAlert.classList.remove('hidden');
+          }
+          showToast('Failed to submit query. Please try again.', 'error');
+        }
+      });
+    }
+  }
+
+  function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errEl = document.getElementById(`err-${fieldId}`);
+    if (field) field.classList.add('is-invalid');
+    if (errEl) errEl.textContent = message;
+  }
+
+  /* ==========================================================================
      View Renderer Router & Unknown Route Catch-All
      ========================================================================== */
   const viewContainer = document.getElementById('view-container');
   const defaultHomeHtml = viewContainer ? viewContainer.innerHTML : '';
 
   // Registry of valid system view routes
-  const VALID_ROUTES = ['home', 'shop', 'categories', 'wishlist', 'orders', 'profile', 'cart', 'checkout', 'search', 'product-not-found', 'category-not-found', '404'];
+  const VALID_ROUTES = ['home', 'shop', 'categories', 'wishlist', 'orders', 'profile', 'cart', 'checkout', 'search', 'support', 'contact', 'product-not-found', 'category-not-found', '404'];
 
   function renderView(viewName, overrideState) {
     if (['profile', 'orders', 'wishlist'].includes(viewName) && !AuthService.isAuthenticated()) {
@@ -5001,6 +5515,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (viewName === 'notifications') {
       renderNotificationsView(overrideState);
+      return;
+    }
+
+    if (viewName === 'support' || viewName === 'contact') {
+      renderSupportView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -5907,9 +6427,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* Category Card Filter Router (Delegated for dynamic views) */
+  /* Category Card Filter & Navigation Router (Delegated for dynamic views) */
   if (viewContainer) {
     viewContainer.addEventListener('click', (e) => {
+      const navBtn = e.target.closest('[data-nav-target]');
+      if (navBtn) {
+        e.preventDefault();
+        const target = navBtn.getAttribute('data-nav-target');
+        const navItem = document.querySelector(`.nav-item[data-nav="${target}"]`);
+        if (navItem) {
+          navItem.click();
+        } else {
+          renderView(target);
+        }
+        return;
+      }
+
       const card = e.target.closest('.category-card[data-category]');
       if (card) {
         e.preventDefault();

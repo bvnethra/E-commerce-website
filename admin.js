@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Bind login action
   document.getElementById('admin-login-submit').addEventListener('click', handleAdminLogin);
-  
+
   // Bind logout action
   document.getElementById('logout-btn').addEventListener('click', handleAdminLogout);
 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const targetTab = link.getAttribute('data-tab');
       document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
-      
+
       const targetView = document.getElementById(`view-${targetTab}`);
       if (targetView) targetView.classList.add('active');
 
@@ -77,7 +77,7 @@ function showAdminDashboard() {
   document.getElementById('auth-overlay').style.display = 'none';
   document.getElementById('sidebar-layout').style.display = 'flex';
   document.getElementById('main-layout').style.display = 'block';
-  
+
   // Load databases and render overview
   initializeAdminDatabases();
   loadModuleView('dashboard');
@@ -158,7 +158,7 @@ function initializeAdminDatabases() {
         localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
       }
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // 6. Categories Database initialization fallback
   const CURRENT_DB_VERSION = 'v5';
@@ -199,12 +199,12 @@ function initializeAdminDatabases() {
   }
 
   // 7. Products Database initialization fallback
-  const CURRENT_DB_VERSION_PROD = 'v8';
+  const CURRENT_DB_VERSION_PROD = 'v30';
   let storedProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
   if (storedProds.length < 108 || currentDbVersion !== CURRENT_DB_VERSION_PROD || !storedProds[0]?.name.includes('Shirt')) {
     const defaultProducts = [];
     const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
-    
+
     const categoryProductNames = {
       'Men': ['Shirt', 'T-Shirt', 'Pants', 'Jacket'],
       'Women': ['Dress', 'Top', 'Skirt', 'Jeans'],
@@ -236,13 +236,13 @@ function initializeAdminDatabases() {
     };
 
     const categoryProductImages = {
-      'Men Shirt': 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=300&q=80',
+      'Men Shirt': 'assets/images/prod_shirt.png',
       'Men T-Shirt': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=300&q=80',
       'Men Pants': 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=300&q=80',
       'Men Jacket': 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=300&q=80',
       'Women Dress': 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80',
       'Women Top': 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=300&q=80',
-      'Women Skirt': 'https://images.unsplash.com/photo-1583496661160-fb488b2c1a82?auto=format&fit=crop&w=300&q=80',
+      'Women Skirt': 'assets/images/prod_skirt.png',
       'Women Jeans': 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=300&q=80',
       'Activewear Gym Shorts': 'https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=300&q=80',
       'Activewear Sports Bra': 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=300&q=80',
@@ -251,12 +251,12 @@ function initializeAdminDatabases() {
       'Sleepwear Pajama Set': 'https://images.unsplash.com/photo-1608748010899-18f300247112?auto=format&fit=crop&w=300&q=80',
       'Sleepwear Nightgown': 'https://images.unsplash.com/photo-1562572159-4ebcd318f4dd?auto=format&fit=crop&w=300&q=80',
       'Sleepwear Robe': 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=300&q=80',
-      'Sleepwear Sweatpants': 'https://images.unsplash.com/photo-1551854838-212c50b4c184?auto=format&fit=crop&w=300&q=80',
+      'Sleepwear Sweatpants': 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=300&q=80',
       'Shoes Sneakers': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80',
       'Shoes Boots': 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=300&q=80',
       'Shoes Sandals': 'https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=300&q=80',
       'Shoes Formal Shoes': 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=300&q=80',
-      'Bags & Luggage Backpack': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80',
+      'Bags & Luggage Backpack': 'assets/images/prod_backpack.png',
       'Bags & Luggage Suitcase': 'https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?auto=format&fit=crop&w=300&q=80',
       'Bags & Luggage Handbag': 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80',
       'Bags & Luggage Laptop Bag': 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&w=300&q=80',
@@ -264,25 +264,25 @@ function initializeAdminDatabases() {
       'Jewelry Ring': 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=300&q=80',
       'Jewelry Earrings': 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=300&q=80',
       'Jewelry Bracelet': 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=300&q=80',
-      'Accessories Sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=300&q=80',
-      'Accessories Wallet': 'https://images.unsplash.com/photo-1627124118303-622c97be5e31?auto=format&fit=crop&w=300&q=80',
-      'Accessories Belt': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80',
-      'Accessories Smartwatch': 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=300&q=80',
+      'Accessories Sunglasses': 'assets/images/prod_sunglasses.png',
+      'Accessories Wallet': 'assets/images/prod_wallet.png',
+      'Accessories Belt': 'assets/images/prod_belt.png',
+      'Accessories Smartwatch': 'assets/images/prod_watch.png',
       'Kids & Baby Onesie': 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=300&q=80',
       'Kids & Baby Kids T-Shirt': 'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=300&q=80',
       'Kids & Baby Kids Shorts': 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=300&q=80',
       'Kids & Baby Baby Blanket': 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=300&q=80',
       'Electronics Smartphone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80',
-      'Electronics Laptop': 'https://images.unsplash.com/photo-1496181130204-7552cc14ac1a?auto=format&fit=crop&w=300&q=80',
+      'Electronics Laptop': 'assets/images/prod_laptop.png',
       'Electronics Power Bank': 'https://images.unsplash.com/photo-1609592424109-dd2556b68b8e?auto=format&fit=crop&w=300&q=80',
       'Electronics Tablet': 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80',
-      'Audio Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80',
-      'Audio Earbuds': 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=300&q=80',
+      'Audio Headphones': 'assets/images/prod_headphones.png',
+      'Audio Earbuds': 'assets/images/prod_earbuds.png',
       'Audio Bluetooth Speaker': 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=300&q=80',
       'Audio Soundbar': 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=300&q=80',
       'Gaming Gaming Console': 'https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=300&q=80',
       'Gaming Game Controller': 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=300&q=80',
-      'Gaming Gaming Headset': 'https://images.unsplash.com/photo-1574744577884-64260b433a78?auto=format&fit=crop&w=300&q=80',
+      'Gaming Gaming Headset': 'assets/images/prod_gaming_headset.png',
       'Gaming Video Game': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80',
       'Smart Home Smart Bulb': 'https://images.unsplash.com/photo-1550985543-f47f38aeee65?auto=format&fit=crop&w=300&q=80',
       'Smart Home Security Camera': 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=300&q=80',
@@ -296,8 +296,8 @@ function initializeAdminDatabases() {
       'Home Decor Vase': 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=300&q=80',
       'Home Decor Scented Candle': 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=300&q=80',
       'Home Decor Curtain': 'https://images.unsplash.com/photo-1514894780887-121968d00567?auto=format&fit=crop&w=300&q=80',
-      'Bedding & Bath Bed Sheet': 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=300&q=80',
-      'Bedding & Bath Comforter': 'https://images.unsplash.com/photo-150569339888-ac5ce068fe85?auto=format&fit=crop&w=300&q=80',
+      'Bedding & Bath Bed Sheet': 'assets/images/prod_bedsheet.png',
+      'Bedding & Bath Comforter': 'assets/images/prod_comforter.png',
       'Bedding & Bath Bath Towel': 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=300&q=80',
       'Bedding & Bath Pillow': 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=300&q=80',
       'Kitchen & Dining Frying Pan': 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&w=300&q=80',
@@ -306,7 +306,7 @@ function initializeAdminDatabases() {
       'Kitchen & Dining Dinnerware Set': 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=300&q=80',
       'Lighting Desk Lamp': 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&q=80',
       'Lighting Ceiling Light': 'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=300&q=80',
-      'Lighting Floor Lamp': 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=300&q=80',
+      'Lighting Floor Lamp': 'assets/images/prod_floorlamp.png',
       'Lighting Solar Light': 'https://images.unsplash.com/photo-1509395062183-67c5ad6faff9?auto=format&fit=crop&w=300&q=80',
       'Beauty & Skincare Face Wash': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=300&q=80',
       'Beauty & Skincare Moisturizer': 'https://images.unsplash.com/photo-1608248597481-496100c8c836?auto=format&fit=crop&w=300&q=80',
@@ -326,11 +326,11 @@ function initializeAdminDatabases() {
       'Health & Wellness First Aid Kit': 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&w=300&q=80',
       'Sports & Fitness Dumbbell': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=300&q=80',
       'Sports & Fitness Yoga Mat': 'https://images.unsplash.com/photo-1592432678016-e910b452f9a2?auto=format&fit=crop&w=300&q=80',
-      'Sports & Fitness Resistance Band': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=300&q=80',
+      'Sports & Fitness Resistance Band': 'assets/images/prod_resistanceband.png',
       'Sports & Fitness Basketball': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=300&q=80',
       'Outdoor & Camping Camping Tent': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=300&q=80',
       'Outdoor & Camping Sleeping Bag': 'https://images.unsplash.com/photo-1517824806704-9040b037703b?auto=format&fit=crop&w=300&q=80',
-      'Outdoor & Camping Hiking Backpack': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80',
+      'Outdoor & Camping Hiking Backpack': 'assets/images/prod_backpack.png',
       'Outdoor & Camping Headlamp': 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=300&q=80',
       'Office & Stationery Notebook': 'https://images.unsplash.com/photo-1531346878377-a5c20888254f?auto=format&fit=crop&w=300&q=80',
       'Office & Stationery Pen Set': 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=300&q=80',
@@ -340,7 +340,7 @@ function initializeAdminDatabases() {
       'Toys & Games Board Game': 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=300&q=80',
       'Toys & Games Building Blocks': 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=300&q=80',
       'Toys & Games Puzzle': 'https://images.unsplash.com/photo-1585250000033-03333e577078?auto=format&fit=crop&w=300&q=80',
-      'Pet Supplies Dog Food': 'https://images.unsplash.com/photo-1589721062801-44026de174e5?auto=format&fit=crop&w=300&q=80',
+      'Pet Supplies Dog Food': 'assets/images/prod_dog_food.png',
       'Pet Supplies Pet Bed': 'https://images.unsplash.com/photo-1541599540903-216a46ca1ad0?auto=format&fit=crop&w=300&q=80',
       'Pet Supplies Dog Leash': 'https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?auto=format&fit=crop&w=300&q=80',
       'Pet Supplies Pet Toy': 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=300&q=80'
@@ -372,7 +372,7 @@ function initializeAdminDatabases() {
           reviewCount: Math.floor(10 + Math.random() * 200),
           inStock: true,
           stockCount: Math.floor(5 + Math.random() * 50),
-          sku: `SKU-${cat.name.substring(0,3).toUpperCase()}-${globalId * 111}`,
+          sku: `SKU-${cat.name.substring(0, 3).toUpperCase()}-${globalId * 111}`,
           deliveryBadge: 'Express Shipping in 2 Days',
           warranty: '1 Year Brand Warranty',
           returnPolicy: '30 Days Money Back Guarantee',
@@ -403,7 +403,7 @@ function initializeAdminDatabases() {
    ========================================================================== */
 function loadModuleView(tabName) {
   renderKPIs();
-  
+
   switch (tabName) {
     case 'dashboard':
       // Overview stats are loaded by renderKPIs
@@ -519,7 +519,7 @@ function filterProductsByCategory(val) {
 
 function populateCategorySelectDropdown() {
   const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
-  
+
   // 1. Form dropdown
   const select = document.getElementById('prod-form-cat');
   if (select) {
@@ -572,7 +572,7 @@ function openEditProductModal(id) {
   document.getElementById('prod-form-stock').value = p.stockCount || 10;
   document.getElementById('prod-form-img').value = p.img || '';
   document.getElementById('prod-form-desc').value = p.shortDesc || '';
-  
+
   document.getElementById('product-modal').style.display = 'flex';
 }
 
@@ -732,8 +732,8 @@ function renderOrdersTable() {
   }
 
   orders.forEach(order => {
-    const addrStr = typeof order.address === 'object' 
-      ? `${order.address.line1 || ''}, ${order.address.city || ''}` 
+    const addrStr = typeof order.address === 'object'
+      ? `${order.address.line1 || ''}, ${order.address.city || ''}`
       : (order.address || 'N/A');
     const itemsSummary = (order.itemsDetail || []).map(it => `${it.name} (x${it.quantity})`).join(', ') || `${order.items || 1} items`;
 
@@ -781,13 +781,13 @@ function approveOrder(orderId, isAccepted) {
     orders[index].status = newStatus;
     orders[index].statusClass = isAccepted ? 'packed' : 'cancelled';
     localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
-    
+
     // Log dynamic status update to delivery logs automatically
     updateDeliveryLogStatus(orderId, newStatus);
-    
+
     // Log standard notification triggers
     logSystemNotification('Customer', 'SMS & Email', `Order #${orderId} has been ${isAccepted ? 'Accepted & Packed' : 'Rejected & Cancelled'} by administrator.`);
-    
+
     renderOrdersTable();
     renderKPIs();
   }
@@ -800,13 +800,13 @@ function updateOrderStatus(orderId, newStatus) {
     orders[index].status = newStatus;
     orders[index].statusClass = newStatus.toLowerCase();
     localStorage.setItem('shopsphere_orders', JSON.stringify(orders));
-    
+
     // Log dynamic status update to delivery logs automatically
     updateDeliveryLogStatus(orderId, newStatus);
-    
+
     // Log standard notification triggers
     logSystemNotification('Customer', 'SMS & Email', `Order #${orderId} status has been updated to: ${newStatus}`);
-    
+
     renderOrdersTable();
     renderKPIs();
   }
@@ -854,7 +854,7 @@ function deleteRegisteredUser(userId) {
       localStorage.removeItem('aura_user');
       localStorage.removeItem('aura_jwt_token');
     }
-  } catch (e) {}
+  } catch (e) { }
 
   renderUsersTable();
   renderKPIs();
@@ -889,7 +889,7 @@ const AdminApiService = {
       if (res.ok) {
         const backendProds = await res.json();
         const localProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
-        
+
         const mergedProds = backendProds.map(bp => {
           const lp = localProds.find(p => p.id === bp.id);
           const stock = lp ? lp.stockCount : 15;
@@ -1177,7 +1177,7 @@ function assignDeliveryPartner(orderId, partnerName) {
 
   localStorage.setItem('shopsphere_delivery_log', JSON.stringify(deliveryLog));
   renderDeliveryTable();
-  
+
   logSystemNotification('Delivery Partner', 'API Webhook', `Shipment for Order #${orderId} assigned to ${partnerName}`);
 }
 
@@ -1270,14 +1270,14 @@ function triggerNotificationBroadcast() {
 function renderAnalyticsReport() {
   const orders = JSON.parse(localStorage.getItem('shopsphere_orders') || '[]');
   const activeOrders = orders.filter(o => o.status !== 'CANCELLED');
-  
+
   const totalAmount = activeOrders.reduce((sum, o) => {
     const cleanNum = parseFloat(String(o.total || '0').replace(/[^\d.]/g, ''));
     return sum + cleanNum;
   }, 0);
 
   const averageBasketValue = activeOrders.length > 0 ? (totalAmount / activeOrders.length).toFixed(0) : 0;
-  
+
   document.getElementById('analytics-summary-text').innerHTML = `
     <strong>Accumulated Stores Revenue</strong>: ₹${totalAmount.toLocaleString()}<br>
     <strong>Fulfilled Orders Volume</strong>: ${activeOrders.length} checkouts<br>
