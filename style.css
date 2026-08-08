@@ -7990,18 +7990,23 @@ input {
   .support-container {
     padding: 20px 12px 40px 12px;
   }
+
   .support-hero {
     padding: 28px 16px;
   }
+
   .support-hero h1 {
     font-size: 1.8rem;
   }
+
   .support-card {
     padding: 24px 18px;
   }
+
   .support-form-row {
     grid-template-columns: 1fr;
   }
+
   .support-quick-nav {
     grid-template-columns: 1fr;
   }
@@ -8147,8 +8152,8 @@ input {
 }
 
 .profile-nav-btn.active {
-  background: var(--color-accent-bg, rgba(40,116,240,0.12));
-  border-color: rgba(40,116,240,0.3);
+  background: var(--color-accent-bg, rgba(40, 116, 240, 0.12));
+  border-color: rgba(40, 116, 240, 0.3);
   color: var(--text-primary);
   font-weight: 700;
 }
@@ -8158,8 +8163,8 @@ input {
 }
 
 .profile-nav-btn.danger-btn:hover {
-  background: rgba(239,68,68,0.1);
-  border-color: rgba(239,68,68,0.3);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .profile-content-panel {
@@ -8272,7 +8277,7 @@ input {
 
 .profile-address-card.default-addr {
   border-color: var(--color-accent, #2874f0);
-  box-shadow: 0 0 12px rgba(40,116,240,0.15);
+  box-shadow: 0 0 12px rgba(40, 116, 240, 0.15);
 }
 
 .payments-overview-grid {
@@ -8396,12 +8401,12 @@ input {
 }
 
 .danger-card {
-  border-color: rgba(239,68,68,0.3);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .danger-warning-box {
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.3);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   padding: 16px;
   border-radius: var(--radius-md);
   display: flex;
@@ -8410,7 +8415,7 @@ input {
 }
 
 .danger-border {
-  border-color: rgba(239,68,68,0.4) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
 /* Responsive Profile Layout */
@@ -8425,6 +8430,7 @@ input {
     padding: 8px;
     scrollbar-width: none;
   }
+
   .profile-nav-menu::-webkit-scrollbar {
     display: none;
   }
@@ -8440,12 +8446,15 @@ input {
   .profile-section-card {
     padding: 18px 14px;
   }
+
   .form-grid-2 {
     grid-template-columns: 1fr;
   }
+
   .profile-info-grid {
     grid-template-columns: 1fr;
   }
+
   .pref-row {
     flex-direction: column;
     align-items: flex-start;
