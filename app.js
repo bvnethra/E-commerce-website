@@ -231,6 +231,66 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     },
 
+    updateProfile(data) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const current = this.getUser() || {};
+          const updated = { ...current, ...data };
+          localStorage.setItem('aura_user', JSON.stringify(updated));
+          AppState.user = updated;
+          
+          try {
+            const registeredUsers = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+            const idx = registeredUsers.findIndex(u => (u.id && u.id === current.id) || (u.email && u.email.toLowerCase() === current.email?.toLowerCase()));
+            if (idx !== -1) {
+              registeredUsers[idx] = { ...registeredUsers[idx], ...updated };
+            } else {
+              registeredUsers.push(updated);
+            }
+            localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
+          } catch (e) { }
+
+          updateHeaderAuthState();
+          resolve(updated);
+        }, 400);
+      });
+    },
+
+    updatePassword(currentPassword, newPassword) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (!newPassword || newPassword.length < 6) {
+            return reject(new Error('New password must be at least 6 characters.'));
+          }
+          const current = this.getUser() || {};
+          current.passwordLastChanged = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          localStorage.setItem('aura_user', JSON.stringify(current));
+          AppState.user = current;
+          resolve(true);
+        }, 400);
+      });
+    },
+
+    deleteAccount(confirmPhrase) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if ((confirmPhrase || '').trim().toUpperCase() !== 'DELETE') {
+            return reject(new Error('Please type DELETE to confirm account deletion.'));
+          }
+          const current = this.getUser();
+          if (current) {
+            try {
+              let registeredUsers = JSON.parse(localStorage.getItem('aura_registered_users') || '[]');
+              registeredUsers = registeredUsers.filter(u => u.email.toLowerCase() !== current.email.toLowerCase());
+              localStorage.setItem('aura_registered_users', JSON.stringify(registeredUsers));
+            } catch (e) { }
+          }
+          this.logout();
+          resolve(true);
+        }, 500);
+      });
+    },
+
     logout() {
       localStorage.removeItem('aura_jwt_token');
       localStorage.removeItem('aura_user');
@@ -5888,10 +5948,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (viewName === 'profile') {
       const u = AuthService.getUser() || { id: 'usr_guest', name: 'User', email: 'user@example.com', phone: '+91 98765 43210' };
       const initials = (u.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-      const defaultAddr = typeof AddressService !== 'undefined' ? AddressService.getDefault() : null;
-      const defaultAddressString = defaultAddr
-        ? `${defaultAddr.addressLine}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
-        : 'No address saved yet.';
+      const nameParts = (u.name || 'User').split(' ');
+      const firstName = nameParts[0] || 'User';
+      const lastName = nameParts.slice(1).join(' ') || '';
 
       // Fetch user's previous orders
       const ordersList = [];
@@ -5959,45 +6018,413 @@ document.addEventListener('DOMContentLoaded', () => {
       contentHtml = `
         <div class="view-section-header">
           <div>
-            <h2 class="view-title" data-i18n="profile">User Profile</h2>
-            <p class="view-subtitle" data-i18n="profile_sub">Manage personal information & delivery addresses</p>
+            <h2 class="view-title" data-i18n="my_profile">My Account Overview</h2>
+            <p class="view-subtitle" data-i18n="profile_sub">Manage personal information, delivery addresses, security, and preferences</p>
           </div>
         </div>
-        <div style="background: var(--bg-card); padding: 30px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 24px;">
-          <div style="display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
-            <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #047857); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800;">
-              ${initials}
-            </div>
-            <div>
-              <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin: 0;">${u.name}</h3>
-              <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 4px 0;">${u.email} • ${u.phone}</p>
-              <div style="display: flex; gap: 8px; margin-top: 6px;">
-                <span class="status-pill success" data-i18n="verified_account">Verified Account</span>
-                <span class="status-pill success" style="background: rgba(40,116,240,0.15); color: #2874f0;" data-i18n="jwt_auth">JWT Authenticated</span>
+
+        <div class="profile-layout-grid">
+          <!-- LEFT COLUMN: Profile Navigation Sidebar & Summary Card -->
+          <aside class="profile-sidebar">
+            <div class="profile-user-summary-card">
+              <div class="profile-avatar-wrapper">
+                ${u.avatar ? `<img src="${u.avatar}" class="profile-avatar-img" alt="${u.name}">` : `<div class="profile-avatar-initials" id="profile-display-initials">${initials}</div>`}
+                <label for="profile-avatar-input" class="profile-avatar-upload-badge" title="Change Profile Picture" aria-label="Upload profile image">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </label>
+                <input type="file" id="profile-avatar-input" accept="image/*" style="display:none;">
+              </div>
+              <div class="profile-summary-details">
+                <h3 class="profile-summary-name" id="profile-display-name-header">${u.name}</h3>
+                <p class="profile-summary-email" id="profile-display-email-header">${u.email}</p>
+                <div class="profile-badge-row">
+                  <span class="status-pill success">Verified Customer</span>
+                  <span class="status-pill success" style="background: rgba(40,116,240,0.15); color: #2874f0;">256-Bit JWT</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-            <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;" data-i18n="saved_address">Saved Address</h4>
-              <p id="profile-saved-address-text" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">${defaultAddressString}</p>
-              <button id="profile-manage-address-btn" class="btn-secondary-action" data-i18n="manage_addresses" style="padding: 8px 16px; font-size: 0.85rem;">Manage Addresses</button>
-            </div>
-            <div style="background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-              <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;" data-i18n="account_security">Account Security</h4>
-              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;" data-i18n="jwt_security_desc">Session is protected with 256-bit encryption JWT tokens.</p>
-              <button id="profile-logout-action-btn" class="btn-secondary-action" data-i18n="logout_session" style="padding: 8px 16px; font-size: 0.85rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">Logout Session</button>
-            </div>
-          </div>
+            <!-- Account Navigation Menu -->
+            <nav class="profile-nav-menu" role="tablist" aria-label="Account sections">
+              <button class="profile-nav-btn active" data-tab="personal" role="tab" aria-selected="true" aria-controls="profile-tab-personal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Personal Information</span>
+              </button>
+              <button class="profile-nav-btn" data-tab="addresses" role="tab" aria-selected="false" aria-controls="profile-tab-addresses">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Manage Addresses</span>
+              </button>
+              <button class="profile-nav-btn" data-tab="security" role="tab" aria-selected="false" aria-controls="profile-tab-security">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Account Security</span>
+              </button>
+              <button class="profile-nav-btn" data-tab="payments" role="tab" aria-selected="false" aria-controls="profile-tab-payments">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>Payments & Saved Info</span>
+              </button>
+              <button class="profile-nav-btn" data-tab="activity" role="tab" aria-selected="false" aria-controls="profile-tab-activity">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <span>My Activity & Orders</span>
+              </button>
+              <button class="profile-nav-btn" data-tab="preferences" role="tab" aria-selected="false" aria-controls="profile-tab-preferences">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Account Preferences</span>
+              </button>
+              <button class="profile-nav-btn" data-tab="faq" role="tab" aria-selected="false" aria-controls="profile-tab-faq">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Help & FAQs</span>
+              </button>
+              <button class="profile-nav-btn danger-btn" data-tab="deletion" role="tab" aria-selected="false" aria-controls="profile-tab-deletion">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Delete Account</span>
+              </button>
+            </nav>
+          </aside>
 
-          <!-- Purchase History & Product Review Ratings Section -->
-          <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 20px;">
-            <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">Purchase History & Ratings</h4>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-              ${ordersHtml}
+          <!-- RIGHT COLUMN: Dynamic Section Panels -->
+          <main class="profile-content-panel">
+            <!-- SECTION 1: Personal Information -->
+            <div class="profile-tab-section active" id="profile-tab-personal" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>Personal Information</h3>
+                    <p>Manage your name, contact details, gender, and birthday</p>
+                  </div>
+                  <button id="profile-edit-info-toggle" class="btn-primary-action btn-sm" style="display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <span id="edit-toggle-label">Edit Info</span>
+                  </button>
+                </div>
+
+                <!-- View Mode Grid -->
+                <div id="personal-info-view-mode" class="profile-info-grid">
+                  <div class="info-cell">
+                    <label>First Name</label>
+                    <div id="view-first-name">${firstName}</div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Last Name</label>
+                    <div id="view-last-name">${lastName || '-'}</div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Email Address</label>
+                    <div id="view-email">${u.email}</div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Mobile Number</label>
+                    <div id="view-phone">${u.phone}</div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Gender</label>
+                    <div id="view-gender">${u.gender || 'Not Specified'}</div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Date of Birth</label>
+                    <div id="view-dob">${u.dob || 'Not Provided'}</div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Account Status</label>
+                    <div><span class="status-pill success">Active & Verified</span></div>
+                  </div>
+                  <div class="info-cell">
+                    <label>Member Since</label>
+                    <div>${u.memberSince || 'January 2026'}</div>
+                  </div>
+                </div>
+
+                <!-- Edit Mode Form (Hidden by default) -->
+                <form id="personal-info-edit-form" class="profile-edit-form" style="display: none;" novalidate>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label for="edit-first-name">First Name <span class="required" style="color:#ef4444;">*</span></label>
+                      <input type="text" id="edit-first-name" class="form-input" value="${firstName}" required>
+                      <span class="field-error" id="err-first-name" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                    </div>
+                    <div class="form-group">
+                      <label for="edit-last-name">Last Name <span class="required" style="color:#ef4444;">*</span></label>
+                      <input type="text" id="edit-last-name" class="form-input" value="${lastName}" required>
+                      <span class="field-error" id="err-last-name" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                    </div>
+                  </div>
+                  <div class="form-grid-2" style="margin-top: 14px;">
+                    <div class="form-group">
+                      <label for="edit-email">Email Address <span class="required" style="color:#ef4444;">*</span></label>
+                      <input type="email" id="edit-email" class="form-input" value="${u.email}" required>
+                      <span class="field-error" id="err-email" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                    </div>
+                    <div class="form-group">
+                      <label for="edit-phone">Mobile Number <span class="required" style="color:#ef4444;">*</span></label>
+                      <input type="tel" id="edit-phone" class="form-input" value="${u.phone}" required>
+                      <span class="field-error" id="err-phone" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                    </div>
+                  </div>
+                  <div class="form-grid-2" style="margin-top: 14px;">
+                    <div class="form-group">
+                      <label style="display:block; margin-bottom:6px; font-weight:600; font-size:0.88rem;">Gender</label>
+                      <div class="gender-radio-group">
+                        <label class="radio-label"><input type="radio" name="edit-gender" value="Male" ${u.gender === 'Male' ? 'checked' : ''}> Male</label>
+                        <label class="radio-label"><input type="radio" name="edit-gender" value="Female" ${u.gender === 'Female' ? 'checked' : ''}> Female</label>
+                        <label class="radio-label"><input type="radio" name="edit-gender" value="Other" ${u.gender === 'Other' ? 'checked' : ''}> Other</label>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="edit-dob" style="display:block; margin-bottom:6px; font-weight:600; font-size:0.88rem;">Date of Birth</label>
+                      <input type="date" id="edit-dob" class="form-input" value="${u.dob || ''}">
+                    </div>
+                  </div>
+
+                  <div class="form-action-row" style="margin-top: 20px;">
+                    <button type="submit" id="save-personal-info-btn" class="btn-primary-action" style="padding: 10px 24px; font-weight: 700;">
+                      <span class="btn-text">Save Changes</span>
+                    </button>
+                    <button type="button" id="cancel-personal-info-btn" class="btn-secondary-action" style="padding: 10px 20px;">Cancel</button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
+
+            <!-- SECTION 2: Manage Addresses -->
+            <div class="profile-tab-section" id="profile-tab-addresses" style="display:none;" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>Manage Saved Addresses</h3>
+                    <p>Add, edit, or set default delivery addresses for faster checkout</p>
+                  </div>
+                  <button id="profile-add-address-trigger" class="btn-primary-action btn-sm" style="display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Add New Address</span>
+                  </button>
+                </div>
+
+                <div id="profile-address-cards-container" class="profile-address-grid">
+                  <!-- Address cards dynamically rendered -->
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: Account Security -->
+            <div class="profile-tab-section" id="profile-tab-security" style="display:none;" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>Account Security</h3>
+                    <p>Update password and review active 256-bit SSL encrypted sessions</p>
+                  </div>
+                </div>
+
+                <!-- Change Password Form -->
+                <form id="change-password-form" class="profile-security-form" novalidate>
+                  <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 14px;">Change Password</h4>
+                  <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="pwd-current" style="display:block; margin-bottom:6px; font-weight:600; font-size:0.88rem;">Current Password</label>
+                    <input type="password" id="pwd-current" class="form-input" placeholder="Enter current password" required>
+                    <span class="field-error" id="err-pwd-current" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                  </div>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label for="pwd-new" style="display:block; margin-bottom:6px; font-weight:600; font-size:0.88rem;">New Password</label>
+                      <input type="password" id="pwd-new" class="form-input" placeholder="Minimum 6 characters" required>
+                      <span class="field-error" id="err-pwd-new" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                    </div>
+                    <div class="form-group">
+                      <label for="pwd-confirm" style="display:block; margin-bottom:6px; font-weight:600; font-size:0.88rem;">Confirm New Password</label>
+                      <input type="password" id="pwd-confirm" class="form-input" placeholder="Re-enter new password" required>
+                      <span class="field-error" id="err-pwd-confirm" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+                    </div>
+                  </div>
+                  <button type="submit" id="update-password-btn" class="btn-primary-action" style="margin-top: 18px; padding: 10px 24px; font-weight: 700;">
+                    <span class="btn-text">Update Password</span>
+                  </button>
+                </form>
+
+                <!-- Session Information -->
+                <div class="security-info-box" style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                  <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Active Device Session</h4>
+                  <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                      <div style="font-weight: 700; color: var(--text-primary);">Current Browser Session</div>
+                      <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px;">Encrypted with 256-Bit SSL JWT Tokens • Windows PC (Active)</div>
+                    </div>
+                    <span class="status-pill success">Active Now</span>
+                  </div>
+                  <div style="display: flex; gap: 12px;">
+                    <button id="sec-logout-current-btn" class="btn-secondary-action" style="padding: 8px 16px; font-size: 0.85rem;">Logout Current Session</button>
+                    <button id="sec-logout-all-btn" class="btn-secondary-action danger-border" style="padding: 8px 16px; font-size: 0.85rem; color: #ef4444;">Logout All Devices</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: Payments & Saved Info -->
+            <div class="profile-tab-section" id="profile-tab-payments" style="display:none;" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>Payments & Saved Information</h3>
+                    <p>Saved payment options, UPI IDs, and gift card balances</p>
+                  </div>
+                </div>
+
+                <div class="payments-overview-grid">
+                  <div class="payment-card-item">
+                    <div class="payment-card-icon">💳</div>
+                    <div>
+                      <div class="payment-card-title">Saved Credit / Debit Cards</div>
+                      <div class="payment-card-desc">No cards stored. Payments are processed securely via Razorpay/Stripe gateways.</div>
+                    </div>
+                  </div>
+                  <div class="payment-card-item">
+                    <div class="payment-card-icon">⚡</div>
+                    <div>
+                      <div class="payment-card-title">Saved UPI Identifiers</div>
+                      <div class="payment-card-desc">Instant UPI checkout enabled at payment page.</div>
+                    </div>
+                  </div>
+                  <div class="payment-card-item">
+                    <div class="payment-card-icon">🎁</div>
+                    <div>
+                      <div class="payment-card-title">ShopSphere Gift Cards & Wallet</div>
+                      <div class="payment-card-desc">Available Balance: <strong>₹0.00</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 5: My Activity & Orders -->
+            <div class="profile-tab-section" id="profile-tab-activity" style="display:none;" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>My Activity & Quick Access</h3>
+                    <p>Direct shortcuts to your orders, wishlist, and product ratings</p>
+                  </div>
+                </div>
+
+                <div class="activity-shortcuts-grid">
+                  <button class="activity-shortcut-btn" id="act-goto-orders">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>My Orders</span>
+                  </button>
+                  <button class="activity-shortcut-btn" id="act-goto-wishlist">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <span>Wishlist</span>
+                  </button>
+                  <button class="activity-shortcut-btn" id="act-goto-support">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Support Queries</span>
+                  </button>
+                </div>
+
+                <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                  <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 14px;">Purchase History & Ratings</h4>
+                  ${ordersHtml}
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 6: Account Preferences -->
+            <div class="profile-tab-section" id="profile-tab-preferences" style="display:none;" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>Account Preferences</h3>
+                    <p>Customize notifications, appearance, and language settings</p>
+                  </div>
+                </div>
+
+                <div class="preferences-list">
+                  <div class="pref-row">
+                    <div>
+                      <div class="pref-title">Theme Mode</div>
+                      <div class="pref-desc">Switch between Dark Mode and Light Mode appearance</div>
+                    </div>
+                    <button id="pref-theme-toggle-btn" class="btn-secondary-action">
+                      <span>Toggle Theme</span>
+                    </button>
+                  </div>
+                  <div class="pref-row">
+                    <div>
+                      <div class="pref-title">Language Selection</div>
+                      <div class="pref-desc">Choose your preferred application language</div>
+                    </div>
+                    <select id="pref-lang-select" class="form-input" style="width: auto;">
+                      <option value="en" ${AppState.currentLanguage === 'en' ? 'selected' : ''}>English</option>
+                      <option value="ta" ${AppState.currentLanguage === 'ta' ? 'selected' : ''}>Tamil (தமிழ்)</option>
+                      <option value="hi" ${AppState.currentLanguage === 'hi' ? 'selected' : ''}>Hindi (हिंदी)</option>
+                    </select>
+                  </div>
+                  <div class="pref-row">
+                    <div>
+                      <div class="pref-title">Order Status SMS & Email Alerts</div>
+                      <div class="pref-desc">Receive real-time delivery notifications</div>
+                    </div>
+                    <input type="checkbox" id="pref-sms-toggle" checked style="width: 20px; height: 20px; accent-color: var(--color-accent, #2874f0);">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 7: Help & FAQs -->
+            <div class="profile-tab-section" id="profile-tab-faq" style="display:none;" role="tabpanel">
+              <div class="profile-section-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3>Help & Frequently Asked Questions</h3>
+                    <p>Find quick answers to common account and order questions</p>
+                  </div>
+                  <button id="faq-contact-support-btn" class="btn-primary-action btn-sm">Contact Support</button>
+                </div>
+
+                <div class="faq-accordion">
+                  <details class="faq-item">
+                    <summary class="faq-summary">How do I update my registered mobile number or email?</summary>
+                    <div class="faq-answer">Navigate to the <strong>Personal Information</strong> tab and click <strong>Edit Info</strong> to update your contact details in real-time.</div>
+                  </details>
+                  <details class="faq-item">
+                    <summary class="faq-summary">How is my account data secured?</summary>
+                    <div class="faq-answer">ShopSphere uses industry-standard 256-bit SSL encryption and JWT authentication tokens to protect your profile and session.</div>
+                  </details>
+                  <details class="faq-item">
+                    <summary class="faq-summary">How do I manage my saved delivery addresses?</summary>
+                    <div class="faq-answer">Go to the <strong>Manage Addresses</strong> section where you can add new addresses, edit existing details, or choose your default shipping destination.</div>
+                  </details>
+                  <details class="faq-item">
+                    <summary class="faq-summary">How can I track my existing order status?</summary>
+                    <div class="faq-answer">Click on <strong>My Activity & Orders</strong> or access the Orders section from the main sidebar to view real-time delivery tracking.</div>
+                  </details>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 8: Delete Account (Danger Zone) -->
+            <div class="profile-tab-section" id="profile-tab-deletion" style="display:none;" role="tabpanel">
+              <div class="profile-section-card danger-card">
+                <div class="profile-card-header">
+                  <div>
+                    <h3 style="color: #ef4444;">Delete Account</h3>
+                    <p>Permanently remove your account, saved addresses, and preferences</p>
+                  </div>
+                </div>
+
+                <div class="danger-warning-box">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <div>
+                    <div style="font-weight: 700; color: #ef4444;">Warning: This action is permanent!</div>
+                    <div style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px;">Once deleted, your profile details, saved delivery addresses, wishlist items, and order access will be permanently erased.</div>
+                  </div>
+                </div>
+
+                <div>
+                  <button id="trigger-delete-modal-btn" class="btn-secondary-action danger-border" style="margin-top: 16px; color: #ef4444; font-weight: 700;">
+                    Delete My Account
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
         </div>
       `;
     } else {
@@ -6015,21 +6442,363 @@ document.addEventListener('DOMContentLoaded', () => {
     viewContainer.innerHTML = contentHtml;
 
     if (viewName === 'profile') {
-      const addressBtn = document.getElementById('profile-manage-address-btn');
-      const logoutBtn = document.getElementById('profile-logout-action-btn');
+      const u = AuthService.getUser() || {};
 
-      if (addressBtn) {
-        addressBtn.addEventListener('click', () => {
-          requireAuth('ADDRESSES', {}, () => { if (window.openAddressModal) window.openAddressModal(); });
+      // 1. Tab Switcher Handler
+      const navBtns = document.querySelectorAll('.profile-nav-btn');
+      const tabSections = document.querySelectorAll('.profile-tab-section');
+
+      navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetTab = btn.getAttribute('data-tab');
+          navBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+
+          tabSections.forEach(sec => {
+            sec.style.display = 'none';
+            sec.classList.remove('active');
+          });
+
+          const activeSec = document.getElementById(`profile-tab-${targetTab}`);
+          if (activeSec) {
+            activeSec.style.display = 'block';
+            activeSec.classList.add('active');
+          }
+
+          if (targetTab === 'addresses') {
+            renderProfileAddresses();
+          }
+        });
+      });
+
+      // 2. Personal Information Edit Toggle & Form Submit
+      const editToggleBtn = document.getElementById('profile-edit-info-toggle');
+      const viewModeGrid = document.getElementById('personal-info-view-mode');
+      const editModeForm = document.getElementById('personal-info-edit-form');
+      const cancelEditBtn = document.getElementById('cancel-personal-info-btn');
+      const toggleLabel = document.getElementById('edit-toggle-label');
+
+      if (editToggleBtn && viewModeGrid && editModeForm) {
+        editToggleBtn.addEventListener('click', () => {
+          const isEditing = editModeForm.style.display !== 'none';
+          if (isEditing) {
+            editModeForm.style.display = 'none';
+            viewModeGrid.style.display = 'grid';
+            if (toggleLabel) toggleLabel.textContent = 'Edit Info';
+          } else {
+            editModeForm.style.display = 'block';
+            viewModeGrid.style.display = 'none';
+            if (toggleLabel) toggleLabel.textContent = 'View Info';
+          }
+        });
+
+        if (cancelEditBtn) {
+          cancelEditBtn.addEventListener('click', () => {
+            editModeForm.style.display = 'none';
+            viewModeGrid.style.display = 'grid';
+            if (toggleLabel) toggleLabel.textContent = 'Edit Info';
+          });
+        }
+
+        editModeForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const fn = document.getElementById('edit-first-name').value.trim();
+          const ln = document.getElementById('edit-last-name').value.trim();
+          const email = document.getElementById('edit-email').value.trim();
+          const phone = document.getElementById('edit-phone').value.trim();
+          const genderEl = editModeForm.querySelector('input[name="edit-gender"]:checked');
+          const gender = genderEl ? genderEl.value : '';
+          const dob = document.getElementById('edit-dob').value;
+
+          document.querySelectorAll('#personal-info-edit-form .field-error').forEach(el => el.textContent = '');
+
+          let valid = true;
+          if (!fn) {
+            document.getElementById('err-first-name').textContent = 'First name is required.';
+            valid = false;
+          }
+          if (!email || !email.includes('@')) {
+            document.getElementById('err-email').textContent = 'Please enter a valid email address.';
+            valid = false;
+          }
+          if (!phone || phone.replace(/\D/g, '').length < 10) {
+            document.getElementById('err-phone').textContent = 'Please enter a valid 10-digit mobile number.';
+            valid = false;
+          }
+
+          if (!valid) return;
+
+          const saveBtn = document.getElementById('save-personal-info-btn');
+          if (saveBtn) saveBtn.disabled = true;
+
+          const fullName = `${fn} ${ln}`.trim();
+          AuthService.updateProfile({ name: fullName, email, phone, gender, dob })
+            .then(updated => {
+              if (saveBtn) saveBtn.disabled = false;
+              const vFn = document.getElementById('view-first-name');
+              const vLn = document.getElementById('view-last-name');
+              const vEm = document.getElementById('view-email');
+              const vPh = document.getElementById('view-phone');
+              const vGe = document.getElementById('view-gender');
+              const vDb = document.getElementById('view-dob');
+              const hName = document.getElementById('profile-display-name-header');
+              const hEmail = document.getElementById('profile-display-email-header');
+
+              if (vFn) vFn.textContent = fn;
+              if (vLn) vLn.textContent = ln || '-';
+              if (vEm) vEm.textContent = email;
+              if (vPh) vPh.textContent = phone;
+              if (vGe) vGe.textContent = gender || 'Not Specified';
+              if (vDb) vDb.textContent = dob || 'Not Provided';
+              if (hName) hName.textContent = fullName;
+              if (hEmail) hEmail.textContent = email;
+
+              editModeForm.style.display = 'none';
+              viewModeGrid.style.display = 'grid';
+              if (toggleLabel) toggleLabel.textContent = 'Edit Info';
+
+              showToast('Personal information updated successfully', 'success');
+            })
+            .catch(err => {
+              if (saveBtn) saveBtn.disabled = false;
+              showToast(err.message || 'Failed to save changes', 'error');
+            });
         });
       }
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          AuthService.logout();
+
+      // 3. Avatar Upload Handler
+      const avatarInput = document.getElementById('profile-avatar-input');
+      if (avatarInput) {
+        avatarInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              const base64 = evt.target.result;
+              AuthService.updateProfile({ avatar: base64 }).then(() => {
+                renderView('profile');
+                showToast('Profile picture updated successfully', 'success');
+              });
+            };
+            reader.readAsDataURL(file);
+          }
         });
       }
 
-      // Bind interactive product ratings stars
+      // 4. Address Cards Renderer
+      function renderProfileAddresses() {
+        const container = document.getElementById('profile-address-cards-container');
+        if (!container) return;
+        const addresses = typeof AddressService !== 'undefined' ? AddressService.getAll() : [];
+        if (addresses.length === 0) {
+          container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-secondary); grid-column: 1 / -1;">No addresses saved yet. Click "+ Add New Address" above to save your first shipping destination.</p>`;
+          return;
+        }
+
+        const currentUser = AuthService.getUser() || {};
+        container.innerHTML = addresses.map(addr => `
+          <div class="profile-address-card ${addr.isDefault ? 'default-addr' : ''}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <span class="status-pill" style="background: var(--bg-hover); color: var(--text-primary); font-weight: 700;">${addr.type || 'Home'}</span>
+                ${addr.isDefault ? `<span class="status-pill success" style="margin-left: 6px;">Default</span>` : ''}
+              </div>
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">${addr.name || currentUser.name || 'User'}</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                ${addr.addressLine}, ${addr.city}, ${addr.state} - <strong>${addr.pincode}</strong>
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Phone: ${addr.phone || currentUser.phone || ''}</div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 4px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+              ${!addr.isDefault ? `<button class="btn-secondary-action btn-sm set-default-addr-btn" data-id="${addr.id}" style="font-size: 0.78rem; padding: 4px 8px;">Set Default</button>` : ''}
+              <button class="btn-secondary-action btn-sm edit-addr-btn" data-id="${addr.id}" style="font-size: 0.78rem; padding: 4px 8px;">Edit</button>
+              <button class="btn-secondary-action btn-sm delete-addr-btn" data-id="${addr.id}" style="font-size: 0.78rem; padding: 4px 8px; color: #ef4444; border-color: rgba(239,68,68,0.3);">Delete</button>
+            </div>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.set-default-addr-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            if (typeof AddressService !== 'undefined') {
+              AddressService.setDefault(id);
+              renderProfileAddresses();
+              showToast('Default delivery address updated', 'success');
+            }
+          });
+        });
+
+        container.querySelectorAll('.edit-addr-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            if (window.openAddressModal) window.openAddressModal(id);
+          });
+        });
+
+        container.querySelectorAll('.delete-addr-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            if (typeof AddressService !== 'undefined') {
+              AddressService.delete(id);
+              renderProfileAddresses();
+              showToast('Address deleted successfully', 'info');
+            }
+          });
+        });
+      }
+
+      const addAddressBtn = document.getElementById('profile-add-address-trigger');
+      if (addAddressBtn) {
+        addAddressBtn.addEventListener('click', () => {
+          if (window.openAddressModal) window.openAddressModal();
+        });
+      }
+
+      // 5. Account Security Change Password Form & Logout
+      const pwdForm = document.getElementById('change-password-form');
+      if (pwdForm) {
+        pwdForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const curr = document.getElementById('pwd-current').value;
+          const newPwd = document.getElementById('pwd-new').value;
+          const confirmPwd = document.getElementById('pwd-confirm').value;
+
+          document.querySelectorAll('#change-password-form .field-error').forEach(el => el.textContent = '');
+
+          let valid = true;
+          if (!curr) {
+            document.getElementById('err-pwd-current').textContent = 'Current password is required.';
+            valid = false;
+          }
+          if (!newPwd || newPwd.length < 6) {
+            document.getElementById('err-pwd-new').textContent = 'New password must be at least 6 characters.';
+            valid = false;
+          }
+          if (newPwd !== confirmPwd) {
+            document.getElementById('err-pwd-confirm').textContent = 'Passwords do not match.';
+            valid = false;
+          }
+
+          if (!valid) return;
+
+          const updBtn = document.getElementById('update-password-btn');
+          if (updBtn) updBtn.disabled = true;
+
+          AuthService.updatePassword(curr, newPwd)
+            .then(() => {
+              if (updBtn) updBtn.disabled = false;
+              pwdForm.reset();
+              showToast('Password updated successfully', 'success');
+            })
+            .catch(err => {
+              if (updBtn) updBtn.disabled = false;
+              showToast(err.message || 'Failed to update password', 'error');
+            });
+        });
+      }
+
+      const secLogoutCurrent = document.getElementById('sec-logout-current-btn');
+      const secLogoutAll = document.getElementById('sec-logout-all-btn');
+      if (secLogoutCurrent) secLogoutCurrent.addEventListener('click', () => AuthService.logout());
+      if (secLogoutAll) secLogoutAll.addEventListener('click', () => AuthService.logout());
+
+      // 6. Activity Navigation Shortcuts
+      const actOrders = document.getElementById('act-goto-orders');
+      const actWishlist = document.getElementById('act-goto-wishlist');
+      const actSupport = document.getElementById('act-goto-support');
+      if (actOrders) actOrders.addEventListener('click', () => renderView('orders'));
+      if (actWishlist) actWishlist.addEventListener('click', () => renderView('wishlist'));
+      if (actSupport) actSupport.addEventListener('click', () => renderView('support'));
+
+      // 7. Preferences Handlers
+      const prefThemeToggle = document.getElementById('pref-theme-toggle-btn');
+      if (prefThemeToggle) {
+        prefThemeToggle.addEventListener('click', () => {
+          const globalThemeBtn = document.getElementById('theme-toggle');
+          if (globalThemeBtn) {
+            globalThemeBtn.click();
+          } else {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+          }
+          showToast('Theme preference updated', 'info');
+        });
+      }
+
+      const prefLangSelect = document.getElementById('pref-lang-select');
+      if (prefLangSelect) {
+        prefLangSelect.addEventListener('change', (e) => {
+          if (typeof changeLanguage === 'function') {
+            changeLanguage(e.target.value);
+          }
+        });
+      }
+
+      // 8. FAQ Contact Support Button
+      const faqSupportBtn = document.getElementById('faq-contact-support-btn');
+      if (faqSupportBtn) faqSupportBtn.addEventListener('click', () => renderView('support'));
+
+      // 9. Account Deletion Modal & Confirmation Handler
+      const triggerDeleteBtn = document.getElementById('trigger-delete-modal-btn');
+      const deleteModalOverlay = document.getElementById('account-delete-modal-overlay');
+      const deleteModalCancel = document.getElementById('acct-delete-cancel-btn');
+      const deleteModalConfirm = document.getElementById('acct-delete-confirm-btn');
+      const deleteInput = document.getElementById('acct-delete-confirm-input');
+      const deleteError = document.getElementById('acct-delete-error');
+
+      if (triggerDeleteBtn && deleteModalOverlay) {
+        triggerDeleteBtn.addEventListener('click', () => {
+          if (deleteInput) deleteInput.value = '';
+          if (deleteError) deleteError.textContent = '';
+          deleteModalOverlay.classList.remove('hidden');
+        });
+
+        if (deleteModalCancel) {
+          deleteModalCancel.addEventListener('click', () => {
+            deleteModalOverlay.classList.add('hidden');
+          });
+        }
+
+        document.addEventListener('keydown', function escHandler(evt) {
+          if (evt.key === 'Escape' && !deleteModalOverlay.classList.contains('hidden')) {
+            deleteModalOverlay.classList.add('hidden');
+            document.removeEventListener('keydown', escHandler);
+          }
+        });
+
+        if (deleteModalConfirm) {
+          deleteModalConfirm.addEventListener('click', () => {
+            const val = (deleteInput ? deleteInput.value : '').trim();
+            if (val.toUpperCase() !== 'DELETE') {
+              if (deleteError) deleteError.textContent = 'Please type DELETE exactly to confirm.';
+              return;
+            }
+
+            deleteModalConfirm.disabled = true;
+            AuthService.deleteAccount('DELETE')
+              .then(() => {
+                deleteModalConfirm.disabled = false;
+                deleteModalOverlay.classList.add('hidden');
+                showToast('Account deleted successfully', 'info');
+              })
+              .catch(err => {
+                deleteModalConfirm.disabled = false;
+                if (deleteError) deleteError.textContent = err.message || 'Deletion failed.';
+              });
+          });
+        }
+      }
+
+      // 10. Bind interactive product ratings stars
       const widgets = document.querySelectorAll('.profile-star-rating-widget');
       widgets.forEach(w => {
         const stars = w.querySelectorAll('.profile-star-item');
@@ -6043,7 +6812,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveProductRating(u.id, pid, val);
               }
 
-              // Refresh star coloring immediately
               stars.forEach(s => {
                 const sVal = parseInt(s.getAttribute('data-value'));
                 s.style.color = sVal <= val ? '#ffb703' : 'inherit';

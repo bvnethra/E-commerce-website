@@ -1059,6 +1059,29 @@
           style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 700; justify-content: center; background-color: #ef4444; border-color: #ef4444; color: #ffffff; border-radius: var(--radius-md);">Delete</button>
       </div>
     </div>
+  <!-- Delete Account Confirmation Modal -->
+  <div id="account-delete-modal-overlay" class="address-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="acct-delete-title">
+    <div class="address-modal-card" style="max-width: 440px; text-align: center; align-items: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 28px; height: 28px;">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </div>
+      <h3 id="acct-delete-title" style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0 0 8px 0;">Delete Your Account?</h3>
+      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 16px 0;">This will permanently erase your profile details, delivery addresses, wishlist items, and account access. This action cannot be undone.</p>
+      <div style="width: 100%; margin-bottom: 20px; text-align: left;">
+        <label for="acct-delete-confirm-input" style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 6px;">Type <strong>DELETE</strong> to confirm:</label>
+        <input type="text" id="acct-delete-confirm-input" class="form-input" placeholder="Type DELETE here" style="width: 100%;">
+        <span id="acct-delete-error" class="field-error" style="color:#ef4444; font-size:0.8rem; display:block; margin-top:4px;"></span>
+      </div>
+      <div style="display: flex; gap: 12px; width: 100%;">
+        <button id="acct-delete-cancel-btn" class="btn-secondary-action" style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 600; justify-content: center; border-radius: var(--radius-md);">Cancel</button>
+        <button id="acct-delete-confirm-btn" class="btn-primary-action" style="flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 700; justify-content: center; background-color: #ef4444; border-color: #ef4444; color: #ffffff; border-radius: var(--radius-md);">Delete Permanently</button>
+      </div>
+    </div>
   </div>
 
   <!-- Settings Drawer Overlay -->
