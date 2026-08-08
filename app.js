@@ -392,22 +392,47 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   const AddressService = {
     init() {
-      if (!localStorage.getItem('aura_addresses')) {
-        const defaultAddr = [
-          {
-            id: 'addr_1',
-            name: AppState.user?.name || 'Vishal',
-            phone: AppState.user?.phone || '8120089832',
-            pincode: '560001',
-            addressLine: 'Flat 402, Skyline Residency, MG Road',
-            city: 'Bengaluru',
-            state: 'Karnataka',
-            type: 'Home',
-            isDefault: true
-          }
-        ];
-        localStorage.setItem('aura_addresses', JSON.stringify(defaultAddr));
-      }
+      try {
+        const stored = JSON.parse(localStorage.getItem('aura_addresses') || '[]');
+        if (!stored || stored.length < 2) {
+          const defaultAddr = [
+            {
+              id: 'addr_1',
+              name: AppState.user?.name || 'Varun',
+              phone: AppState.user?.phone || '9876543210',
+              pincode: '560001',
+              addressLine: 'Flat 402, Skyline Residency, MG Road',
+              city: 'Bengaluru',
+              state: 'Karnataka',
+              type: 'Home',
+              isDefault: true
+            },
+            {
+              id: 'addr_2',
+              name: AppState.user?.name || 'Varun',
+              phone: AppState.user?.phone || '9876543210',
+              pincode: '600001',
+              addressLine: 'No 15, Anna Salai, Nungambakkam',
+              city: 'Chennai',
+              state: 'Tamil Nadu',
+              type: 'Work',
+              isDefault: false
+            },
+            {
+              id: 'addr_3',
+              name: AppState.user?.name || 'Varun',
+              phone: AppState.user?.phone || '9876543210',
+              pincode: '400001',
+              addressLine: 'Suite 201, Nariman Point, Marine Drive',
+              city: 'Mumbai',
+              state: 'Maharashtra',
+              type: 'Other',
+              isDefault: false
+            }
+          ];
+          localStorage.setItem('aura_addresses', JSON.stringify(defaultAddr));
+        }
+      } catch (e) { }
       this.updateHeaderLocation();
     },
 
@@ -779,6 +804,9 @@ document.addEventListener('DOMContentLoaded', () => {
       modalOverlay.classList.add('hidden');
       locationTrigger.setAttribute('aria-expanded', 'false');
     }
+
+    window.openHeaderLocationModal = openHeaderLocationModal;
+    window.closeHeaderLocationModal = closeHeaderLocationModal;
 
     locationTrigger.addEventListener('click', openHeaderLocationModal);
     locationTrigger.addEventListener('keydown', (e) => {
