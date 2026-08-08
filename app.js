@@ -690,6 +690,179 @@ document.addEventListener('DOMContentLoaded', () => {
   initAddressModal();
 
   /* ==========================================================================
+     Header Delivery Location Popover & Address Sync Controller
+     ========================================================================== */
+  function initHeaderLocationSelector() {
+    const trigger = document.getElementById('location-select');
+    const popover = document.getElementById('location-popover');
+    const listContainer = document.getElementById('popover-address-list');
+    const addBtn = document.getElementById('popover-add-btn');
+    const manageBtn = document.getElementById('popover-manage-btn');
+
+    if (!trigger || !popover || !listContainer) return;
+
+    function renderPopoverAddresses() {
+      listContainer.innerHTML = `
+        <div style="padding: 12px; text-align: center; color: var(--text-muted); font-size: 0.82rem;">
+          <div class="skeleton-loader" style="height: 36px; margin-bottom: 6px;"></div>
+          <div class="skeleton-loader" style="height: 36px;"></div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        try {
+          const addrs = typeof AddressService !== 'undefined' ? AddressService.getAll() : [];
+          listContainer.innerHTML = '';
+
+          if (addrs.length === 0) {
+            listContainer.innerHTML = `
+              <div style="text-align: center; padding: 20px 12px; background: var(--bg-body); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+                <div style="font-size: 1.5rem; margin-bottom: 4px;">📍</div>
+                <div style="font-weight: 700; color: var(--text-primary); font-size: 0.88rem;">No Saved Addresses</div>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 2px 0 12px 0;">Add an address to choose your delivery location.</p>
+                <button id="popover-empty-add-btn" class="btn-primary-action btn-sm" style="padding: 6px 14px; font-size: 0.8rem; margin: 0 auto;">+ Add Address</button>
+              </div>
+            `;
+            const emptyAddBtn = document.getElementById('popover-empty-add-btn');
+            if (emptyAddBtn) {
+              emptyAddBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closePopover();
+                if (window.openAddressModal) window.openAddressModal();
+              });
+            }
+            return;
+          }
+
+          const currentUser = typeof AuthService !== 'undefined' ? (AuthService.getUser() || {}) : {};
+
+          listContainer.innerHTML = addrs.map(addr => `
+            <div class="popover-address-item ${addr.isDefault ? 'selected' : ''}" data-id="${addr.id}" style="padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid ${addr.isDefault ? 'var(--color-accent, #2874f0)' : 'var(--border-color)'}; background: ${addr.isDefault ? 'var(--color-accent-bg, rgba(40,116,240,0.06))' : 'var(--bg-card)'}; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s ease;">
+              <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+                <input type="radio" name="popover-selected-addr" value="${addr.id}" ${addr.isDefault ? 'checked' : ''} style="margin-top: 3px; accent-color: var(--color-accent, #2874f0); cursor: pointer;" aria-label="Select address ${addr.city}">
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-weight: 700; color: var(--text-primary); font-size: 0.85rem;">${addr.name || currentUser.name || 'User'}</span>
+                    <span class="status-pill" style="font-size: 0.68rem; padding: 1px 5px; background: var(--bg-hover); color: var(--text-primary); font-weight: 700;">${addr.type || 'Home'}</span>
+                    ${addr.isDefault ? `<span class="status-pill success" style="font-size: 0.68rem; padding: 1px 5px;">Default</span>` : ''}
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 3px; line-height: 1.35;">
+                    ${addr.addressLine}, ${addr.city}, ${addr.state} - <strong>${addr.pincode}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+          listContainer.querySelectorAll('.popover-address-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const id = item.getAttribute('data-id');
+              if (typeof AddressService !== 'undefined') {
+                AddressService.setDefault(id);
+                const def = AddressService.getDefault();
+                if (def) {
+                  showToast(`Delivery location updated: ${def.city} - ${def.pincode}`, 'success');
+                }
+              }
+              closePopover();
+
+              if (AppState.currentView === 'profile') {
+                const profileTab = document.querySelector('.profile-nav-btn.active');
+                if (profileTab && profileTab.getAttribute('data-tab') === 'addresses') {
+                  renderView('profile');
+                }
+              }
+            });
+          });
+        } catch (err) {
+          listContainer.innerHTML = `
+            <div style="padding: 14px; text-align: center; color: #ef4444; font-size: 0.82rem;">
+              Unable to load saved addresses.
+              <button id="popover-retry-btn" class="btn-secondary-action btn-sm" style="margin-top: 8px; width: 100%;">Retry</button>
+            </div>
+          `;
+          const retryBtn = document.getElementById('popover-retry-btn');
+          if (retryBtn) {
+            retryBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              renderPopoverAddresses();
+            });
+          }
+        }
+      }, 100);
+    }
+
+    function togglePopover(e) {
+      if (e) e.stopPropagation();
+      const isHidden = popover.classList.contains('hidden');
+      if (isHidden) {
+        openPopover();
+      } else {
+        closePopover();
+      }
+    }
+
+    function openPopover() {
+      renderPopoverAddresses();
+      popover.classList.remove('hidden');
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closePopover() {
+      popover.classList.add('hidden');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    trigger.addEventListener('click', togglePopover);
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        togglePopover(e);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!trigger.contains(e.target) && !popover.contains(e.target)) {
+        closePopover();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !popover.classList.contains('hidden')) {
+        closePopover();
+      }
+    });
+
+    if (addBtn) {
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closePopover();
+        if (window.openAddressModal) window.openAddressModal();
+      });
+    }
+
+    if (manageBtn) {
+      manageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closePopover();
+        requireAuth('PROFILE', {}, () => {
+          renderView('profile');
+          setTimeout(() => {
+            const addrTabBtn = document.querySelector('.profile-nav-btn[data-tab="addresses"]');
+            if (addrTabBtn) addrTabBtn.click();
+          }, 50);
+        });
+      });
+    }
+
+    window.openHeaderLocationModal = openPopover;
+    window.closeHeaderLocationModal = closePopover;
+  }
+
+  initHeaderLocationSelector();
+
+  /* ==========================================================================
      Translation & Localization Engine (i18n)
      ========================================================================== */
   const TRANSLATIONS = {
