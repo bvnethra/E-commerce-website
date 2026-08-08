@@ -7359,16 +7359,23 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Category Card Filter & Navigation Router (Delegated for dynamic views) */
   if (viewContainer) {
     viewContainer.addEventListener('click', (e) => {
-      const navBtn = e.target.closest('[data-nav-target]');
+      const navBtn = e.target.closest('[data-nav-target], [data-nav], .promo-arrow-btn, .deals-action-btn, .view-all-link');
       if (navBtn) {
         e.preventDefault();
-        const target = navBtn.getAttribute('data-nav-target');
+        const target = navBtn.getAttribute('data-nav-target') || navBtn.getAttribute('data-nav') || 'shop';
         const navItem = document.querySelector(`.nav-item[data-nav="${target}"]`);
         if (navItem) {
           navItem.click();
         } else {
           renderView(target);
         }
+        return;
+      }
+
+      const allCatCard = e.target.closest('.all-categories-card');
+      if (allCatCard) {
+        e.preventDefault();
+        renderView('categories');
         return;
       }
 
