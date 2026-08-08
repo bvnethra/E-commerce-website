@@ -863,6 +863,70 @@ function deleteRegisteredUser(userId) {
 /* ==========================================================================
    MODULE 6: Inventory Management
    ========================================================================== */
+const AdminApiService = {
+  baseUrl: 'http://localhost:8080',
+  isLive: false,
+
+  async init() {
+    try {
+      const res = await fetch(`${this.baseUrl}/health`);
+      if (res.ok) {
+        const health = await res.json();
+        if (health.status === 'UP') {
+          this.isLive = true;
+          console.log('Admin connected to live backend.');
+        }
+      }
+    } catch (e) {
+      this.isLive = false;
+    }
+  },
+
+  async syncProducts() {
+    if (!this.isLive) return;
+    try {
+      const res = await fetch(`${this.baseUrl}/api/products?limit=100`);
+      if (res.ok) {
+        const backendProds = await res.json();
+        const localProds = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
+        
+        const mergedProds = backendProds.map(bp => {
+          const lp = localProds.find(p => p.id === bp.id);
+          const stock = lp ? lp.stockCount : 15;
+          return {
+            id: bp.id,
+            name: bp.name,
+            cat: bp.category ? bp.category.name : (lp ? lp.cat : 'Accessories'),
+            brand: bp.brand ? bp.brand.name : (lp ? lp.brand : 'HypeBrand'),
+            price: `₹${parseFloat(bp.price).toLocaleString('en-IN')}`,
+            originalPrice: `₹${Math.round(parseFloat(bp.price) * 1.5).toLocaleString('en-IN')}`,
+            numericPrice: parseFloat(bp.price),
+            discount: 33,
+            badge: '-33%',
+            rating: bp.rating || 4.2,
+            reviewCount: bp.reviewCount || 15,
+            inStock: stock > 0,
+            stockCount: stock,
+            sku: bp.sku || `SKU-${bp.id * 123}`,
+            deliveryBadge: 'Express Shipping in 2 Days',
+            warranty: '1 Year Brand Warranty',
+            returnPolicy: '30 Days Money Back Guarantee',
+            sellerInfo: 'Hype Direct Official Store',
+            shortDesc: bp.description || 'Premium build quality.',
+            description: bp.description || 'Premium quality.',
+            img: bp.imageUrl || 'assets/images/cat_accessories.png',
+            images: [bp.imageUrl || 'assets/images/cat_accessories.png']
+          };
+        });
+
+        localStorage.setItem('shopsphere_products', JSON.stringify(mergedProds));
+      }
+    } catch (err) {
+      console.error('Failed to sync products with backend database', err);
+    }
+  }
+};
+
 function populateInventoryCategorySelectDropdown() {
   const categories = JSON.parse(localStorage.getItem('shopsphere_categories') || '[]');
   const select = document.getElementById('inventory-category-select');
@@ -881,7 +945,11 @@ function populateInventoryCategorySelectDropdown() {
   }
 }
 
-function renderInventoryTable() {
+async function renderInventoryTable() {
+  await AdminApiService.init();
+  if (AdminApiService.isLive) {
+    await AdminApiService.syncProducts();
+  }
   const products = JSON.parse(localStorage.getItem('shopsphere_products') || '[]');
   const tableBody = document.getElementById('inventory-table-body');
   tableBody.innerHTML = '';

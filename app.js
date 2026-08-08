@@ -1795,14 +1795,149 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Simulated Async API Service with Instant Resolution
+  function normalizeBackendProduct(p) {
+    const numericPrice = p.price || 1999;
+    const originalPrice = Math.round(numericPrice * 1.5);
+    const discount = 33;
+    return {
+      id: p.id,
+      name: p.name,
+      cat: p.category ? p.category.name : 'Accessories',
+      brand: p.brand ? p.brand.name : 'HypeBrand',
+      price: `₹${numericPrice.toLocaleString('en-IN')}`,
+      originalPrice: `₹${originalPrice.toLocaleString('en-IN')}`,
+      numericPrice: numericPrice,
+      discount: discount,
+      badge: `-${discount}%`,
+      rating: p.rating || 4.2,
+      reviewCount: p.reviewCount || 15,
+      inStock: true,
+      stockCount: 15,
+      sku: `SKU-${p.id * 123}`,
+      deliveryBadge: 'Express Shipping in 2 Days',
+      warranty: '1 Year Brand Warranty',
+      returnPolicy: '30 Days Money Back Guarantee',
+      sellerInfo: 'Hype Direct Official Store',
+      shortDesc: p.description || 'Premium design and high-quality build.',
+      description: p.description || 'Experience the premium build quality and high performance style.',
+      img: p.imageUrl || 'assets/images/cat_accessories.png',
+      images: [p.imageUrl || 'assets/images/cat_accessories.png'],
+      variants: {
+        colors: ['Black', 'Default'],
+        sizes: ['Standard']
+      },
+      specs: {
+        'Category': p.category ? p.category.name : 'Accessories',
+        'Brand': p.brand ? p.brand.name : 'HypeBrand'
+      }
+    };
+  }
+
+  function normalizeBackendCategory(c) {
+    const bgMap = {
+      'Men': '#e0f2fe',
+      'Women': '#fce7f3',
+      'Activewear': '#ccfbf1',
+      'Sleepwear': '#fae8ff',
+      'Shoes': '#fef9c3',
+      'Accessories': '#fef9c3',
+      'Electronics': '#dcfce7',
+      'Lighting': '#fef9c3',
+      'Decor': '#f7fee7',
+      'Lifestyle': '#ecfccb',
+      'Smart Watch': '#fae8ff'
+    };
+    const imgMap = {
+      'Men': 'assets/images/cat_men.png',
+      'Women': 'assets/images/cat_women.png',
+      'Activewear': 'assets/images/cat_activewear.png',
+      'Sleepwear': 'assets/images/cat_sleepwear.svg',
+      'Shoes': 'assets/images/cat_shoes.png',
+      'Accessories': 'assets/images/cat_accessories.png',
+      'Electronics': 'assets/images/cat_electronics.png',
+      'Lighting': 'assets/images/cat_lighting.svg',
+      'Decor': 'assets/images/cat_homedecor.svg',
+      'Lifestyle': 'assets/images/cat_furniture.png',
+      'Smart Watch': 'assets/images/prod_watch.png'
+    };
+    return {
+      name: c.name,
+      subtitle: c.description || 'Collection',
+      bg: bgMap[c.name] || '#f1f5f9',
+      img: imgMap[c.name] || 'assets/images/cat_accessories.png'
+    };
+  }
+
+  // Simulated Async API Service with Live Backend Switch
   const ApiService = {
-    fetchViewData(viewName) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ state: 'success', data: ApiService.getMockData(viewName) });
-        }, 100);
-      });
+    isLive: false,
+    baseUrl: 'http://localhost:8080',
+
+    async init() {
+      try {
+        const res = await fetch(`${this.baseUrl}/health`);
+        if (res.ok) {
+          const health = await res.json();
+          if (health.status === 'UP') {
+            this.isLive = true;
+            console.log('Connected to AURA live backend API.');
+          }
+        }
+      } catch (err) {
+        console.warn('Backend API offline. Running in Local Storage Mock mode.');
+      }
+    },
+
+    async fetchViewData(viewName) {
+      if (!this.isLive) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ state: 'success', data: ApiService.getMockData(viewName) });
+          }, 100);
+        });
+      }
+
+      try {
+        if (viewName === 'home') {
+          const catRes = await fetch(`${this.baseUrl}/api/categories`);
+          const prodRes = await fetch(`${this.baseUrl}/api/products?limit=100`);
+          if (catRes.ok && prodRes.ok) {
+            const backendCats = await catRes.json();
+            const backendProds = await prodRes.json();
+            const normalizedProds = backendProds.map(normalizeBackendProduct);
+            const normalizedCats = backendCats.map(normalizeBackendCategory);
+            
+            mockDb.products = normalizedProds;
+            mockDb.categories = normalizedCats;
+            localStorage.setItem('shopsphere_products', JSON.stringify(normalizedProds));
+            localStorage.setItem('shopsphere_categories', JSON.stringify(normalizedCats));
+            
+            return { state: 'success', data: normalizedProds };
+          }
+        } else if (viewName === 'categories') {
+          const catRes = await fetch(`${this.baseUrl}/api/categories`);
+          if (catRes.ok) {
+            const backendCats = await catRes.json();
+            const normalizedCats = backendCats.map(normalizeBackendCategory);
+            mockDb.categories = normalizedCats;
+            localStorage.setItem('shopsphere_categories', JSON.stringify(normalizedCats));
+            return { state: 'success', data: normalizedCats };
+          }
+        } else if (viewName === 'shop' || viewName === 'products') {
+          const prodRes = await fetch(`${this.baseUrl}/api/products?limit=100`);
+          if (prodRes.ok) {
+            const backendProds = await prodRes.json();
+            const normalizedProds = backendProds.map(normalizeBackendProduct);
+            mockDb.products = normalizedProds;
+            localStorage.setItem('shopsphere_products', JSON.stringify(normalizedProds));
+            return { state: 'success', data: normalizedProds };
+          }
+        }
+      } catch (err) {
+        console.error('API call failed, falling back to local data', err);
+      }
+
+      return { state: 'success', data: ApiService.getMockData(viewName) };
     },
 
     getMockData(viewName) {
@@ -5598,12 +5733,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initial bindings for static elements on initial DOM load
-  loadFiltersFromURL();
-  bindProductCardListeners();
-  bindGlobalNavigationEvents();
-  bindAuthEventListeners();
-  updateCartBadge();
+  // Initial bindings for static elements on initial DOM load after API service resolves
+  ApiService.init().then(() => {
+    loadFiltersFromURL();
+    bindProductCardListeners();
+    bindGlobalNavigationEvents();
+    bindAuthEventListeners();
+    updateCartBadge();
+  });
 
   // Automatically prompt login modal on site entry if unauthenticated
   if (!AuthService.isAuthenticated()) {
