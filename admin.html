@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopSphere Admin Portal | 13-Module Console</title>
+  <!-- Google Fonts - Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- ShopSphere Core style variable links -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Admin Specific Overrides -->
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+  <!-- Auth Login Screen Overlay -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-logo">Shop<span>Sphere</span> Admin</div>
+      <p class="auth-subtitle">Log in with your administrator credentials</p>
+      <div style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 20px; background: var(--input-bg); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: inline-block;">
+        Demo Credentials: <strong style="color: var(--text-primary);">admin_ss</strong> / <strong style="color: var(--text-primary);">ss123</strong>
+      </div>
+      
+      <div id="login-error-msg" style="color: var(--color-danger); font-size: 13.5px; font-weight: 600; margin-bottom: 16px; display: none;"></div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label for="admin-login-username">Admin Username</label>
+          <input type="text" class="form-control" id="admin-login-username" placeholder="e.g. shopsphere_admin">
+        </div>
+        <div class="form-group">
+          <label for="admin-login-password">Admin Password</label>
+          <input type="password" class="form-control" id="admin-login-password" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" id="admin-login-submit" style="justify-content: center; width: 100%; margin-top: 10px; padding: 12px;">Access Admin Console</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Layout Panel -->
+  <aside class="sidebar" id="sidebar-layout" style="display: none;">
+    <div class="brand">
+      <div class="brand-logo">Shop<span>Sphere</span></div>
+    </div>
+    <ul class="nav-list">
+      <li><a href="#" class="nav-link active" data-tab="dashboard">Dashboard</a></li>
+      <li><a href="#" class="nav-link" data-tab="products">Product Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="categories">Category Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="orders">Order Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="users">User Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="inventory">Inventory Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="coupons">Coupon Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="payments">Payment Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="delivery">Delivery Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="reviews">Reviews Mgmt</a></li>
+      <li><a href="#" class="nav-link" data-tab="notifications">Notifications</a></li>
+      <li><a href="#" class="nav-link" data-tab="analytics">Reports & Analytics</a></li>
+      <li><a href="#" class="nav-link" data-tab="settings">Settings</a></li>
+      <li style="margin-top: auto;"><a href="#" class="nav-link" id="view-storefront">View Storefront</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main content Panel -->
+  <main class="main-content" id="main-layout" style="display: none;">
+    <div class="header">
+      <h1 class="page-title" id="page-title">Dashboard Overview</h1>
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="btn btn-secondary" id="logout-btn">Log Out</button>
+      </div>
+    </div>
+
+    <!-- KPIs Metric Stats Cards Container -->
+    <div class="kpi-container">
+      <div class="kpi-card">
+        <span class="kpi-title">Total Sales</span>
+        <span class="kpi-value" id="kpi-sales">₹0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Total Orders</span>
+        <span class="kpi-value" id="kpi-orders">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Product Catalog</span>
+        <span class="kpi-value" id="kpi-products">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Active Coupons</span>
+        <span class="kpi-value" id="kpi-coupons">0</span>
+      </div>
+    </div>
+
+    <!-- VIEW 1: DASHBOARD -->
+    <section class="admin-view active" id="view-dashboard">
+      <div style="background-color: var(--bg-card); border-radius: var(--radius-md); padding: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); margin-bottom: 30px;">
+        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">ShopSphere Admin Administration</h2>
+        <p style="color: var(--text-secondary); line-height: 1.6;">Welcome to the administrator control panel. Use the sidebar menu options to manage product listings, categories, process checkout transactions, monitor stock logs, generate discount coupons, moderate reviews, and configure store settings.</p>
+      </div>
+    </section>
+
+    <!-- VIEW 2: PRODUCT MANAGEMENT -->
+    <section class="admin-view" id="view-products">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Products</h2>
+        <button class="btn btn-primary" onclick="openProductModal()">+ Add New Product</button>
+      </div>
+      
+      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 20px; background: var(--bg-card); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); width: fit-content;">
+        <label for="admin-product-category-filter" style="font-size: 13.5px; font-weight: 600; color: var(--text-secondary); margin: 0;">Filter by Category:</label>
+        <select class="form-control" id="admin-product-category-filter" style="width: auto; padding: 6px 12px; font-size: 13px; height: auto; margin: 0;" onchange="filterProductsByCategory(this.value)">
+          <option value="ALL">All Categories</option>
+        </select>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>SKU</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 3: CATEGORY MANAGEMENT -->
+    <section class="admin-view" id="view-categories">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Categories</h2>
+        <button class="btn btn-primary" onclick="openCategoryModal()">+ Add Category</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Category Name</th>
+              <th>Subtitle</th>
+              <th>Background Color</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="categories-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 4: ORDER MANAGEMENT -->
+    <section class="admin-view" id="view-orders">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Checkout Orders Log</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total Amount</th>
+              <th>Payment Mode</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Change Status</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 5: USER MANAGEMENT -->
+    <section class="admin-view" id="view-users">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Customer Accounts</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 6: INVENTORY MANAGEMENT -->
+    <section class="admin-view" id="view-inventory">
+      <div class="header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Inventory Status & Tracking</h2>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Filter by Category:</span>
+          <select id="inventory-category-select" class="form-control" onchange="renderInventoryTable()" style="width: 200px; padding: 6px 12px; height: auto;">
+            <option value="ALL">All Categories</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Current Stock</th>
+              <th>Status</th>
+              <th>Quick Update Quantity</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 7: COUPON MANAGEMENT -->
+    <section class="admin-view" id="view-coupons">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Discount Coupons</h2>
+        <button class="btn btn-primary" onclick="openCouponModal()">+ Create Coupon</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Discount Type</th>
+              <th>Value</th>
+              <th>Status</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="coupons-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 8: PAYMENT MANAGEMENT -->
+    <section class="admin-view" id="view-payments">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Transactions & Payment logs</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Payment Method</th>
+              <th>Transaction Amount</th>
+              <th>Verification Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="payments-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 9: DELIVERY MANAGEMENT -->
+    <section class="admin-view" id="view-delivery">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Delivery & Shipments Coordinator</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Selected Address</th>
+              <th>Delivery Partner</th>
+              <th>Tracking Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="delivery-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 10: REVIEWS MANAGEMENT -->
+    <section class="admin-view" id="view-reviews">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Customer Reviews Moderation</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Rating</th>
+              <th>Comment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reviews-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 11: NOTIFICATIONS LOG -->
+    <section class="admin-view" id="view-notifications">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Notifications Logs</h2>
+        <button class="btn btn-primary" onclick="triggerNotificationBroadcast()">Trigger Test Broadcast</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Recipient Type</th>
+              <th>Medium</th>
+              <th>Notification Content</th>
+              <th>Send Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="notifications-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 12: REPORTS & ANALYTICS -->
+    <section class="admin-view" id="view-analytics">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Sales Reports & Performance Logs</h2>
+      </div>
+      <div class="analytics-chart-placeholder">
+        <span>Sales Performance Chart (Interactive Canvas Mock)</span>
+      </div>
+      <div style="background-color: var(--bg-card); border-radius: var(--radius-md); padding: 24px; border: 1px solid var(--border-color);">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Analytics Summary</h3>
+        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 14px;" id="analytics-summary-text">Calculating data...</p>
+      </div>
+    </section>
+
+    <!-- VIEW 13: SETTINGS -->
+    <section class="admin-view" id="view-settings">
+      <div class="header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Global Settings</h2>
+      </div>
+      <div style="background-color: var(--bg-card); border-radius: var(--radius-md); padding: 30px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 20px;">
+        <div class="form-group">
+          <label for="settings-tax-rate">Store Tax Rate (%)</label>
+          <input type="number" class="form-control" id="settings-tax-rate" value="18">
+        </div>
+        <div class="form-group">
+          <label for="settings-shipping-price">Flat Shipping Fee (₹)</label>
+          <input type="number" class="form-control" id="settings-shipping-price" value="99">
+        </div>
+        <div class="form-group">
+          <label for="settings-gateway">Default Active Payment Gateway</label>
+          <select class="form-control" id="settings-gateway">
+            <option value="razorpay">Razorpay Gateway (Production)</option>
+            <option value="stripe">Stripe Global (Sandbox)</option>
+            <option value="cod-only">Cash On Delivery Only</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="saveAdminSettings()" style="width: fit-content; margin-top: 10px;">Save Settings</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Product Modal -->
+  <div class="modal" id="product-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="product-modal-title">Add New Product</h3>
+        <button onclick="closeProductModal()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prod-form-id">
+        <div class="form-group">
+          <label for="prod-form-name">Product Name</label>
+          <input type="text" class="form-control" id="prod-form-name" placeholder="e.g. Noise Ultra 2 Max">
+        </div>
+        <div class="form-group">
+          <label for="prod-form-cat">Category</label>
+          <select class="form-control" id="prod-form-cat"></select>
+        </div>
+        <div class="form-group">
+          <label for="prod-form-price">Price (₹)</label>
+          <input type="number" class="form-control" id="prod-form-price" placeholder="e.g. 2999">
+        </div>
+        <div class="form-group">
+          <label for="prod-form-stock">Stock Count</label>
+          <input type="number" class="form-control" id="prod-form-stock" placeholder="e.g. 15">
+        </div>
+        <div class="form-group">
+          <label for="prod-form-img">Image Path</label>
+          <input type="text" class="form-control" id="prod-form-img" placeholder="e.g. assets/images/prod_watch.png">
+        </div>
+        <div class="form-group">
+          <label for="prod-form-desc">Short Description</label>
+          <textarea class="form-control" id="prod-form-desc" rows="2" placeholder="e.g. Premium smartwatch..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProductForm()">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div class="modal" id="category-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="category-modal-title">Add Category</h3>
+        <button onclick="closeCategoryModal()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="cat-form-id">
+        <div class="form-group">
+          <label for="cat-form-name">Category Name</label>
+          <input type="text" class="form-control" id="cat-form-name" placeholder="e.g. Activewear">
+        </div>
+        <div class="form-group">
+          <label for="cat-form-subtitle">Subtitle</label>
+          <input type="text" class="form-control" id="cat-form-subtitle" placeholder="e.g. Premium Collection">
+        </div>
+        <div class="form-group">
+          <label for="cat-form-bg">Background Hex Color</label>
+          <input type="text" class="form-control" id="cat-form-bg" placeholder="e.g. #f3e8ff">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCategoryForm()">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coupon Modal -->
+  <div class="modal" id="coupon-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="coupon-modal-title">Create Coupon</h3>
+        <button onclick="closeCouponModal()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="coupon-form-id">
+        <div class="form-group">
+          <label for="coupon-form-code">Coupon Code</label>
+          <input type="text" class="form-control" id="coupon-form-code" placeholder="e.g. HYPE50">
+        </div>
+        <div class="form-group">
+          <label for="coupon-form-type">Discount Type</label>
+          <select class="form-control" id="coupon-form-type">
+            <option value="PERCENTAGE">Percentage (%)</option>
+            <option value="FIXED_AMOUNT">Fixed Amount (₹)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="coupon-form-value">Discount Value</label>
+          <input type="number" class="form-control" id="coupon-form-value" placeholder="e.g. 50">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCouponModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCouponForm()">Save Coupon</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Verification Modal -->
+  <div class="modal" id="payment-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Payment Verification Details</h3>
+        <button onclick="closePaymentModal()" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body" id="payment-modal-body">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closePaymentModal()">Close Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core admin scripts loading -->
+  <script src="admin.js"></script>
+
+</body>
+
+</html>

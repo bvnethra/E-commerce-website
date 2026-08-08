@@ -172,20 +172,29 @@
       </button>
 
       <!-- Search Bar -->
-      <div class="search-container">
+      <div class="search-container" style="position: relative; display: flex; align-items: center;">
         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
         <input type="text" id="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search for products, brands and more..."
-          aria-label="Search products">
+          aria-label="Search products" style="padding-right: 42px;">
+        <button id="voice-search-btn" title="Search by voice" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; outline: none; z-index: 5;">
+          <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; transition: transform 0.2s;">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Header Right Utilities -->
       <div class="header-right">
         <!-- Location Selector -->
-        <div class="location-selector" id="location-select">
+        <div class="location-selector" id="location-select" style="cursor: default;">
           <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -193,22 +202,8 @@
           </svg>
           <div class="location-info">
             <span class="location-label" data-i18n="deliver_to">Deliver to</span>
-            <button class="location-value-btn" aria-haspopup="listbox" aria-expanded="false">
-              <span id="current-location">India</span>
-              <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
+            <span id="current-location" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">India</span>
           </div>
-          <!-- Dropdown Options -->
-          <ul class="location-dropdown" id="location-dropdown" role="listbox" aria-label="Locations">
-            <li role="option" aria-selected="true" data-value="India">India</li>
-            <li role="option" aria-selected="false" data-value="USA">USA</li>
-            <li role="option" aria-selected="false" data-value="UK">UK</li>
-            <li role="option" aria-selected="false" data-value="Germany">Germany</li>
-            <li role="option" aria-selected="false" data-value="Japan">Japan</li>
-          </ul>
         </div>
 
         <!-- Cart Icon -->
@@ -375,7 +370,7 @@
       <section class="categories-section" style="margin-top: 50px; margin-bottom: 50px;">
         <div class="category-grid">
           <!-- Men Category -->
-          <a href="#" class="category-card" style="--card-bg: #f1f3e7;">
+          <a href="#" class="category-card" data-category="Men" style="--card-bg: #f1f3e7;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_men">Men</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -384,7 +379,7 @@
           </a>
 
           <!-- Women Category -->
-          <a href="#" class="category-card" style="--card-bg: #f9ebdf;">
+          <a href="#" class="category-card" data-category="Women" style="--card-bg: #f9ebdf;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_women">Women</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -393,7 +388,7 @@
           </a>
 
           <!-- Electronics Category -->
-          <a href="#" class="category-card" style="--card-bg: #e4edf7;">
+          <a href="#" class="category-card" data-category="Electronics" style="--card-bg: #e4edf7;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_electronics">Electronics</span>
               <span class="category-subtitle" data-i18n="subtitle_gadgets">Gadgets</span>
@@ -402,7 +397,7 @@
           </a>
 
           <!-- Shoes Category -->
-          <a href="#" class="category-card" style="--card-bg: #f5ece4;">
+          <a href="#" class="category-card" data-category="Shoes" style="--card-bg: #f5ece4;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_shoes">Shoes</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
@@ -411,7 +406,7 @@
           </a>
 
           <!-- Accessories Category -->
-          <a href="#" class="category-card" style="--card-bg: #ecdff9;">
+          <a href="#" class="category-card" data-category="Accessories" style="--card-bg: #ecdff9;">
             <div class="category-info">
               <span class="category-title" data-i18n="category_accessories">Accessories</span>
               <span class="category-subtitle" data-i18n="subtitle_collection">Collection</span>
